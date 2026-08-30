@@ -7,7 +7,15 @@ import { Helmet } from 'react-helmet-async';
 import './Admin.css';
 
 const STATUSES = ['pending','confirmed','processing','shipped','delivered','cancelled','refunded'];
-const BADGE = { pending:'badge-orange', confirmed:'badge-blue', processing:'badge-blue', shipped:'badge-blue', delivered:'badge-green', cancelled:'badge-red', refunded:'badge-gray' };
+const BADGE = {
+  pending:    'bg-orange-50 text-orange-700',
+  confirmed:  'bg-blue-50 text-blue-700',
+  processing: 'bg-indigo-50 text-indigo-700',
+  shipped:    'bg-cyan-50 text-cyan-700',
+  delivered:  'bg-green-50 text-green-700',
+  cancelled:  'bg-red-50 text-red-700',
+  refunded:   'bg-stone-100 text-stone-600',
+};
 
 export default function AdminOrders() {
   const [orders, setOrders]     = useState([]);
@@ -29,33 +37,59 @@ export default function AdminOrders() {
   };
 
   return (
-    <div className="admin-layout">
+    <div className="flex min-h-screen bg-[#FAF7F2]">
       <Helmet><title>Orders — Admin | Boomcoart</title></Helmet>
       <AdminNav />
-      <div className="admin-content">
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:12, marginBottom:24 }}>
-          <h1 className="admin-page-title" style={{ marginBottom:0 }}>Orders</h1>
-          <select className="form-input" style={{ width:'auto', minWidth:160 }} value={filter} onChange={e => setFilter(e.target.value)}>
-            <option value="">All Statuses</option>
-            {STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase()+s.slice(1)}</option>)}
-          </select>
-        </div>
 
-        {loading ? <Loader /> : (
-          <div className="card" style={{ padding:0, overflow:'hidden' }}>
-            <div className="table-wrap">
-              <table className="table">
-                <thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Update Status</th><th>Tracking #</th></tr></thead>
-                <tbody>
-                  {orders.map(o => (
-                    <OrderRow key={o._id} order={o} onUpdate={handleStatusUpdate} updating={updating === o._id} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
+      <main className="flex-1 min-w-0 overflow-x-hidden bg-[#FAF7F2]">
+        <div className="px-12 py-10">
+          {/* Page Header */}
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-serif text-[#123026]">Orders</h2>
+            <select 
+              className="border border-stone-200 rounded-lg px-4 py-2.5 text-sm bg-white text-[#123026] font-medium outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/10 transition-all shadow-sm cursor-pointer" 
+              style={{ minWidth: 180 }} 
+              value={filter} 
+              onChange={e => setFilter(e.target.value)}
+            >
+              <option value="">All Statuses</option>
+              {STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase()+s.slice(1)}</option>)}
+            </select>
           </div>
-        )}
-      </div>
+
+          {/* Orders Table */}
+          {loading ? <Loader /> : (
+            <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-left">
+                  <thead>
+                    <tr className="border-b border-stone-200 bg-stone-100">
+                      <th className="py-4 pl-8 pr-6 text-xs font-bold uppercase tracking-wider text-stone-500">Order ID</th>
+                      <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-500">Customer</th>
+                      <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-500">Items</th>
+                      <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-500">Total</th>
+                      <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-500">Status</th>
+                      <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-500">Update</th>
+                      <th className="py-4 pr-8 pl-6 text-xs font-bold uppercase tracking-wider text-stone-500">Tracking</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100">
+                    {orders.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="py-12 text-center text-stone-400 text-sm">No orders found.</td>
+                      </tr>
+                    ) : (
+                      orders.map(o => (
+                        <OrderRow key={o._id} order={o} onUpdate={handleStatusUpdate} updating={updating === o._id} />
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }
@@ -65,37 +99,71 @@ function OrderRow({ order: o, onUpdate, updating }) {
   const [tracking, setTracking] = useState(o.trackingNumber || '');
 
   return (
-    <tr>
-      <td>
-        <p style={{ fontFamily:'monospace', fontSize:13, fontWeight:600 }}>#{o._id.slice(-8).toUpperCase()}</p>
-        <p style={{ fontSize:12, color:'var(--gray-400)' }}>{new Date(o.createdAt).toLocaleDateString('en-IN')}</p>
-        <p style={{ fontSize:11, color: o.isPaid?'var(--green)':'var(--orange)', fontWeight:600, marginTop:2 }}>{o.isPaid?'PAID':o.paymentMethod==='cod'?'COD':'UNPAID'}</p>
+    <tr className="hover:bg-stone-50 transition-colors duration-100">
+      {/* Order ID */}
+      <td className="py-5 pl-8 pr-6 align-top">
+        <p className="font-medium text-[#123026] text-sm">#{o._id.slice(-8).toUpperCase()}</p>
+        <p className="text-xs text-stone-400 mt-1">{new Date(o.createdAt).toLocaleDateString('en-IN')}</p>
+        <p className={`text-xs font-semibold mt-1 ${o.isPaid ? 'text-green-600' : 'text-orange-600'}`}>
+          {o.isPaid ? 'PAID' : o.paymentMethod === 'cod' ? 'COD' : 'UNPAID'}
+        </p>
       </td>
-      <td>
-        <p style={{ fontWeight:600, color:'var(--navy)', fontSize:14 }}>{o.user?.name}</p>
-        <p style={{ fontSize:12, color:'var(--gray-400)' }}>{o.user?.email}</p>
+
+      {/* Customer */}
+      <td className="py-5 px-6 align-top">
+        <p className="font-medium text-[#123026] text-sm">{o.user?.name}</p>
+        <p className="text-xs text-stone-400 mt-0.5">{o.user?.email}</p>
       </td>
-      <td>
-        <div style={{ display:'flex', gap:4 }}>
-          {o.orderItems.slice(0,3).map(i => <img key={i._id} src={i.image} alt={i.name} style={{ width:36, height:44, objectFit:'cover', borderRadius:4 }} />)}
-          {o.orderItems.length>3 && <span style={{ fontSize:11, color:'var(--gray-400)', alignSelf:'center' }}>+{o.orderItems.length-3}</span>}
+
+      {/* Items */}
+      <td className="py-5 px-6 align-top">
+        <div className="flex gap-1.5 mb-1.5">
+          {o.orderItems.slice(0,3).map(i => <img key={i._id} src={i.image} alt={i.name} className="w-9 h-11 object-cover rounded-md shadow-sm border border-stone-100" />)}
+          {o.orderItems.length>3 && <span className="text-xs text-stone-400 self-center ml-1">+{o.orderItems.length-3}</span>}
         </div>
-        <p style={{ fontSize:11, color:'var(--gray-400)', marginTop:4 }}>{o.orderItems.length} item{o.orderItems.length>1?'s':''}</p>
+        <p className="text-xs text-stone-400">{o.orderItems.length} item{o.orderItems.length>1?'s':''}</p>
       </td>
-      <td style={{ fontWeight:700, color:'var(--navy)' }}>₹{o.totalPrice?.toLocaleString()}</td>
-      <td><span className={`badge ${BADGE[o.orderStatus]||'badge-gray'}`}>{o.orderStatus}</span></td>
-      <td>
-        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-          <select className="form-input" style={{ fontSize:13, padding:'6px 10px' }} value={status} onChange={e => setStatus(e.target.value)}>
+
+      {/* Total */}
+      <td className="py-5 px-6 font-bold text-[#123026] align-top text-sm">
+        ₹{o.totalPrice?.toLocaleString()}
+      </td>
+
+      {/* Status Badge */}
+      <td className="py-5 px-6 align-top">
+        <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${BADGE[o.orderStatus] || 'bg-stone-100 text-stone-600'}`}>
+          {o.orderStatus}
+        </span>
+      </td>
+
+      {/* Update Status */}
+      <td className="py-5 px-6 align-top">
+        <div className="flex flex-col gap-2" style={{ minWidth: 120 }}>
+          <select 
+            className="border border-stone-200 rounded-lg px-3 py-1.5 text-xs bg-white text-stone-700 outline-none focus:border-[#D4AF37] w-full" 
+            value={status} 
+            onChange={e => setStatus(e.target.value)}
+          >
             {STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase()+s.slice(1)}</option>)}
           </select>
-          <button className="btn btn-primary btn-sm" disabled={updating} onClick={() => onUpdate(o._id, status, tracking)}>
+          <button 
+            className="bg-[#123026] hover:bg-[#0d221b] text-white transition-colors py-1.5 rounded-lg text-xs font-semibold shadow-sm" 
+            disabled={updating} 
+            onClick={() => onUpdate(o._id, status, tracking)}
+          >
             {updating ? '…' : 'Update'}
           </button>
         </div>
       </td>
-      <td>
-        <input className="form-input" style={{ fontSize:13, padding:'6px 10px', width:130 }} placeholder="Enter tracking #" value={tracking} onChange={e => setTracking(e.target.value)} />
+
+      {/* Tracking # */}
+      <td className="py-5 pr-8 pl-6 align-top">
+        <input 
+          className="border border-stone-200 rounded-lg px-3 py-2 text-xs bg-white w-32 outline-none focus:border-[#D4AF37] shadow-sm" 
+          placeholder="Enter tracking #" 
+          value={tracking} 
+          onChange={e => setTracking(e.target.value)} 
+        />
       </td>
     </tr>
   );

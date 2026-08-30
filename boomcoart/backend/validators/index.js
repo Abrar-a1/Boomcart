@@ -26,6 +26,18 @@ const authSchemas = {
   }),
 };
 
+const userSchemas = {
+  addAddress: Joi.object({
+    addressLine1: Joi.string().required(),
+    addressLine2: Joi.string().allow('', null),
+    city: Joi.string().required(),
+    state: Joi.string().required(),
+    pincode: Joi.string().required(),
+    phone: Joi.string().required(),
+    isDefault: Joi.boolean().default(false)
+  }),
+};
+
 const productSchemas = {
   create: Joi.object({
     name: Joi.string().trim().max(120).required(),
@@ -77,4 +89,57 @@ const appointmentSchemas = {
   })
 };
 
-module.exports = { authSchemas, productSchemas, appointmentSchemas };
+const orderSchemas = {
+  create: Joi.object({
+    orderItems: Joi.array().items(
+      Joi.object({
+        product: Joi.string().required(),
+        name: Joi.string().required(),
+        image: Joi.string().required(),
+        price: Joi.number().required(),
+        quantity: Joi.number().min(1).required(),
+        size: Joi.string().allow('', null)
+      })
+    ).min(1).required(),
+    shippingAddress: Joi.object({
+      addressLine1: Joi.string().required(),
+      addressLine2: Joi.string().allow('', null),
+      city: Joi.string().required(),
+      state: Joi.string().required(),
+      pincode: Joi.string().required(),
+      phone: Joi.string().required()
+    }).required(),
+    paymentMethod: Joi.string().valid('cod', 'razorpay').required(),
+    itemsPrice: Joi.number().min(0).required(),
+    shippingPrice: Joi.number().min(0).required(),
+    taxPrice: Joi.number().min(0).required(),
+    totalPrice: Joi.number().min(0).required(),
+    couponCode: Joi.string().allow('', null),
+    discountAmount: Joi.number().min(0).default(0)
+  })
+};
+
+const reviewSchemas = {
+  create: Joi.object({
+    productId: Joi.string().required(),
+    rating: Joi.number().min(1).max(5).required(),
+    title: Joi.string().max(100).required(),
+    comment: Joi.string().max(1000).required()
+  })
+};
+
+const paymentSchemas = {
+  createOrder: Joi.object({
+    amount: Joi.number().positive().required(),
+    currency: Joi.string().default('INR'),
+    orderId: Joi.string().allow('', null)
+  }),
+  verify: Joi.object({
+    razorpay_order_id: Joi.string().required(),
+    razorpay_payment_id: Joi.string().required(),
+    razorpay_signature: Joi.string().required(),
+    orderId: Joi.string().required()
+  })
+};
+
+module.exports = { authSchemas, userSchemas, productSchemas, appointmentSchemas, orderSchemas, reviewSchemas, paymentSchemas };

@@ -8,7 +8,11 @@ const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) { res.status(400); throw new Error('All fields required'); }
   if (await User.findOne({ email })) { res.status(400); throw new Error('Email already registered'); }
-  const user = await User.create({ name, email, password });
+  
+  // Only the specific email defined in .env gets admin access. Everyone else is a normal user.
+  const role = (process.env.ADMIN_EMAIL && email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()) ? 'admin' : 'user';
+  
+  const user = await User.create({ name, email, password, role });
   res.status(201).json({
     success: true,
     data: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar, token: generateToken(user._id) },
@@ -60,14 +64,25 @@ const forgotPassword = asyncHandler(async (req, res) => {
   user.resetPasswordToken  = crypto.createHash('sha256').update(token).digest('hex');
   user.resetPasswordExpire = Date.now() + 30 * 60 * 1000;
   await user.save({ validateBeforeSave: false });
-  const resetUrl = `${process.env.CLIENT_URL}/reset-password/${token}`;
+  const clientUrls = (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map(s => s.trim());
+  const baseUrl = req.headers.origin || clientUrls[0];
+  const resetUrl = `${baseUrl}/reset-password/${token}`;
+  
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`\n========================================`);
+    console.log(`🔐 PASSWORD RESET LINK:`);
+    console.log(resetUrl);
+    console.log(`========================================\n`);
+  }
+
   try {
     await sendEmail({
       to: user.email,
       subject: 'Password Reset — Boomcoart',
       html: `<p>Hi ${user.name},</p><p>Click the link below to reset your password (valid for 30 min):</p><p><a href="${resetUrl}" style="color:#1a1a2e;font-weight:700">${resetUrl}</a></p><p>If you didn't request this, ignore this email.</p>`,
     });
-  } catch {
+  } catch (error) {
+    console.error('Email sending failed:', error.message);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     await user.save({ validateBeforeSave: false });

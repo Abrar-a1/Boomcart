@@ -5,41 +5,160 @@
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background: var(--cream);
+  background: var(--color-background, #FDF7F0);
 }
 
 .auth-card {
-  background: var(--white);
-  border-radius: var(--radius-xl);
-  padding: 40px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 48px 40px;
   width: 100%;
-  max-width: 440px;
-  box-shadow: var(--shadow-lg);
+  max-width: 460px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  display: flex;
+  flex-direction: column;
 }
 
+/* ─── Typography & Hierarchy ──────────────────────────────── */
 .auth-logo {
-  font-family: var(--font-serif);
-  font-size: 28px;
-  color: var(--navy);
+  font-family: var(--font-heading);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-primary, #1E3A3A);
   text-align: center;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .auth-subtitle {
   text-align: center;
-  color: var(--gray-400);
-  font-size: 14px;
-  margin-bottom: 32px;
+  color: var(--color-text-muted, #6b7c6e);
+  font-size: 15px;
+  margin-bottom: 36px;
 }
 
+/* ─── Form Layout & Spacing ───────────────────────────────── */
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
+  width: 100%;
 }
 
-.auth-submit {
-  margin-top: 4px;
+/* ─── Input Field Design ──────────────────────────────────── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Slightly more space between label and input */
+  text-align: left;
+  width: 100%;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text, #2C3E2F);
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 16px; /* Added slightly more padding */
+  background-color: #fafafa;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--color-text, #2C3E2F);
+  transition: all 0.2s ease;
+  font-family: var(--font-body);
+}
+
+.form-input::placeholder {
+  color: #6B7280; /* Darker placeholder for contrast */
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-accent, #D4AF37); /* Gold focus */
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15); /* Gold glow */
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: var(--color-accent, #D4AF37);
+}
+
+/* ─── Call-to-Action (CTA) Button ─────────────────────────── */
+.btn-primary.auth-submit {
+  width: 100%;
+  background-color: var(--color-primary, #1E3A3A);
+  color: #ffffff;
+  border: none;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-primary.auth-submit:hover:not(:disabled) {
+  background-color: var(--color-accent, #D4AF37); /* Gold on hover */
+  color: var(--color-primary, #1E3A3A); /* Dark text on gold */
+}
+
+.btn-primary.auth-submit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-primary.auth-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ─── Footer Links ────────────────────────────────────────── */
+.auth-switch {
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-muted, #6b7c6e);
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.auth-switch a {
+  color: var(--color-primary, #1E3A3A);
+  font-weight: 600;
+  margin-left: 4px;
+  transition: all 0.2s ease;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+  color: var(--color-accent, #D4AF37);
 }
 
 /* ─── Auth Divider ────────────────────────────────────────── */
@@ -47,7 +166,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 4px 0;
+  margin: 16px 0;
 }
 
 .auth-divider::before,
@@ -55,27 +174,10 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: var(--gray-100);
+  background: #e2e8f0;
 }
 
 .auth-divider span {
   font-size: 13px;
-  color: var(--gray-400);
-}
-
-/* ─── Auth Switch Link ────────────────────────────────────── */
-.auth-switch {
-  text-align: center;
-  font-size: 14px;
-  color: var(--gray-500);
-  margin-top: 8px;
-}
-
-.auth-switch a {
-  color: var(--navy);
-  font-weight: 700;
-}
-
-.auth-switch a:hover {
-  text-decoration: underline;
+  color: #94a3b8;
 }

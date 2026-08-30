@@ -29,56 +29,109 @@ export default function AdminUsers() {
   };
 
   return (
-    <div className="admin-layout">
+    <div className="flex min-h-screen bg-[#FAF7F2]">
       <Helmet><title>Users — Admin | Boomcoart</title></Helmet>
       <AdminNav />
-      <div className="admin-content">
-        <h1 className="admin-page-title">Users</h1>
-        {loading ? <Loader /> : (
-          <div className="card" style={{ padding:0, overflow:'hidden' }}>
-            <div className="table-wrap">
-              <table className="table">
-                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
-                <tbody>
-                  {users.map(u => (
-                    <tr key={u._id}>
-                      <td>
-                        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                          <div style={{ width:36, height:36, borderRadius:'50%', background:'var(--navy)', color:'var(--gold)', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:700, fontSize:14, flexShrink:0 }}>
-                            {u.name?.[0]?.toUpperCase()}
-                          </div>
-                          <span style={{ fontWeight:600, color:'var(--navy)', fontSize:14 }}>{u.name}</span>
-                        </div>
-                      </td>
-                      <td style={{ fontSize:14, color:'var(--gray-600)' }}>{u.email}</td>
-                      <td>
-                        <span className={`badge ${u.role==='admin'?'badge-navy':'badge-gray'}`}>
-                          {u.role==='admin' && <FiShield size={11} style={{ marginRight:4 }} />}
-                          {u.role}
-                        </span>
-                      </td>
-                      <td><span className={`badge ${u.isActive?'badge-green':'badge-red'}`}>{u.isActive?'Active':'Inactive'}</span></td>
-                      <td style={{ fontSize:13, color:'var(--gray-400)' }}>{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
-                      <td>
-                        <div style={{ display:'flex', gap:6 }}>
-                          <button className="btn btn-outline btn-sm" onClick={() => toggleRole(u)} title={u.role==='admin'?'Revoke admin':'Make admin'}>
-                            <FiShield size={13}/> {u.role==='admin'?'Revoke':'Admin'}
-                          </button>
-                          {u.isActive && (
-                            <button className="btn btn-danger btn-sm" onClick={() => deactivate(u)} title="Deactivate">
-                              <FiUserX size={13}/>
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+
+      <main className="flex-1 min-w-0 overflow-x-hidden bg-[#FAF7F2]">
+        <div className="px-12 py-10">
+          {/* Page Header */}
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-serif text-[#123026]">Users</h2>
+            <span className="text-sm text-stone-400 font-medium">
+              {users.length} user{users.length !== 1 ? 's' : ''} total
+            </span>
           </div>
-        )}
-      </div>
+          
+          {/* Users Table */}
+          {loading ? <Loader /> : (
+            <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-left">
+                  <thead>
+                    <tr className="border-b border-stone-200 bg-stone-100">
+                      <th className="py-4 pl-8 pr-6 text-xs font-bold uppercase tracking-wider text-stone-500">Name</th>
+                      <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-500">Email</th>
+                      <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-500">Role</th>
+                      <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-500">Status</th>
+                      <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-500">Joined</th>
+                      <th className="py-4 pr-8 pl-6 text-xs font-bold uppercase tracking-wider text-stone-500 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100">
+                    {users.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-12 text-center text-stone-400 text-sm">No users found.</td>
+                      </tr>
+                    ) : (
+                      users.map(u => (
+                        <tr key={u._id} className="hover:bg-stone-50 transition-colors duration-100">
+                          {/* Name + Avatar */}
+                          <td className="py-5 pl-8 pr-6">
+                            <div className="flex items-center gap-3">
+                              <span className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-xs font-bold text-[#123026] shrink-0 border border-stone-200/60">
+                                {u.name?.[0]?.toUpperCase()}
+                              </span>
+                              <span className="font-medium text-[#123026] text-sm">{u.name}</span>
+                            </div>
+                          </td>
+
+                          {/* Email */}
+                          <td className="py-5 px-6 text-stone-500 text-sm">{u.email}</td>
+
+                          {/* Role */}
+                          <td className="py-5 px-6">
+                            <span className={`inline-flex items-center gap-1 text-xs uppercase px-2.5 py-1 rounded-full font-semibold tracking-wide ${
+                              u.role === 'admin' ? 'bg-[#123026] text-[#D4AF37]' : 'bg-stone-100 text-stone-600'
+                            }`}>
+                              {u.role === 'admin' && <FiShield size={11} />}
+                              {u.role}
+                            </span>
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-5 px-6">
+                            <span className={`inline-flex text-xs px-2.5 py-1 rounded-full font-semibold ${
+                              u.isActive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'
+                            }`}>
+                              {u.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                          </td>
+
+                          {/* Joined */}
+                          <td className="py-5 px-6 text-stone-500 text-sm">{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
+
+                          {/* Actions */}
+                          <td className="py-5 pr-8 pl-6 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button 
+                                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border border-stone-200 text-stone-600 rounded-lg hover:bg-stone-50 hover:border-stone-300 transition-all" 
+                                onClick={() => toggleRole(u)} 
+                                title={u.role === 'admin' ? 'Revoke admin' : 'Make admin'}
+                              >
+                                <FiShield size={12}/> {u.role === 'admin' ? 'Revoke' : 'Admin'}
+                              </button>
+                              {u.isActive && (
+                                <button 
+                                  className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 hover:border-red-300 transition-all" 
+                                  onClick={() => deactivate(u)} 
+                                  title="Deactivate"
+                                >
+                                  <FiUserX size={12}/> Disable
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }

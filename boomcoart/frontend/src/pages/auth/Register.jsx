@@ -3,12 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import './Auth.css';
 
 export default function Register() {
   const { register, loading } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ name:'', email:'', password:'', confirm:'' });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,8 +35,18 @@ export default function Register() {
           ].map(f => (
             <div key={f.n} className="form-group">
               <label>{f.l}</label>
-              <input type={f.t} className="form-input" placeholder={f.p}
-                value={form[f.n]} onChange={e => setForm({...form, [f.n]: e.target.value})} required />
+              {f.t === 'password' ? (
+                <div className="password-wrapper">
+                  <input type={showPassword ? 'text' : 'password'} className="form-input" placeholder={f.p}
+                    value={form[f.n]} onChange={e => setForm({...form, [f.n]: e.target.value})} required style={{ paddingRight: '40px' }} />
+                  <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                  </button>
+                </div>
+              ) : (
+                <input type={f.t} className="form-input" placeholder={f.p}
+                  value={form[f.n]} onChange={e => setForm({...form, [f.n]: e.target.value})} required />
+              )}
             </div>
           ))}
           <button className="btn btn-primary btn-block btn-lg auth-submit" type="submit" disabled={loading}>

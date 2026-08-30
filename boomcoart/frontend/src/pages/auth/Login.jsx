@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Helmet } from 'react-helmet-async';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import './Auth.css';
 
 export default function Login() {
@@ -10,6 +11,7 @@ export default function Login() {
   const location = useLocation();
   const from = location.state?.from || '/';
   const [form, setForm] = useState({ email:'', password:'' });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,15 +33,20 @@ export default function Login() {
           </div>
           <div className="form-group">
             <label>Password</label>
-            <input type="password" className="form-input" placeholder="••••••••" value={form.password}
-              onChange={e => setForm({...form, password:e.target.value})} required />
+            <div className="password-wrapper">
+              <input type={showPassword ? 'text' : 'password'} className="form-input" placeholder="••••••••" value={form.password}
+                onChange={e => setForm({...form, password:e.target.value})} required style={{ paddingRight: '40px' }} />
+              <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+              </button>
+            </div>
           </div>
           <button className="btn btn-primary btn-block btn-lg auth-submit" type="submit" disabled={loading}>
             {loading ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
-        <div style={{ textAlign:'right', marginTop:-8, marginBottom:4 }}>
-          <Link to="/forgot-password" style={{ fontSize:13, color:'var(--gray-400)' }}>Forgot password?</Link>
+        <div style={{ textAlign: 'right', marginTop: '16px', marginBottom: '8px' }}>
+          <Link to="/forgot-password" style={{ fontSize: '14px', color: 'var(--color-text-muted, #6b7c6e)', padding: '8px 4px', display: 'inline-block', fontWeight: '500', transition: 'color 0.2s' }}>Forgot password?</Link>
         </div>
         <div className="auth-switch" style={{ marginTop:20 }}>
           Don't have an account? <Link to="/register">Create one</Link>

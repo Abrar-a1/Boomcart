@@ -47,15 +47,17 @@ app.use(mongoSanitize());
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
 // Strict rate limit on Auth to deter credential stuffing (max 5 requests per 15 minutes per IP)
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5, message: 'Too many login attempts, try again after 15 minutes' });
+// Transaction limit for orders/payments to prevent abuse/spam
+const transactionLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: 'Too many transactions, please try again later' });
 app.use('/api/', limiter);
 
 app.get('/api/health', (req, res) => res.json({ status: 'OK', app: 'Boomcoart API' }));
 app.use('/api/auth',     authLimiter, authRoutes);
 app.use('/api/products', productRoutes);
-app.use('/api/orders',   orderRoutes);
+app.use('/api/orders',   transactionLimiter, orderRoutes);
 app.use('/api/users',    userRoutes);
 app.use('/api/reviews',  reviewRoutes);
-app.use('/api/payments', paymentRoutes);
+app.use('/api/payments', transactionLimiter, paymentRoutes);
 app.use('/api/appointments', appointmentRoutes);
 
 app.use(notFound);
