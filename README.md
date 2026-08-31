@@ -1,4 +1,4 @@
-# Boomcoart — Fashion E-commerce
+# Boomcart — Fashion E-commerce
 
 A full-stack fashion e-commerce platform built with React, Node.js, MongoDB, Cloudinary and Razorpay.
 
