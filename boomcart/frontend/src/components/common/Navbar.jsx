@@ -65,7 +65,7 @@ export default function Navbar() {
           </div>
 
           {/* ── Center: Navigation — box model: each link has its own padding ── */}
-          <nav className="hidden md:flex" style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <nav className="hidden md:flex" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             {NAV_LINKS.map(([label, href]) => (
               <Link key={label} to={href}
                 style={{ 

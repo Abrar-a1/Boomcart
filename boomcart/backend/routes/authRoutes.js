@@ -12,5 +12,5 @@ r.get('/me', protect, getMe);
 r.put('/update-profile', protect, validate(authSchemas.updateProfile), updateProfile);
 r.put('/change-password', protect, validate(authSchemas.changePassword), changePassword);
 r.post('/forgot-password', validate(authSchemas.forgotPassword), forgotPassword);
-r.put('/reset-password/:token', validate(authSchemas.resetPassword), resetPassword);
+r.post('/reset-password', validate(authSchemas.resetPassword), resetPassword);
 module.exports = r;
