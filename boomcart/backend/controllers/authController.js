@@ -77,18 +77,18 @@ const forgotPassword = asyncHandler(async (req, res) => {
     console.log(`========================================\n`);
   }
 
-  try {
-    await sendEmail({
-      to: user.email,
-      subject: 'Password Reset OTP — Boomcart',
-      html: `<p>Hi ${user.name},</p><p>Your password reset OTP is:</p><h2 style="color:#1a1a2e;font-size:32px;letter-spacing:4px;text-align:center;padding:20px;background:#f4f4f4;border-radius:8px;width:fit-content">${otp}</h2><p>This OTP is valid for 15 minutes.</p><p>If you didn't request this, ignore this email.</p>`,
-    });
-  } catch (error) {
+  // Send email asynchronously (fire and forget) to prevent slow API response
+  sendEmail({
+    to: user.email,
+    subject: 'Password Reset OTP — Boomcart',
+    html: `<p>Hi ${user.name},</p><p>Your password reset OTP is:</p><h2 style="color:#1a1a2e;font-size:32px;letter-spacing:4px;text-align:center;padding:20px;background:#f4f4f4;border-radius:8px;width:fit-content">${otp}</h2><p>This OTP is valid for 15 minutes.</p><p>If you didn't request this, ignore this email.</p>`,
+  }).catch(async (error) => {
     console.error('Email sending failed:', error.message);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     await user.save({ validateBeforeSave: false });
-  }
+  });
+
   res.json({ success: true, message: 'If that email exists, an OTP was sent.' });
 });
 
