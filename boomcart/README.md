@@ -24,8 +24,8 @@ A full-stack fashion e-commerce platform built with React, Node.js, MongoDB, Clo
 ### 1. Clone & install
 
 ```bash
-git clone https://github.com/Abrar-a1/Boomcart.git
-cd Boomcart/boomcart
+git clone <your-repo-url>
+cd boomcart
 npm install          # installs concurrently at root
 npm run install-all  # installs backend + frontend deps
 ```
