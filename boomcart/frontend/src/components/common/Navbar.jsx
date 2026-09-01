@@ -103,7 +103,7 @@ export default function Navbar() {
                   <span className="hidden sm:inline">Search...</span>
                 </button>
               ) : (
-                <form onSubmit={handleSearch} className="animate-fade-in" style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: '320px', display: 'flex', alignItems: 'center', backgroundColor: '#fff', borderRadius: '999px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', border: '2px solid #D4AF37' }}>
+                <form onSubmit={handleSearch} className="animate-fade-in w-[220px] sm:w-[320px]" style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', backgroundColor: '#fff', borderRadius: '999px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', border: '2px solid #D4AF37' }}>
                   <input
                     autoFocus
                     type="text"
