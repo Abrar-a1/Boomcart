@@ -29,6 +29,9 @@ scheduleCloudinaryCleanup(); // Auto-delete expired media daily
 
 const app = express();
 
+// Trust the reverse proxy (Render) so rate limiting works correctly based on client IPs
+app.set('trust proxy', 1);
+
 app.use(helmet());
 // Support multiple comma-separated origins (e.g. "http://localhost:5173,https://boomcart.vercel.app")
 const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map(s => s.trim());
