@@ -5,6 +5,10 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
+const dns = require('dns');
+
+// Use Google DNS to resolve MongoDB Atlas hostnames (fixes router DNS issues)
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 dotenv.config();
 

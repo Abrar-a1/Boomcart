@@ -61,27 +61,38 @@ const changePassword = asyncHandler(async (req, res) => {
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email }).select('+resetPasswordToken +resetPasswordExpire');
-  if (!user) return res.json({ success: true, message: 'If that email exists, an OTP was sent.' });
+  if (!user) return res.json({ success: true, message: 'If that email exists, a reset link was sent.' });
   
-  // Generate 6-digit OTP
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  // Generate a secure random token
+  const resetToken = crypto.randomBytes(32).toString('hex');
   
-  // Hash OTP and set expire
-  user.resetPasswordToken  = crypto.createHash('sha256').update(otp).digest('hex');
+  // Hash the token and store in database
+  user.resetPasswordToken  = crypto.createHash('sha256').update(resetToken).digest('hex');
   user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 mins
   await user.save({ validateBeforeSave: false });
   
+  const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+  
   if (process.env.NODE_ENV === 'development') {
     console.log(`\n========================================`);
-    console.log(`🔐 PASSWORD RESET OTP: ${otp}`);
+    console.log(`🔐 PASSWORD RESET LINK: ${resetUrl}`);
     console.log(`========================================\n`);
   }
 
   // Send email asynchronously (fire and forget) to prevent slow API response
   sendEmail({
     to: user.email,
-    subject: 'Password Reset OTP — Boomcart',
-    html: `<p>Hi ${user.name},</p><p>Your password reset OTP is:</p><h2 style="color:#1a1a2e;font-size:32px;letter-spacing:4px;text-align:center;padding:20px;background:#f4f4f4;border-radius:8px;width:fit-content">${otp}</h2><p>This OTP is valid for 15 minutes.</p><p>If you didn't request this, ignore this email.</p>`,
+    subject: 'Password Reset — Boomcart',
+    html: `<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#fff;border-radius:12px">
+      <h2 style="color:#1a1a2e;margin-bottom:8px">Hi ${user.name},</h2>
+      <p style="color:#555;font-size:15px;line-height:1.6">We received a request to reset your password. Click the button below to set a new password:</p>
+      <div style="text-align:center;margin:28px 0">
+        <a href="${resetUrl}" style="background:#1E3A3A;color:#fff;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:600;font-size:16px;display:inline-block">Reset Password</a>
+      </div>
+      <p style="color:#888;font-size:13px;line-height:1.6">This link is valid for <strong>15 minutes</strong>. If you didn't request this, you can safely ignore this email.</p>
+      <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
+      <p style="color:#aaa;font-size:12px;text-align:center">© ${new Date().getFullYear()} Boomcart. All rights reserved.</p>
+    </div>`,
   }).catch(async (error) => {
     console.error('Email sending failed:', error.message);
     user.resetPasswordToken = undefined;
@@ -89,21 +100,20 @@ const forgotPassword = asyncHandler(async (req, res) => {
     await user.save({ validateBeforeSave: false });
   });
 
-  res.json({ success: true, message: 'If that email exists, an OTP was sent.' });
+  res.json({ success: true, message: 'If that email exists, a reset link was sent.' });
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
-  const { email, otp, password } = req.body;
-  if (!email || !otp || !password) { res.status(400); throw new Error('Email, OTP, and new password are required'); }
+  const { token, password } = req.body;
+  if (!token || !password) { res.status(400); throw new Error('Token and new password are required'); }
 
-  const hashedOTP = crypto.createHash('sha256').update(otp.toString()).digest('hex');
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
   const user = await User.findOne({ 
-    email,
-    resetPasswordToken: hashedOTP, 
+    resetPasswordToken: hashedToken, 
     resetPasswordExpire: { $gt: Date.now() } 
   }).select('+resetPasswordToken +resetPasswordExpire');
   
-  if (!user) { res.status(400); throw new Error('Invalid or expired OTP'); }
+  if (!user) { res.status(400); throw new Error('Invalid or expired reset link'); }
   
   user.password = password;
   user.resetPasswordToken = undefined;
