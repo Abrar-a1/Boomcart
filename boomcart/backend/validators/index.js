@@ -22,7 +22,8 @@ const authSchemas = {
     email: Joi.string().email().required(),
   }),
   resetPassword: Joi.object({
-    token: Joi.string().required(),
+    email: Joi.string().email().required(),
+    otp: Joi.string().length(6).required(),
     password: Joi.string().min(6).required(),
   }),
 };

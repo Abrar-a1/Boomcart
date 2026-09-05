@@ -22,7 +22,8 @@ const register = asyncHandler(async (req, res) => {
 });
 
 const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { password } = req.body;
+  const email = req.body.email?.trim().toLowerCase();
   if (!email || !password) { res.status(400); throw new Error('Email and password required'); }
   const user = await User.findOne({ email }).select('+password');
   if (!user || !(await user.matchPassword(password))) { res.status(401); throw new Error('Invalid credentials'); }
@@ -59,65 +60,69 @@ const changePassword = asyncHandler(async (req, res) => {
 });
 
 const forgotPassword = asyncHandler(async (req, res) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email }).select('+resetPasswordToken +resetPasswordExpire');
-  if (!user) return res.json({ success: true, message: 'If that email exists, a reset link was sent.' });
+  const email = req.body.email?.trim().toLowerCase();
+  const user = await User.findOne({ email }).select('+resetPasswordOtp +resetPasswordOtpExpire');
+  if (!user) return res.json({ success: true, message: 'If that email exists, an OTP was sent.' });
   
-  // Generate a secure random token
-  const resetToken = crypto.randomBytes(32).toString('hex');
+  // Generate a secure 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
   
-  // Hash the token and store in database
-  user.resetPasswordToken  = crypto.createHash('sha256').update(resetToken).digest('hex');
-  user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 mins
+  // Hash the OTP and store in database
+  user.resetPasswordOtp  = crypto.createHash('sha256').update(otp).digest('hex');
+  user.resetPasswordOtpExpire = Date.now() + 15 * 60 * 1000; // 15 mins
   await user.save({ validateBeforeSave: false });
-  
-  const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
   
   if (process.env.NODE_ENV === 'development') {
     console.log(`\n========================================`);
-    console.log(`🔐 PASSWORD RESET LINK: ${resetUrl}`);
+    console.log(`🔐 PASSWORD RESET OTP: ${otp}`);
     console.log(`========================================\n`);
   }
 
-  // Send email asynchronously (fire and forget) to prevent slow API response
-  sendEmail({
-    to: user.email,
-    subject: 'Password Reset — Boomcart',
-    html: `<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#fff;border-radius:12px">
-      <h2 style="color:#1a1a2e;margin-bottom:8px">Hi ${user.name},</h2>
-      <p style="color:#555;font-size:15px;line-height:1.6">We received a request to reset your password. Click the button below to set a new password:</p>
-      <div style="text-align:center;margin:28px 0">
-        <a href="${resetUrl}" style="background:#1E3A3A;color:#fff;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:600;font-size:16px;display:inline-block">Reset Password</a>
-      </div>
-      <p style="color:#888;font-size:13px;line-height:1.6">This link is valid for <strong>15 minutes</strong>. If you didn't request this, you can safely ignore this email.</p>
-      <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
-      <p style="color:#aaa;font-size:12px;text-align:center">© ${new Date().getFullYear()} Boomcart. All rights reserved.</p>
-    </div>`,
-  }).catch(async (error) => {
+  // Send email and wait for result so we can return error if it fails
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: 'Password Reset OTP — Boomcart',
+      html: `<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#fff;border-radius:12px">
+        <h2 style="color:#1a1a2e;margin-bottom:8px">Hi ${user.name},</h2>
+        <p style="color:#555;font-size:15px;line-height:1.6">We received a request to reset your password. Use the OTP below to set a new password:</p>
+        <div style="text-align:center;margin:28px 0">
+          <div style="background:#1E3A3A;color:#fff;padding:14px 36px;border-radius:8px;font-weight:700;font-size:24px;letter-spacing:4px;display:inline-block">${otp}</div>
+        </div>
+        <p style="color:#888;font-size:13px;line-height:1.6">This OTP is valid for <strong>15 minutes</strong>. If you didn't request this, you can safely ignore this email.</p>
+        <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
+        <p style="color:#aaa;font-size:12px;text-align:center">© ${new Date().getFullYear()} Boomcart. All rights reserved.</p>
+      </div>`,
+    });
+    res.json({ success: true, message: 'If that email exists, an OTP was sent.' });
+  } catch (error) {
     console.error('Email sending failed:', error.message);
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
+    user.resetPasswordOtp = undefined;
+    user.resetPasswordOtpExpire = undefined;
     await user.save({ validateBeforeSave: false });
-  });
-
-  res.json({ success: true, message: 'If that email exists, a reset link was sent.' });
+    res.status(500);
+    throw new Error('Failed to send email. Please check email configuration.');
+  }
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
-  const { token, password } = req.body;
-  if (!token || !password) { res.status(400); throw new Error('Token and new password are required'); }
-
-  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-  const user = await User.findOne({ 
-    resetPasswordToken: hashedToken, 
-    resetPasswordExpire: { $gt: Date.now() } 
-  }).select('+resetPasswordToken +resetPasswordExpire');
+  const { otp, password } = req.body;
+  const email = req.body.email?.trim().toLowerCase();
   
-  if (!user) { res.status(400); throw new Error('Invalid or expired reset link'); }
+  if (!email || !otp || !password) { res.status(400); throw new Error('Email, OTP, and new password are required'); }
+
+  const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
+  const user = await User.findOne({ 
+    email,
+    resetPasswordOtp: hashedOtp, 
+    resetPasswordOtpExpire: { $gt: Date.now() } 
+  }).select('+resetPasswordOtp +resetPasswordOtpExpire');
+  
+  if (!user) { res.status(400); throw new Error('Invalid or expired OTP'); }
   
   user.password = password;
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpire = undefined;
+  user.resetPasswordOtp = undefined;
+  user.resetPasswordOtpExpire = undefined;
   await user.save();
   res.json({ success: true, message: 'Password reset successful', data: { token: generateToken(user._id) } });
 });

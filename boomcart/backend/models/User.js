@@ -21,8 +21,8 @@ const userSchema = new mongoose.Schema({
   addresses: [addressSchema],
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   isActive: { type: Boolean, default: true },
-  resetPasswordToken: { type: String, select: false },
-  resetPasswordExpire: { type: Date, select: false },
+  resetPasswordOtp: { type: String, select: false },
+  resetPasswordOtpExpire: { type: Date, select: false },
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

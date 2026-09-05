@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { resetPassword } from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -8,12 +8,14 @@ import { FiEye, FiEyeOff } from 'react-icons/fi';
 import './Auth.css';
 
 export default function ResetPassword() {
-  const { token } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { updateUser } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState(location.state?.email || '');
+  const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
 
@@ -21,9 +23,11 @@ export default function ResetPassword() {
     e.preventDefault();
     if (password !== confirm) return toast.error('Passwords do not match');
     if (password.length < 6) return toast.error('Password must be at least 6 characters');
+    if (!email) return toast.error('Email is required');
+    if (!otp || otp.length !== 6) return toast.error('Please enter a valid 6-digit OTP');
     setLoading(true);
     try {
-      const { data } = await resetPassword({ token, password });
+      const { data } = await resetPassword({ email, otp, password });
       updateUser({ token: data.data.token });
       toast.success('Password reset! You are now logged in.');
       navigate('/');
@@ -37,9 +41,21 @@ export default function ResetPassword() {
       <Helmet><title>Reset Password — Boomcart</title></Helmet>
       <div className="auth-card">
         <h1 className="auth-logo">Boomcart</h1>
-        <p className="auth-subtitle">Enter your new password below.</p>
+        <p className="auth-subtitle">Enter your email, the 6-digit OTP, and new password below.</p>
 
         <form className="auth-form" onSubmit={handleResetPassword}>
+          <div className="form-group">
+            <label>Email Address</label>
+            <input type="email" className="form-input" placeholder="you@example.com"
+              value={email} onChange={e => setEmail(e.target.value)} required />
+          </div>
+
+          <div className="form-group">
+            <label>6-Digit OTP</label>
+            <input type="text" className="form-input" placeholder="Enter OTP from email"
+              value={otp} onChange={e => setOtp(e.target.value)} required maxLength={6} style={{ letterSpacing: '2px', fontWeight: 'bold' }} />
+          </div>
+
           {[
             { n:'password', l:'New Password',     p:'Min. 6 characters', v: password, set: setPassword },
             { n:'confirm',  l:'Confirm Password', p:'Re-enter password', v: confirm, set: setConfirm  },
