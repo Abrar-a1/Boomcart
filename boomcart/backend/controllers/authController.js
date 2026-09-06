@@ -16,16 +16,24 @@ const sendOtp = asyncHandler(async (req, res) => {
   if (type === 'signup' && userExists) {
     res.status(400); throw new Error('Email already registered');
   }
-  if (type === 'reset' && !userExists) {
-    res.status(404); throw new Error('No account found with that email');
+  
+  // Account enumeration defense: If reset, we always return success.
+  // We'll proceed with generating the OTP but we won't email it if user doesn't exist.
+  // But wait, the client is waiting for OTP. So we do need to generate it.
+  
+  const existingOtp = await Otp.findOne({ email, type });
+  if (existingOtp) {
+    if (Date.now() - new Date(existingOtp.lastResend).getTime() < 60000) {
+      res.status(429); throw new Error('Please wait 60 seconds before requesting another OTP');
+    }
   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otp = crypto.randomInt(100000, 1000000).toString();
   const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
 
   await Otp.findOneAndUpdate(
-    { email },
-    { email, otp: hashedOtp, type, createdAt: Date.now() },
+    { email, type },
+    { email, otp: hashedOtp, type, attempts: 0, lastResend: Date.now(), createdAt: Date.now() },
     { upsert: true, new: true }
   );
 
@@ -50,7 +58,12 @@ const sendOtp = asyncHandler(async (req, res) => {
         <p style="color:#aaa;font-size:12px;text-align:center">© ${new Date().getFullYear()} Boomcart. All rights reserved.</p>
       </div>`,
     });
-    res.status(200).json({ success: true, message: 'OTP sent' });
+    
+    if (type === 'reset') {
+       res.status(200).json({ success: true, message: 'If an account with this email exists, an OTP has been sent.' });
+    } else {
+       res.status(200).json({ success: true, message: 'OTP sent' });
+    }
   } catch (error) {
     console.error('Email sending failed:', error.message);
     await Otp.findOneAndDelete({ email });
@@ -64,10 +77,27 @@ const verifyOtp = asyncHandler(async (req, res) => {
   const { otp, type, name, password } = req.body;
   if (!email || !otp || !type) { res.status(400); throw new Error('Email, OTP, and type are required'); }
 
-  const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
-  const otpRecord = await Otp.findOne({ email, otp: hashedOtp, type });
+  const otpRecord = await Otp.findOne({ email, type });
   
   if (!otpRecord) { res.status(400); throw new Error('Invalid or expired OTP'); }
+
+  const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
+  if (otpRecord.otp !== hashedOtp) {
+    // Atomic increment using findOneAndUpdate to prevent race conditions
+    const updatedOtp = await Otp.findOneAndUpdate(
+      { _id: otpRecord._id },
+      { $inc: { attempts: 1 } },
+      { new: true }
+    );
+    if (updatedOtp && updatedOtp.attempts >= 5) {
+      await Otp.findByIdAndDelete(otpRecord._id);
+      res.status(400); throw new Error('Maximum attempts reached. Please request a new OTP.');
+    }
+    res.status(400); throw new Error('Invalid OTP');
+  }
+
+  // OTP is correct! Delete it so it cannot be reused.
+  await Otp.findByIdAndDelete(otpRecord._id);
 
   if (type === 'signup') {
     if (!name || !password) { res.status(400); throw new Error('Name and password required for signup'); }
@@ -101,7 +131,6 @@ const verifyOtp = asyncHandler(async (req, res) => {
     user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
     user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 mins
     await user.save({ validateBeforeSave: false });
-    await Otp.findOneAndDelete({ email });
 
     return res.status(200).json({
       success: true,
@@ -155,8 +184,9 @@ const changePassword = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select('+password');
   if (!(await user.matchPassword(currentPassword))) { res.status(400); throw new Error('Current password incorrect'); }
   user.password = newPassword;
+  user.refreshTokens = []; // Revoke sessions on password change
   await user.save();
-  res.json({ success: true, message: 'Password updated' });
+  res.json({ success: true, message: 'Password updated. Please login again.' });
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
@@ -175,6 +205,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   if (!user) { res.status(400); throw new Error('Invalid or expired reset token'); }
   
   user.password = newPassword;
+  user.refreshTokens = []; // Revoke all sessions on password reset
   user.resetPasswordToken = undefined;
   user.resetPasswordExpire = undefined;
   await user.save();
