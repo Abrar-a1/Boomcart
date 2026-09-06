@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { loginUser, sendOtp, verifyOtp, logoutUser } from '../services/authService';
+import { loginUser, sendOtp, verifyOtp, logoutUser, getMe } from '../services/authService';
 import { getWishlist } from '../services/userService';
 import toast from 'react-hot-toast';
 
@@ -25,9 +25,23 @@ export const AuthProvider = ({ children }) => {
     } catch { /* silently ignore */ }
   }, []);
 
-  // On startup, if user is already logged in, sync wishlist from server
+  // On startup, check session via /auth/me
   useEffect(() => {
-    if (user) refreshWishlist();
+    const fetchUser = async () => {
+      setLoading(true);
+      try {
+        const { data } = await getMe();
+        setUser(data.data);
+        localStorage.setItem(KEY, JSON.stringify(data.data)); // Optional persistence for non-auth usage
+        refreshWishlist();
+      } catch (err) {
+        setUser(null);
+        localStorage.removeItem(KEY);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const login = async (email, password) => {

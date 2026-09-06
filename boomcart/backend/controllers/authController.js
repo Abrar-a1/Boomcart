@@ -77,10 +77,15 @@ const verifyOtp = asyncHandler(async (req, res) => {
     const adminEmails = adminEmailsStr.split(',').map(e => e.trim().toLowerCase()).filter(e => e);
     const role = adminEmails.includes(email.toLowerCase()) ? 'admin' : 'user';
     
-    const user = await User.create({ name, email, password, role, profileCompleted: false });
-    await Otp.findOneAndDelete({ email });
-
-    generateTokens(res, user._id);
+    const { refreshToken } = generateTokens(res, user._id);
+    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    user.refreshTokens.push({
+      tokenHash,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      userAgent: req.headers['user-agent'],
+      ip: req.ip
+    });
+    await user.save({ validateBeforeSave: false });
 
     return res.status(201).json({
       success: true,
@@ -113,7 +118,15 @@ const login = asyncHandler(async (req, res) => {
   if (!user || !(await user.matchPassword(password))) { res.status(401); throw new Error('Invalid credentials'); }
   if (!user.isActive) { res.status(401); throw new Error('Account deactivated'); }
   
-  generateTokens(res, user._id);
+  const { refreshToken } = generateTokens(res, user._id);
+  const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+  user.refreshTokens.push({
+    tokenHash,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    userAgent: req.headers['user-agent'],
+    ip: req.ip
+  });
+  await user.save({ validateBeforeSave: false });
   
   res.json({
     success: true,
@@ -182,22 +195,54 @@ const refresh = asyncHandler(async (req, res) => {
       res.status(401); throw new Error('Not authorized, user invalid');
     }
 
-    // Issue a new access token
-    const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV !== 'development',
-      sameSite: 'strict',
-    };
-    res.cookie('accessToken', accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
+    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    const sessionIndex = user.refreshTokens.findIndex(rt => rt.tokenHash === tokenHash);
+
+    if (sessionIndex === -1) {
+      // Possible reuse of an already-rotated token! Wipe all sessions to be safe.
+      user.refreshTokens = [];
+      await user.save({ validateBeforeSave: false });
+      res.status(401); throw new Error('Token reuse detected. All sessions revoked.');
+    }
+
+    // Remove the old token hash
+    user.refreshTokens.splice(sessionIndex, 1);
+
+    // Issue new tokens
+    const { refreshToken: newRefreshToken } = generateTokens(res, user._id);
+    const newTokenHash = crypto.createHash('sha256').update(newRefreshToken).digest('hex');
+    
+    user.refreshTokens.push({
+      tokenHash: newTokenHash,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      userAgent: req.headers['user-agent'],
+      ip: req.ip
+    });
+    
+    await user.save({ validateBeforeSave: false });
     
     res.json({ success: true, message: 'Access token refreshed' });
   } catch (error) {
-    res.status(401); throw new Error('Not authorized, invalid refresh token');
+    res.status(401); throw new Error(error.message || 'Not authorized, invalid refresh token');
   }
 });
 
 const logout = asyncHandler(async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (refreshToken) {
+    try {
+      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id);
+      if (user) {
+        const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+        user.refreshTokens = user.refreshTokens.filter(rt => rt.tokenHash !== tokenHash);
+        await user.save({ validateBeforeSave: false });
+      }
+    } catch (e) {
+      // Ignore if token is invalid during logout, we just clear cookies
+    }
+  }
+
   res.cookie('accessToken', '', { httpOnly: true, expires: new Date(0) });
   res.cookie('refreshToken', '', { httpOnly: true, expires: new Date(0) });
   res.json({ success: true, message: 'Logged out successfully' });

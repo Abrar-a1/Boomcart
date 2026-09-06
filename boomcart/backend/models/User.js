@@ -24,6 +24,13 @@ const userSchema = new mongoose.Schema({
   profileCompleted: { type: Boolean, default: false },
   resetPasswordToken: { type: String, select: false },
   resetPasswordExpire: { type: Date, select: false },
+  refreshTokens: [{
+    tokenHash: String,
+    createdAt: { type: Date, default: Date.now },
+    expiresAt: Date,
+    userAgent: String,
+    ip: String,
+  }],
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

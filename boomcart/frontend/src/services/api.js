@@ -10,6 +10,20 @@ const api = axios.create({
   withCredentials: true,
 });
 
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 api.interceptors.request.use((config) => config, (err) => Promise.reject(err));
 
 api.interceptors.response.use(
@@ -19,18 +33,37 @@ api.interceptors.response.use(
 
     // If 401 and it's not the login or refresh route itself, try refreshing
     if (err.response?.status === 401 && !originalConfig.url.includes('/auth/login') && !originalConfig.url.includes('/auth/refresh')) {
-      if (!originalConfig._retry) {
-        originalConfig._retry = true;
-        try {
-          await api.post('/auth/refresh');
+      
+      if (isRefreshing) {
+        // If refresh is already in progress, queue this request
+        return new Promise(function(resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
           return api(originalConfig);
-        } catch (_error) {
-          // Refresh token expired or invalid
-          localStorage.removeItem('boomcart_user');
-          window.location.href = '/login';
-          return Promise.reject(_error);
-        }
+        }).catch(err => {
+          return Promise.reject(err);
+        });
       }
+
+      originalConfig._retry = true;
+      isRefreshing = true;
+
+      return new Promise(function (resolve, reject) {
+        api.post('/auth/refresh')
+          .then(({ data }) => {
+            processQueue(null, data.accessToken); // Or true
+            resolve(api(originalConfig));
+          })
+          .catch((_error) => {
+            processQueue(_error, null);
+            localStorage.removeItem('boomcart_user');
+            window.location.href = '/login';
+            reject(_error);
+          })
+          .finally(() => {
+            isRefreshing = false;
+          });
+      });
     }
     
     return Promise.reject(err);

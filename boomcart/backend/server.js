@@ -16,6 +16,7 @@ dotenv.config();
 const connectDB = require('./config/db');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 const { scheduleCloudinaryCleanup } = require('./config/cloudinary');
+const { setCsrfCookie, validateCsrf } = require('./middleware/csrfMiddleware');
 
 const authRoutes    = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -48,6 +49,8 @@ app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
+app.use(setCsrfCookie);
+app.use(validateCsrf);
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 // Data sanitization against NoSQL query injection
