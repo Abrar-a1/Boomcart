@@ -63,6 +63,7 @@ const createOrder = asyncHandler(async (req, res) => {
       couponCode: couponCode || '',
       discountAmount: calculatedDiscount,
       orderStatus: paymentMethod === 'cod' ? 'confirmed' : 'pending',
+      expiresAt: paymentMethod === 'razorpay' ? new Date(Date.now() + 15 * 60 * 1000) : undefined,
       idempotencyKey
     }], { session });
 
@@ -166,24 +167,38 @@ const cancelOrder = asyncHandler(async (req, res) => {
 // POST /api/payments/verify — also send confirmation email after Razorpay payment succeeds
 // (called from paymentController after verifyPayment — import sendEmail there directly)
 
-// DELETE /api/orders/admin/cleanup — Cleanup stale unpaid Razorpay orders older than 30 min
+// DELETE /api/orders/admin/cleanup — Cleanup stale unpaid Razorpay orders older than 15 min (manual route fallback)
 const cleanupUnpaidOrders = asyncHandler(async (req, res) => {
-  const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000);
   const staleOrders = await Order.find({
     isPaid: false,
-    paymentMethod: 'razorpay',
     orderStatus: 'pending',
-    createdAt: { $lt: thirtyMinsAgo },
+    expiresAt: { $lt: new Date() },
   });
   let cleaned = 0;
   for (const order of staleOrders) {
-    // Restore stock
-    for (const item of order.orderItems) {
-      await productService.restoreStock(item.product, item.size, item.quantity);
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      // Find and lock the order to prevent concurrent processing
+      const lockedOrder = await Order.findOneAndUpdate(
+        { _id: order._id, orderStatus: 'pending', isPaid: false, expiresAt: { $lt: new Date() } },
+        { $set: { orderStatus: 'cancelled' }, $unset: { expiresAt: 1 } },
+        { session, new: true }
+      );
+      if (lockedOrder) {
+        for (const item of lockedOrder.orderItems) {
+          await productService.restoreStock(item.product, item.size, item.quantity, session);
+        }
+        await session.commitTransaction();
+        cleaned++;
+      } else {
+        await session.abortTransaction();
+      }
+    } catch (err) {
+      await session.abortTransaction();
+    } finally {
+      session.endSession();
     }
-    order.orderStatus = 'cancelled';
-    await order.save();
-    cleaned++;
   }
   res.json({ success: true, message: `Cleaned ${cleaned} stale unpaid orders` });
 });

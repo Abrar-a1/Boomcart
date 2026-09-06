@@ -23,7 +23,7 @@ const orderSchema = new mongoose.Schema({
   paymentMethod: { type: String, enum: ['razorpay','cod'], required: true },
   paymentResult: {
     razorpayOrderId: String, razorpayPaymentId: String,
-    razorpaySignature: String, status: String, paidAt: Date,
+    razorpaySignature: String, status: { type: String, enum: ['pending', 'paid', 'failed', 'refunded', 'refund_pending'], default: 'pending' }, paidAt: Date,
   },
   isPaid:        { type: Boolean, default: false },
   itemsPrice:    { type: Number, required: true, default: 0 },
@@ -40,6 +40,7 @@ const orderSchema = new mongoose.Schema({
   }],
   trackingNumber: { type: String, default: '' },
   deliveredAt: Date,
+  expiresAt: { type: Date },
   couponCode: { type: String, default: '' },
   discountAmount: { type: Number, default: 0 },
   idempotencyKey: { type: String, unique: true, sparse: true },

@@ -25,6 +25,7 @@ const userRoutes    = require('./routes/userRoutes');
 const reviewRoutes  = require('./routes/reviewRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
+const initCronJobs  = require('./utils/cronJobs');
 
 connectDB();
 scheduleCloudinaryCleanup(); // Auto-delete expired media daily
@@ -79,4 +80,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`\n🚀 Boomcart API running on port ${PORT} [${process.env.NODE_ENV}]`));
+app.listen(PORT, () => {
+  console.log(`\n🚀 Boomcart API running on port ${PORT} [${process.env.NODE_ENV}]`);
+  initCronJobs();
+});
