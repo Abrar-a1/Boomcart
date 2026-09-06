@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -13,6 +13,28 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
+  const [countdown, setCountdown] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    if (otpSent && countdown > 0) {
+      timer = setInterval(() => setCountdown(c => c - 1), 1000);
+    } else if (countdown === 0) {
+      setCanResend(true);
+    }
+    return () => clearInterval(timer);
+  }, [otpSent, countdown]);
+
+  const handleResend = async () => {
+    setCanResend(false);
+    setCountdown(60);
+    const result = await register(form.name, form.email, form.password);
+    if (!result.success) {
+      setCanResend(true);
+      setCountdown(0);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +42,11 @@ export default function Register() {
       if (form.password !== form.confirm) { toast.error('Passwords do not match'); return; }
       if (form.password.length < 6) { toast.error('Password must be at least 6 characters'); return; }
       const result = await register(form.name, form.email, form.password);
-      if (result.success) setOtpSent(true);
+      if (result.success) {
+        setOtpSent(true);
+        setCountdown(60);
+        setCanResend(false);
+      }
     } else {
       if (otp.length !== 6) { toast.error('Please enter a valid 6-digit OTP'); return; }
       const result = await verifyRegistration(form.name, form.email, form.password, otp);
@@ -67,6 +93,15 @@ export default function Register() {
               <label>6-Digit OTP</label>
               <input type="text" className="form-input" placeholder="Enter OTP from email"
                 value={otp} onChange={e => setOtp(e.target.value)} required maxLength={6} style={{ letterSpacing: '2px', fontWeight: 'bold' }} />
+              <div style={{ marginTop: 8, fontSize: 13, textAlign: 'right' }}>
+                {canResend ? (
+                  <button type="button" onClick={handleResend} disabled={loading} style={{ background:'none', border:'none', color:'var(--color-primary)', cursor:'pointer', fontWeight:'bold', padding:0 }}>
+                    Resend OTP
+                  </button>
+                ) : (
+                  <span style={{ color: '#888' }}>Didn't receive code? Resend in {countdown}s</span>
+                )}
+              </div>
             </div>
           )}
           <button className="btn btn-primary btn-block btn-lg auth-submit" type="submit" disabled={loading}>

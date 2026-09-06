@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { sendOtp, verifyOtp } from '../../services/authService';
 import toast from 'react-hot-toast';
@@ -13,6 +13,18 @@ export default function ForgotPassword() {
 
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
+  const [countdown, setCountdown] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    if (otpSent && countdown > 0) {
+      timer = setInterval(() => setCountdown(c => c - 1), 1000);
+    } else if (countdown === 0) {
+      setCanResend(true);
+    }
+    return () => clearInterval(timer);
+  }, [otpSent, countdown]);
 
   const handleSendOtp = async (e) => {
     if (e) e.preventDefault();
@@ -22,9 +34,24 @@ export default function ForgotPassword() {
       await sendOtp({ email, type: 'reset' });
       toast.success('OTP sent! Check your email.');
       setOtpSent(true);
+      setCountdown(60);
+      setCanResend(false);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to send OTP');
     } finally { setLoading(false); }
+  };
+
+  const handleResend = async () => {
+    setCanResend(false);
+    setCountdown(60);
+    try {
+      await sendOtp({ email, type: 'reset' });
+      toast.success('OTP resent! Check your email.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to resend OTP');
+      setCanResend(true);
+      setCountdown(0);
+    }
   };
 
   const handleVerifyOtp = async (e) => {
@@ -60,6 +87,15 @@ export default function ForgotPassword() {
               <label>6-Digit OTP</label>
               <input type="text" className="form-input" placeholder="Enter OTP"
                 value={otp} onChange={e => setOtp(e.target.value)} required maxLength={6} style={{ letterSpacing: '2px', fontWeight: 'bold' }} />
+              <div style={{ marginTop: 8, fontSize: 13, textAlign: 'right' }}>
+                {canResend ? (
+                  <button type="button" onClick={handleResend} disabled={loading} style={{ background:'none', border:'none', color:'var(--color-primary)', cursor:'pointer', fontWeight:'bold', padding:0 }}>
+                    Resend OTP
+                  </button>
+                ) : (
+                  <span style={{ color: '#888' }}>Didn't receive code? Resend in {countdown}s</span>
+                )}
+              </div>
             </div>
           )}
           <button className="btn btn-primary btn-block btn-lg" type="submit" disabled={loading}>
