@@ -1,10 +1,16 @@
 const Joi = require('joi');
 
 const authSchemas = {
-  register: Joi.object({
-    name: Joi.string().trim().min(2).max(50).required(),
+  sendOtp: Joi.object({
     email: Joi.string().email().lowercase().required(),
-    password: Joi.string().min(6).required(),
+    type: Joi.string().valid('signup', 'reset').required(),
+  }),
+  verifyOtp: Joi.object({
+    email: Joi.string().email().lowercase().required(),
+    otp: Joi.string().length(6).required(),
+    type: Joi.string().valid('signup', 'reset').required(),
+    name: Joi.string().trim().min(2).max(50),
+    password: Joi.string().min(6),
   }),
   login: Joi.object({
     email: Joi.string().email().required(),
@@ -18,13 +24,10 @@ const authSchemas = {
     currentPassword: Joi.string().required(),
     newPassword: Joi.string().min(6).required(),
   }),
-  forgotPassword: Joi.object({
-    email: Joi.string().email().required(),
-  }),
   resetPassword: Joi.object({
-    email: Joi.string().email().required(),
-    otp: Joi.string().length(6).required(),
-    password: Joi.string().min(6).required(),
+    email: Joi.string().email().lowercase().required(),
+    resetToken: Joi.string().required(),
+    newPassword: Joi.string().min(6).required(),
   }),
 };
 

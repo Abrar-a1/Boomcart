@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { loginUser, registerUser } from '../services/authService';
+import { loginUser, sendOtp, verifyOtp } from '../services/authService';
 import { getWishlist } from '../services/userService';
 import toast from 'react-hot-toast';
 
@@ -50,13 +50,26 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password) => {
     setLoading(true);
     try {
-      const { data } = await registerUser({ name, email, password });
-      localStorage.setItem(KEY, JSON.stringify(data.data));
-      setUser(data.data);
-      toast.success('Account created!');
+      await sendOtp({ email, type: 'signup' });
+      toast.success('OTP sent! Please check your email.');
       return { success: true };
     } catch (err) {
-      const msg = err.response?.data?.message || 'Registration failed';
+      const msg = err.response?.data?.message || 'Failed to send OTP';
+      toast.error(msg);
+      return { success: false, message: msg };
+    } finally { setLoading(false); }
+  };
+
+  const verifyRegistration = async (name, email, password, otp) => {
+    setLoading(true);
+    try {
+      const { data } = await verifyOtp({ name, email, password, otp, type: 'signup' });
+      localStorage.setItem(KEY, JSON.stringify(data.data));
+      setUser(data.data);
+      toast.success('Account created successfully!');
+      return { success: true };
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Verification failed';
       toast.error(msg);
       return { success: false, message: msg };
     } finally { setLoading(false); }
@@ -89,7 +102,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, loading, login, register, logout, updateUser,
+      user, loading, login, register, verifyRegistration, logout, updateUser,
       isAdmin: user?.role === 'admin',
       wishlistIds, refreshWishlist, toggleWishlistId,
     }}>
