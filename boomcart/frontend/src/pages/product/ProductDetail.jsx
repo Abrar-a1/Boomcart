@@ -4,6 +4,7 @@ import KidsLayout from '../../layouts/KidsLayout';
 import BridalLayout from '../../layouts/BridalLayout';
 import productService from '../../services/productService';
 import BookingModal from '../../components/booking/BookingModal';
+import ReviewsSection from '../../components/product/ReviewsSection';
 import { Helmet } from 'react-helmet-async';
 import { useStore } from '../../store/useStore';
 import toast from 'react-hot-toast';
@@ -94,6 +95,7 @@ export default function ProductDetail() {
              </button>
           </div>
         </div>
+        <ReviewsSection productId={product._id} />
       </KidsLayout>
     );
   }
@@ -128,19 +130,21 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
+        <ReviewsSection productId={product._id} />
       </BridalLayout>
     );
   }
 
   // --- DEFAULT ADULT UX HANDLER (Men, Women, Unisex) ---
   return (
-    <div className="flex flex-col md:flex-row gap-10 lg:gap-16 py-6 page-transition">
+    <div className="flex flex-col page-transition gap-10">
       <Helmet><title>{product.name} — Boomcart</title></Helmet>
       
-      {/* Image */}
-      <div className="w-full md:w-1/2 aspect-[4/5] rounded-2xl overflow-hidden shadow-md border border-[#E5D9C5] bg-white">
-        <img src={product.images[0]?.url} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-102" />
-      </div>
+      <div className="flex flex-col md:flex-row gap-10 lg:gap-16">
+        {/* Image */}
+        <div className="w-full md:w-1/2 aspect-[4/5] rounded-2xl overflow-hidden shadow-md border border-[#E5D9C5] bg-white">
+          <img src={product.images[0]?.url} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-102" />
+        </div>
 
       {/* Info */}
       <div className="w-full md:w-1/2 flex flex-col justify-center">
@@ -181,6 +185,12 @@ export default function ProductDetail() {
           className="w-full md:max-w-xs bg-[#C25A3C] hover:bg-[#1E3A3A] text-white font-bold py-4 rounded-full tracking-widest uppercase text-sm shadow-md hover:shadow-lg transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed min-h-[44px]">
           {product.stock === 0 ? 'Out of Stock' : (selectedSize || !product.sizes?.length ? 'Add to Cart 🛒' : 'Pick a size first!')}
         </button>
+        </div>
+      </div>
+
+      {/* Reviews rendered at full width below */}
+      <div className="w-full">
+        <ReviewsSection productId={product._id} />
       </div>
     </div>
   );
