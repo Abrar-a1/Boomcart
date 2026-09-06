@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const Otp = require('../models/Otp');
+const AuthThrottle = require('../models/AuthThrottle');
 const generateTokens = require('../utils/generateTokens');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -11,6 +12,16 @@ const sendOtp = asyncHandler(async (req, res) => {
   const { type } = req.body;
   if (!email || !type) { res.status(400); throw new Error('Email and type are required'); }
   
+  // DB-backed email throttling to prevent IP-rotation spam
+  const throttleRecord = await AuthThrottle.findOneAndUpdate(
+    { email, action: 'send-otp' },
+    { $inc: { count: 1 } },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
+  if (throttleRecord.count > 10) {
+    res.status(429); throw new Error('Too many requests for this email. Please try again tomorrow.');
+  }
+
   const userExists = await User.findOne({ email });
 
   if (type === 'signup' && userExists) {
@@ -103,9 +114,15 @@ const verifyOtp = asyncHandler(async (req, res) => {
     if (!name || !password) { res.status(400); throw new Error('Name and password required for signup'); }
     if (await User.findOne({ email })) { res.status(400); throw new Error('Email already registered'); }
 
-    const adminEmailsStr = process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || '';
-    const adminEmails = adminEmailsStr.split(',').map(e => e.trim().toLowerCase()).filter(e => e);
-    const role = adminEmails.includes(email.toLowerCase()) ? 'admin' : 'user';
+    // Explicitly enforce role as 'user' for public signups to prevent privilege escalation
+    const role = 'user';
+    
+    const user = await User.create({
+      name,
+      email,
+      password,
+      role
+    });
     
     const { refreshToken } = generateTokens(res, user._id);
     const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');

@@ -4,12 +4,9 @@ import { getWishlist } from '../services/userService';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
-const KEY = 'boomcart_user';
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; }
-  });
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   // Track wishlist IDs in context so ProductCard can init wishlisted state (#3 fix)
   const [wishlistIds, setWishlistIds] = useState(() => {
@@ -32,11 +29,9 @@ export const AuthProvider = ({ children }) => {
       try {
         const { data } = await getMe();
         setUser(data.data);
-        localStorage.setItem(KEY, JSON.stringify(data.data)); // Optional persistence for non-auth usage
         refreshWishlist();
       } catch (err) {
         setUser(null);
-        localStorage.removeItem(KEY);
       } finally {
         setLoading(false);
       }
@@ -48,7 +43,6 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await loginUser({ email, password });
-      localStorage.setItem(KEY, JSON.stringify(data.data));
       setUser(data.data);
       toast.success(`Welcome back, ${data.data.name}!`);
       setTimeout(refreshWishlist, 0);
@@ -77,7 +71,6 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await verifyOtp({ name, email, password, otp, type: 'signup' });
-      localStorage.setItem(KEY, JSON.stringify(data.data));
       setUser(data.data);
       toast.success('Account created successfully!');
       return { success: true };
@@ -94,7 +87,6 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('Logout request failed', err);
     }
-    localStorage.removeItem(KEY);
     localStorage.removeItem('boomcart_wishlist');
     setUser(null);
     setWishlistIds([]);
@@ -103,7 +95,6 @@ export const AuthProvider = ({ children }) => {
 
   const updateUser = (updates) => {
     const updated = { ...user, ...updates };
-    localStorage.setItem(KEY, JSON.stringify(updated));
     setUser(updated);
   };
 

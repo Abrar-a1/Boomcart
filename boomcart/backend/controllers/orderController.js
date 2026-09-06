@@ -146,22 +146,36 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
 // PUT /api/orders/:id/cancel  — User can cancel their own pending/confirmed order
 const cancelOrder = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id);
-  if (!order) { res.status(404); throw new Error('Order not found'); }
-  if (order.user.toString() !== req.user._id.toString()) {
-    res.status(403); throw new Error('Not authorized to cancel this order');
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const orderId = req.params.id;
+    // We strictly match only if the order is cancellable ('pending' or 'confirmed') to avoid race conditions.
+    const order = await Order.findOneAndUpdate(
+      { _id: orderId, user: req.user._id, orderStatus: { $in: ['pending', 'confirmed'] } },
+      { $set: { orderStatus: 'cancelled' }, $unset: { expiresAt: 1 } },
+      { session, new: true }
+    );
+
+    if (!order) {
+      await session.abortTransaction();
+      res.status(400); throw new Error('Order cannot be cancelled or not found');
+    }
+
+    // Restore stock intelligently via Service Layer
+    for (const item of order.orderItems) {
+      await productService.restoreStock(item.product, item.size, item.quantity, session);
+    }
+    
+    await session.commitTransaction();
+    res.json({ success: true, message: 'Order cancelled', data: order });
+  } catch (error) {
+    await session.abortTransaction();
+    res.status(400); throw new Error(error.message || 'Cancellation failed');
+  } finally {
+    session.endSession();
   }
-  const cancellable = ['pending', 'confirmed'];
-  if (!cancellable.includes(order.orderStatus)) {
-    res.status(400); throw new Error(`Cannot cancel an order that is already ${order.orderStatus}`);
-  }
-  // Restore stock intelligently via Service Layer
-  for (const item of order.orderItems) {
-    await productService.restoreStock(item.product, item.size, item.quantity);
-  }
-  order.orderStatus = 'cancelled';
-  await order.save();
-  res.json({ success: true, message: 'Order cancelled', data: order });
 });
 
 // POST /api/payments/verify — also send confirmation email after Razorpay payment succeeds

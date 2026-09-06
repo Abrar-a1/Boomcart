@@ -49,8 +49,9 @@ const productSchemas = {
     description: Joi.string().max(2000).required(),
     price: Joi.number().min(0).required(),
     discountPrice: Joi.number().min(0).default(0),
-    category: Joi.string().valid('men', 'women', 'bridal', 'boys', 'girls', 'unisex').required(),
+    category: Joi.string().valid('men', 'women', 'bridal', 'kids', 'unisex').required(),
     subCategory: Joi.string().valid('shirts', 'pants', 'kurta', 'saree', 'lehenga', 'dress', 'jeans', 'jacket', 'suit', 'sherwani', 'tops', 'skirts', 'ethnic', 'western', 'accessories').required(),
+    ageGroup: Joi.string().valid('0-2', '3-5', '6-10', '11+').optional(),
     sizes: Joi.any(),
     colors: Joi.any(),
     stock: Joi.number().min(0).required(),
@@ -62,8 +63,9 @@ const productSchemas = {
     description: Joi.string().max(2000),
     price: Joi.number().min(0),
     discountPrice: Joi.number().min(0),
-    category: Joi.string().valid('men', 'women', 'bridal', 'boys', 'girls', 'unisex'),
+    category: Joi.string().valid('men', 'women', 'bridal', 'kids', 'unisex'),
     subCategory: Joi.string().valid('shirts', 'pants', 'kurta', 'saree', 'lehenga', 'dress', 'jeans', 'jacket', 'suit', 'sherwani', 'tops', 'skirts', 'ethnic', 'western', 'accessories'),
+    ageGroup: Joi.string().valid('0-2', '3-5', '6-10', '11+').optional(),
     sizes: Joi.any(),
     colors: Joi.any(),
     stock: Joi.number().min(0),
@@ -107,6 +109,7 @@ const orderSchemas = {
       })
     ).min(1).required(),
     shippingAddress: Joi.object({
+      fullName: Joi.string().required(),
       addressLine1: Joi.string().required(),
       addressLine2: Joi.string().allow('', null),
       city: Joi.string().required(),
@@ -115,12 +118,8 @@ const orderSchemas = {
       phone: Joi.string().required()
     }).required(),
     paymentMethod: Joi.string().valid('cod', 'razorpay').required(),
-    itemsPrice: Joi.number().min(0).required(),
-    shippingPrice: Joi.number().min(0).required(),
-    taxPrice: Joi.number().min(0).required(),
-    totalPrice: Joi.number().min(0).required(),
     couponCode: Joi.string().allow('', null),
-    discountAmount: Joi.number().min(0).default(0)
+    idempotencyKey: Joi.string().allow('', null)
   })
 };
 
@@ -135,9 +134,8 @@ const reviewSchemas = {
 
 const paymentSchemas = {
   createOrder: Joi.object({
-    amount: Joi.number().positive().required(),
     currency: Joi.string().default('INR'),
-    orderId: Joi.string().allow('', null)
+    orderId: Joi.string().required()
   }),
   verify: Joi.object({
     razorpay_order_id: Joi.string().required(),

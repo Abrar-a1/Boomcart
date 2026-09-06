@@ -46,46 +46,73 @@ const createRazorpayOrder = asyncHandler(async (req, res) => {
 const verifyPayment = asyncHandler(async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderId } = req.body;
   
+  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !orderId) {
+    res.status(400); throw new Error('Missing payment verification details');
+  }
+
+  // 1. Authenticate request & Verify HMAC signature FIRST
+  const expected = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+    .update(`${razorpay_order_id}|${razorpay_payment_id}`).digest('hex');
+  if (expected !== razorpay_signature) { res.status(400); throw new Error('Payment verification signature failed'); }
+
   const order = await Order.findById(orderId);
   if (!order) { res.status(404); throw new Error('Order not found'); }
+  if (order.user.toString() !== req.user._id.toString()) { res.status(403); throw new Error('Not authorized'); }
   
-  // Idempotency check
-  if (order.isPaid) {
+  // 2. Idempotency check: if already paid via webhook or retry, just return success
+  if (order.isPaid || order.orderStatus === 'confirmed') {
     return res.json({ success: true, message: 'Payment already verified', data: order });
   }
 
-  // Ensure the Razorpay order ID paid matches the one we generated for this specific DB order
+  // 3. Verify stored Boomcart <-> Razorpay order relationship
   if (!order.paymentResult || order.paymentResult.razorpayOrderId !== razorpay_order_id) {
     res.status(400); throw new Error('Order ID mismatch. Payment verification failed.');
   }
 
-  // Check if order is expired
+  // 4. Fetch Razorpay payment independently
+  if (!razorpay) { res.status(503); throw new Error('Payment gateway not configured'); }
+  let payment;
+  try {
+    payment = await razorpay.payments.fetch(razorpay_payment_id);
+  } catch (err) {
+    res.status(400); throw new Error('Failed to fetch payment details from Razorpay');
+  }
+
+  // 5. Verify payment properties
+  const expectedAmount = Math.round(order.totalPrice * 100);
+  if (payment.amount !== expectedAmount) {
+    res.status(400); throw new Error(`Amount mismatch. Expected ${expectedAmount}, got ${payment.amount}`);
+  }
+  if (payment.currency !== 'INR') {
+    res.status(400); throw new Error(`Invalid currency ${payment.currency}`);
+  }
+  if (payment.order_id !== order.paymentResult.razorpayOrderId) {
+    res.status(400); throw new Error('Payment does not belong to this order');
+  }
+
+  // 6. Check local order state/expiry
   if (order.expiresAt && order.expiresAt < new Date()) {
-    // Ideally we initiate a Razorpay refund here because the user's payment was successful but our order is expired.
-    // For now, we will mark it as refund_pending and DO NOT mark the order as paid.
     order.paymentResult = {
       razorpayOrderId: razorpay_order_id,
       razorpayPaymentId: razorpay_payment_id,
       razorpaySignature: razorpay_signature,
       status: 'refund_pending',
-      paidAt: new Date()
+      paidAt: new Date(payment.created_at * 1000 || Date.now())
     };
     await order.save();
     return res.status(400).json({ success: false, message: 'Order expired. Payment received but stock was released. Refund will be initiated.', data: order });
   }
 
-  const expected = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-    .update(`${razorpay_order_id}|${razorpay_payment_id}`).digest('hex');
-  if (expected !== razorpay_signature) { res.status(400); throw new Error('Payment verification signature failed'); }
-  
+  // 7. Atomically mark Boomcart order paid
   order.isPaid = true;
   order.orderStatus = 'confirmed';
+  order.expiresAt = undefined; // unset expiry now that it's paid
   order.paymentResult = {
     razorpayOrderId: razorpay_order_id,
     razorpayPaymentId: razorpay_payment_id,
     razorpaySignature: razorpay_signature,
     status: 'paid',
-    paidAt: new Date(),
+    paidAt: new Date(payment.created_at * 1000 || Date.now()),
   };
   await order.save();
   
@@ -134,10 +161,14 @@ const handleWebhook = asyncHandler(async (req, res) => {
       
       if (orderId) {
         const order = await Order.findById(orderId);
-        if (order && !order.isPaid) {
-          // Verify amount exactly matches what is expected
+        if (order && !order.isPaid && order.orderStatus !== 'confirmed') {
+          // Verify amount, currency and relationship exactly matches what is expected
           const expectedAmount = Math.round(order.totalPrice * 100);
-          if (paymentEntity.amount === expectedAmount) {
+          
+          if (paymentEntity.amount === expectedAmount && 
+              paymentEntity.currency === 'INR' &&
+              paymentEntity.order_id === order.paymentResult.razorpayOrderId) {
+            
             // Check expiry
             if (order.expiresAt && order.expiresAt < new Date()) {
                console.error(`⚠️ Webhook: Payment captured but order ${orderId} is expired. Flagging for refund.`);
@@ -151,6 +182,7 @@ const handleWebhook = asyncHandler(async (req, res) => {
             } else {
               order.isPaid = true;
               order.orderStatus = 'confirmed';
+              order.expiresAt = undefined;
               order.paymentResult = {
                 razorpayOrderId: paymentEntity.order_id,
                 razorpayPaymentId: paymentEntity.id,
@@ -172,7 +204,7 @@ const handleWebhook = asyncHandler(async (req, res) => {
               } catch (e) { console.error('Confirmation email failed:', e.message); }
             }
           } else {
-            console.error(`❌ Webhook Amount Mismatch for Order ${orderId}. Expected ${expectedAmount}, got ${paymentEntity.amount}`);
+            console.error(`❌ Webhook Mismatch for Order ${orderId}. Expected ${expectedAmount}/INR/${order.paymentResult.razorpayOrderId}, got ${paymentEntity.amount}/${paymentEntity.currency}/${paymentEntity.order_id}`);
           }
         }
       }

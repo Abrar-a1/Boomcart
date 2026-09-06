@@ -21,6 +21,6 @@ const appointmentSchema = new mongoose.Schema({
 
 // Prevent double bookings at the database level!
 // An appointment is uniquely identified by the date and timeSlot.
-appointmentSchema.index({ date: 1, timeSlot: 1 });
+appointmentSchema.index({ date: 1, timeSlot: 1 }, { unique: true });
 
 module.exports = mongoose.model('Appointment', appointmentSchema);

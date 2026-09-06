@@ -3,13 +3,13 @@ const express = require('express');
 const r = express.Router();
 const { sendOtp, verifyOtp, login, getMe, updateProfile, changePassword, resetPassword, refresh, logout } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
-const { authLimiter, loginLimiter } = require('../middleware/rateLimitMiddleware');
+const { authLimiter, loginLimiter, otpVerifyLimiter } = require('../middleware/rateLimitMiddleware');
 const validate = require('../middleware/validate');
 const { authSchemas } = require('../validators');
 
 
 r.post('/send-otp', authLimiter, validate(authSchemas.sendOtp), sendOtp);
-r.post('/verify-otp', validate(authSchemas.verifyOtp), verifyOtp);
+r.post('/verify-otp', otpVerifyLimiter, validate(authSchemas.verifyOtp), verifyOtp);
 r.post('/reset-password', validate(authSchemas.resetPassword), resetPassword);
 r.post('/login', loginLimiter, validate(authSchemas.login), login);
 r.get('/me', protect, getMe);

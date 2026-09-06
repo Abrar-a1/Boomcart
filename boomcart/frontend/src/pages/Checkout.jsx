@@ -18,7 +18,12 @@ export default function Checkout() {
   const [step, setStep]     = useState(1);
   const [loading, setLoading] = useState(false);
   const [payMethod, setPayMethod] = useState('razorpay');
-  const [idempotencyKey] = useState(() => (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substring(2));
+  const [idempotencyKey] = useState(() => {
+    if (window.crypto && window.crypto.randomUUID) {
+      return window.crypto.randomUUID();
+    }
+    throw new Error('Secure randomUUID generation is not supported in this browser context.');
+  });
   
   // Redirect to cart if it becomes empty mid-checkout
   useEffect(() => { if (items.length === 0) navigate('/cart'); }, [items.length, navigate]);

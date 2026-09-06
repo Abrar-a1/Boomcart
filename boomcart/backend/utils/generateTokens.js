@@ -11,8 +11,8 @@ const generateTokens = (res, userId) => {
 
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== 'development', // HTTPS in production
-    sameSite: 'strict', // Prevent CSRF attacks
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
   };
 
   res.cookie('accessToken', accessToken, {

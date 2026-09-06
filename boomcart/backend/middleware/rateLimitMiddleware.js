@@ -18,4 +18,13 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-module.exports = { authLimiter, loginLimiter };
+// Stricter rate limit for verifying OTP
+const otpVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  message: 'Too many verification attempts from this IP, please try again after 15 minutes',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+module.exports = { authLimiter, loginLimiter, otpVerifyLimiter };

@@ -56,7 +56,6 @@ api.interceptors.response.use(
           })
           .catch((_error) => {
             processQueue(_error, null);
-            localStorage.removeItem('boomcart_user');
             window.location.href = '/login';
             reject(_error);
           })
