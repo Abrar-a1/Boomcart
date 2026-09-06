@@ -17,13 +17,17 @@ const getWishlist = asyncHandler(async (req, res) => {
   res.json({ success: true, data: user.wishlist });
 });
 
-// POST /api/users/addresses
 const addAddress = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   if (req.body.isDefault) user.addresses.forEach(a => (a.isDefault = false));
   user.addresses.push(req.body);
+  
+  if (!user.profileCompleted) {
+    user.profileCompleted = true;
+  }
+  
   await user.save();
-  res.status(201).json({ success: true, data: user.addresses });
+  res.status(201).json({ success: true, data: user.addresses, profileCompleted: user.profileCompleted });
 });
 
 // DELETE /api/users/addresses/:addressId

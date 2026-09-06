@@ -16,6 +16,7 @@ import OrderSuccess from './pages/OrderSuccess';
 import OrderTracking from './pages/OrderTracking';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
+import CompleteProfile from './pages/CompleteProfile';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
@@ -63,6 +64,7 @@ export default function App() {
               <Route path="/order/:id"         element={<OrderTracking />} />
               <Route path="/wishlist"          element={<Wishlist />} />
               <Route path="/profile"           element={<Profile />} />
+              <Route path="/complete-profile"  element={<CompleteProfile />} />
             </Route>
 
             {/* Admin only */}
