@@ -18,6 +18,8 @@ export default function Checkout() {
   const [step, setStep]     = useState(1);
   const [loading, setLoading] = useState(false);
   const [payMethod, setPayMethod] = useState('razorpay');
+  const [idempotencyKey] = useState(() => (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substring(2));
+  
   // Redirect to cart if it becomes empty mid-checkout
   useEffect(() => { if (items.length === 0) navigate('/cart'); }, [items.length, navigate]);
 
@@ -43,7 +45,7 @@ export default function Checkout() {
     const orderData = {
       orderItems: items.map(i => ({ product: i.product, name: i.name, image: i.image, price: i.price, quantity: i.quantity, size: i.size, color: i.color })),
       shippingAddress: addr, paymentMethod: payMethod,
-      itemsPrice, shippingPrice, taxPrice, totalPrice,
+      idempotencyKey,
     };
 
     try {
@@ -57,7 +59,17 @@ export default function Checkout() {
       // Razorpay flow
       const { data: dbData } = await createOrder(orderData);
       const dbOrder = dbData.data;
-      const { data: rpData } = await createRazorpayOrder({ amount: totalPrice, orderId: dbOrder._id });
+      
+      // If server returned early due to idempotency and order is already paid, redirect
+      if (dbData.message === 'Order already processed' && dbOrder.isPaid) {
+        clearCart();
+        navigate(`/order-success/${dbOrder._id}`);
+        return;
+      }
+
+      // The Razorpay order amount should be fetched from the DB order object now
+      const rpAmount = dbOrder.totalPrice;
+      const { data: rpData } = await createRazorpayOrder({ amount: rpAmount, orderId: dbOrder._id });
       const rpOrder = rpData.data;
 
       await new Promise((resolve, reject) => {

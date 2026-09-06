@@ -42,6 +42,7 @@ const orderSchema = new mongoose.Schema({
   deliveredAt: Date,
   couponCode: { type: String, default: '' },
   discountAmount: { type: Number, default: 0 },
+  idempotencyKey: { type: String, unique: true, sparse: true },
 }, { timestamps: true });
 
 orderSchema.pre('save', function (next) {

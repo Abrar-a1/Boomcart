@@ -18,44 +18,44 @@ class ProductService {
     };
   }
 
-  async validateAndDecrementStock(productId, sizeRequested, quantity) {
-    // 1. If size is requested, decrement that specific size's stock
+  async validateAndDecrementStock(productId, sizeRequested, quantity, session) {
     if (sizeRequested) {
-      const product = await Product.findOne({
-        _id: productId,
-        "sizes": { $elemMatch: { size: sizeRequested, stock: { $gte: quantity } } }
-      });
+      const product = await Product.findOneAndUpdate(
+        { 
+          _id: productId, 
+          "sizes": { $elemMatch: { size: sizeRequested, stock: { $gte: quantity } } } 
+        },
+        { 
+          $inc: { 
+            "sizes.$.stock": -quantity,
+            "stock": -quantity 
+          } 
+        },
+        { session, new: true }
+      );
       
       if (!product) {
         throw new Error(`Size ${sizeRequested} is Out of Stock or product missing`);
       }
-
-      await Product.updateOne(
-        { _id: productId, "sizes.size": sizeRequested },
-        { 
-          $inc: { 
-            "sizes.$.stock": -quantity,
-            "stock": -quantity // Also decrement overall total stock tally
-          } 
-        }
-      );
     } else {
-      // 2. Generic product with no specific size
-      const product = await Product.findOne({ _id: productId, stock: { $gte: quantity } });
-      if (!product) throw new Error("Product Out of Stock");
-      
-      await Product.updateOne({ _id: productId }, { $inc: { stock: -quantity } });
+      const product = await Product.findOneAndUpdate(
+        { _id: productId, stock: { $gte: quantity } }, 
+        { $inc: { stock: -quantity } },
+        { session, new: true }
+      );
+      if (!product) throw new Error("Product Out of Stock or missing");
     }
   }
 
-  async restoreStock(productId, sizeRestored, quantity) {
+  async restoreStock(productId, sizeRestored, quantity, session) {
      if (sizeRestored) {
        await Product.updateOne(
          { _id: productId, "sizes.size": sizeRestored },
-         { $inc: { "sizes.$.stock": quantity, "stock": quantity } }
+         { $inc: { "sizes.$.stock": quantity, "stock": quantity } },
+         { session }
        );
      } else {
-       await Product.updateOne({ _id: productId }, { $inc: { stock: quantity } });
+       await Product.updateOne({ _id: productId }, { $inc: { stock: quantity } }, { session });
      }
   }
 }

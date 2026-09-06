@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
@@ -7,27 +8,81 @@ const { sendEmail, orderConfirmationEmail } = require('../utils/sendEmail');
 
 // POST /api/orders
 const createOrder = asyncHandler(async (req, res) => {
-  const { orderItems, shippingAddress, paymentMethod, itemsPrice, shippingPrice, taxPrice, totalPrice, couponCode, discountAmount } = req.body;
+  const { orderItems, shippingAddress, paymentMethod, couponCode, idempotencyKey } = req.body;
   if (!orderItems?.length) { res.status(400); throw new Error('No order items'); }
-  
-  // Delegate atomic stock checking to the strict service layer
-  for (const item of orderItems) {
-    await productService.validateAndDecrementStock(item.product, item.size, item.quantity);
-  }
 
-  const order = await Order.create({
-    user: req.user._id, orderItems, shippingAddress, paymentMethod,
-    itemsPrice, shippingPrice, taxPrice, totalPrice,
-    couponCode: couponCode || '', discountAmount: discountAmount || 0,
-    orderStatus: paymentMethod === 'cod' ? 'confirmed' : 'pending',
-  });
-  // Only send confirmation email for COD — Razorpay orders get it after payment verification
-  if (paymentMethod === 'cod') {
-    try {
-      await sendEmail({ to: req.user.email, subject: `Order Confirmed #${order._id.toString().slice(-8).toUpperCase()} | Boomcart`, html: orderConfirmationEmail(order, req.user) });
-    } catch (e) { console.error('Email failed:', e.message); }
+  // Check idempotency first (if provided)
+  if (idempotencyKey) {
+    const existingOrder = await Order.findOne({ idempotencyKey, user: req.user._id });
+    if (existingOrder) {
+      return res.status(200).json({ success: true, data: existingOrder, message: 'Order already processed' });
+    }
   }
-  res.status(201).json({ success: true, data: order });
+  
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    let calculatedItemsPrice = 0;
+    
+    // Server-side authoritative pricing & atomic stock decrements
+    for (const item of orderItems) {
+      const product = await Product.findById(item.product).session(session);
+      if (!product || !product.isActive) {
+        throw new Error(`Product not found or inactive: ${item.name || item.product}`);
+      }
+
+      // Decrement stock atomically (will throw if insufficient stock)
+      await productService.validateAndDecrementStock(item.product, item.size, item.quantity, session);
+
+      // Snapshot authoritative price
+      const price = product.discountPrice > 0 ? product.discountPrice : product.price;
+      item.price = price;
+      
+      // We also trust the server product name and image
+      item.name = product.name;
+      item.image = product.images[0]?.url || item.image || '';
+
+      calculatedItemsPrice += price * item.quantity;
+    }
+
+    const calculatedShippingPrice = calculatedItemsPrice > 999 ? 0 : 99;
+    const calculatedTaxPrice = Math.round(calculatedItemsPrice * 0.05);
+    const calculatedDiscount = 0; // Explicitly set to 0 as per Phase 1B (no trust in client discount)
+    const calculatedTotalPrice = calculatedItemsPrice + calculatedShippingPrice + calculatedTaxPrice - calculatedDiscount;
+
+    const order = await Order.create([{
+      user: req.user._id,
+      orderItems,
+      shippingAddress,
+      paymentMethod,
+      itemsPrice: calculatedItemsPrice,
+      shippingPrice: calculatedShippingPrice,
+      taxPrice: calculatedTaxPrice,
+      totalPrice: calculatedTotalPrice,
+      couponCode: couponCode || '',
+      discountAmount: calculatedDiscount,
+      orderStatus: paymentMethod === 'cod' ? 'confirmed' : 'pending',
+      idempotencyKey
+    }], { session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    // Only send confirmation email for COD — Razorpay orders get it after payment verification
+    if (paymentMethod === 'cod') {
+      try {
+        await sendEmail({ to: req.user.email, subject: `Order Confirmed #${order[0]._id.toString().slice(-8).toUpperCase()} | Boomcart`, html: orderConfirmationEmail(order[0], req.user) });
+      } catch (e) { console.error('Email failed:', e.message); }
+    }
+    
+    res.status(201).json({ success: true, data: order[0] });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    res.status(400);
+    throw new Error(error.message || 'Order creation failed');
+  }
 });
 
 // GET /api/orders/my-orders
