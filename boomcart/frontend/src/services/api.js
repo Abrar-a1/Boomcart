@@ -7,21 +7,32 @@ const baseURL = rawUrl ? (rawUrl.endsWith('/api') ? rawUrl : `${rawUrl.replace(/
 const api = axios.create({
   baseURL,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 });
 
-api.interceptors.request.use((config) => {
-  const user = JSON.parse(localStorage.getItem('boomcart_user') || 'null');
-  if (user?.token) config.headers.Authorization = `Bearer ${user.token}`;
-  return config;
-}, (err) => Promise.reject(err));
+api.interceptors.request.use((config) => config, (err) => Promise.reject(err));
 
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
-    if (err.response?.status === 401 && !err.config?.url?.includes('/auth/login')) {
-      localStorage.removeItem('boomcart_user');
-      window.location.href = '/login';
+  async (err) => {
+    const originalConfig = err.config;
+
+    // If 401 and it's not the login or refresh route itself, try refreshing
+    if (err.response?.status === 401 && !originalConfig.url.includes('/auth/login') && !originalConfig.url.includes('/auth/refresh')) {
+      if (!originalConfig._retry) {
+        originalConfig._retry = true;
+        try {
+          await api.post('/auth/refresh');
+          return api(originalConfig);
+        } catch (_error) {
+          // Refresh token expired or invalid
+          localStorage.removeItem('boomcart_user');
+          window.location.href = '/login';
+          return Promise.reject(_error);
+        }
+      }
     }
+    
     return Promise.reject(err);
   }
 );

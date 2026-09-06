@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { loginUser, sendOtp, verifyOtp } from '../services/authService';
+import { loginUser, sendOtp, verifyOtp, logoutUser } from '../services/authService';
 import { getWishlist } from '../services/userService';
 import toast from 'react-hot-toast';
 
@@ -37,7 +37,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem(KEY, JSON.stringify(data.data));
       setUser(data.data);
       toast.success(`Welcome back, ${data.data.name}!`);
-      // Load wishlist after login
       setTimeout(refreshWishlist, 0);
       return { success: true };
     } catch (err) {
@@ -75,7 +74,12 @@ export const AuthProvider = ({ children }) => {
     } finally { setLoading(false); }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await logoutUser();
+    } catch (err) {
+      console.error('Logout request failed', err);
+    }
     localStorage.removeItem(KEY);
     localStorage.removeItem('boomcart_wishlist');
     setUser(null);

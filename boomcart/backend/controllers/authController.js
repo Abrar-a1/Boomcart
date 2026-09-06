@@ -1,7 +1,8 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const Otp = require('../models/Otp');
-const generateToken = require('../utils/generateToken');
+const generateTokens = require('../utils/generateTokens');
+const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { sendEmail } = require('../utils/sendEmail');
 
@@ -79,9 +80,11 @@ const verifyOtp = asyncHandler(async (req, res) => {
     const user = await User.create({ name, email, password, role, profileCompleted: false });
     await Otp.findOneAndDelete({ email });
 
+    generateTokens(res, user._id);
+
     return res.status(201).json({
       success: true,
-      data: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar, token: generateToken(user._id) },
+      data: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar, profileCompleted: user.profileCompleted },
     });
   } 
   
@@ -109,9 +112,12 @@ const login = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email }).select('+password');
   if (!user || !(await user.matchPassword(password))) { res.status(401); throw new Error('Invalid credentials'); }
   if (!user.isActive) { res.status(401); throw new Error('Account deactivated'); }
+  
+  generateTokens(res, user._id);
+  
   res.json({
     success: true,
-    data: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar, token: generateToken(user._id) },
+    data: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar, profileCompleted: user.profileCompleted },
   });
 });
 
@@ -137,7 +143,7 @@ const changePassword = asyncHandler(async (req, res) => {
   if (!(await user.matchPassword(currentPassword))) { res.status(400); throw new Error('Current password incorrect'); }
   user.password = newPassword;
   await user.save();
-  res.json({ success: true, message: 'Password updated', data: { token: generateToken(user._id) } });
+  res.json({ success: true, message: 'Password updated' });
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
@@ -163,4 +169,38 @@ const resetPassword = asyncHandler(async (req, res) => {
   res.json({ success: true, message: 'Password reset successful. Please login.' });
 });
 
-module.exports = { sendOtp, verifyOtp, login, getMe, updateProfile, changePassword, resetPassword };
+const refresh = asyncHandler(async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    res.status(401); throw new Error('Not authorized, no refresh token');
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    if (!user || !user.isActive) {
+      res.status(401); throw new Error('Not authorized, user invalid');
+    }
+
+    // Issue a new access token
+    const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== 'development',
+      sameSite: 'strict',
+    };
+    res.cookie('accessToken', accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
+    
+    res.json({ success: true, message: 'Access token refreshed' });
+  } catch (error) {
+    res.status(401); throw new Error('Not authorized, invalid refresh token');
+  }
+});
+
+const logout = asyncHandler(async (req, res) => {
+  res.cookie('accessToken', '', { httpOnly: true, expires: new Date(0) });
+  res.cookie('refreshToken', '', { httpOnly: true, expires: new Date(0) });
+  res.json({ success: true, message: 'Logged out successfully' });
+});
+
+module.exports = { sendOtp, verifyOtp, login, getMe, updateProfile, changePassword, resetPassword, refresh, logout };
