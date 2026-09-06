@@ -67,9 +67,8 @@ export default function Checkout() {
         return;
       }
 
-      // The Razorpay order amount should be fetched from the DB order object now
-      const rpAmount = dbOrder.totalPrice;
-      const { data: rpData } = await createRazorpayOrder({ amount: rpAmount, orderId: dbOrder._id });
+      // The Razorpay order amount is calculated on the backend now
+      const { data: rpData } = await createRazorpayOrder({ orderId: dbOrder._id });
       const rpOrder = rpData.data;
 
       await new Promise((resolve, reject) => {
