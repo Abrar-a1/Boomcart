@@ -16,7 +16,9 @@ export default function ProductDetail() {
   const [showBooking, setShowBooking] = useState(false);
   const [selectedSize, setSelectedSize] = useState('');
   
-  // Zustand hook
+  // Mobile Gallery State
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
   const addToCart = useStore(state => state.addToCart);
 
   useEffect(() => {
@@ -26,172 +28,207 @@ export default function ProductDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="p-20 text-center animate-pulse">Loading amazing fashion...</div>;
-  if (!product) return <div className="p-20 text-center font-bold text-red-500">Product Not Found</div>;
+  if (loading) return <div className="min-h-[85vh] flex items-center justify-center font-body text-sm text-[var(--color-text-muted)] animate-pulse">Loading piece...</div>;
+  if (!product) return <div className="min-h-[85vh] flex items-center justify-center font-body text-sm font-bold text-[var(--color-error)]">Product Not Found</div>;
 
   const isBridal = product.category === 'bridal';
+  const isKids   = ['kids', 'boys', 'girls'].includes(product.category);
 
   const handleAddToCart = () => {
     if (!product.sizes?.length) {
-      // Products with no sizing explicitly (like generic accessories)
       addToCart(product, null, 1);
-      toast.success(`${product.name} added to cart!`);
+      toast.success('Added to bag');
       return;
     }
     
     if (!selectedSize) {
-      toast.error('You must select a size first!');
+      toast.error('Please select a size');
       return;
     }
 
     const sizeObj = product.sizes.find(s => s.size === selectedSize);
     if (!sizeObj || sizeObj.stock === 0) {
-      toast.error('Sorry, this size is out of stock!');
+      toast.error('Selected size is out of stock');
       return;
     }
 
     addToCart(product, selectedSize, 1);
-    toast.success(`Added Size ${selectedSize} to your cart! 🛍️`);
+    toast.success('Added to bag');
   };
 
-  const isKids   = ['kids', 'boys', 'girls'].includes(product.category);
+  const images = product.images && product.images.length > 0 ? product.images : [{ url: '/images/placeholder.png' }];
+  const price = product.discountPrice > 0 ? product.discountPrice : product.price;
 
-  // --- KIDS UX HANDLER ---
-  if (isKids) {
-    return (
-      <KidsLayout>
-        <Helmet><title>{product.name} | Kids Fashion — Boomcart</title></Helmet>
-        <div className="flex flex-col md:flex-row gap-10">
-          <div className="w-full md:w-1/2 rounded-2xl overflow-hidden shadow-lg border border-yellow-200">
-             <img src={product.images[0]?.url} alt={product.name} className="w-full h-full object-cover" />
-          </div>
-          <div className="w-full md:w-1/2 flex flex-col justify-center">
-             <h1 className="text-4xl font-black text-gray-800 mb-2">{product.name}</h1>
-             <p className="text-3xl text-blue-600 font-bold mb-6">₹{product.price.toLocaleString()}</p>
-             <p className="text-gray-600 mb-8">{product.description}</p>
-             
-             {product.sizes?.length > 0 && (
-               <div className="mb-6">
-                 <p className="text-sm font-bold text-gray-500 uppercase mb-2">Select Size</p>
-                 <div className="flex gap-3">
-                   {product.sizes.map(s => (
-                     <button key={s.size} disabled={s.stock === 0} onClick={() => setSelectedSize(s.size)}
-                       className={`w-12 h-12 rounded-full font-bold border-2 transition-all ${
-                         s.stock === 0 ? 'bg-gray-100 text-gray-300 border-gray-100 line-through' :
-                         selectedSize === s.size ? 'bg-yellow-400 text-navy border-yellow-400 shadow-md scale-110' : 'border-gray-200 text-gray-600 hover:border-yellow-400'
-                       }`}>
-                       {s.size}
-                     </button>
-                   ))}
-                 </div>
-               </div>
-             )}
-             
-             <button 
-               onClick={handleAddToCart}
-               disabled={(!selectedSize && product.sizes?.length > 0) || product.stock === 0} 
-               className="bg-blue-600 text-white font-black py-4 rounded-2xl shadow-[0_4px_0_0_rgba(37,99,235,1)] hover:translate-y-1 hover:shadow-[0_0px_0_0_rgba(37,99,235,1)] transition-all disabled:opacity-50 min-h-[44px]">
-               {product.stock === 0 ? 'Out of Stock' : (selectedSize || !product.sizes?.length ? 'Toss into Cart! 🛒' : 'Pick a size first!')}
-             </button>
-          </div>
-        </div>
-        <ReviewsSection productId={product._id} />
-      </KidsLayout>
-    );
-  }
-
-  // --- BRIDAL / COUTURE UX HANDLER ---
-  if (isBridal) {
-    return (
-      <BridalLayout>
-        <Helmet><title>{product.name} | Couture Boutique — Boomcart</title></Helmet>
-        
-        {showBooking && <BookingModal productId={product._id} onClose={() => setShowBooking(false)} />}
-  
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          <div className="w-full aspect-[3/4] bg-[#fdfbf7] p-4 border border-[#f0ece6]">
-            <img src={product.images[0]?.url} alt={product.name} className="w-full h-full object-cover shadow-sm" />
-          </div>
-          <div>
-            <h1 className="text-4xl md:text-5xl font-serif text-[#2c2825] mb-4">{product.name}</h1>
-            <p className="font-sans text-lg text-[#8a8176] tracking-wider mb-8">{product.priceRange ? product.priceRange : `₹${product.price.toLocaleString()}`}</p>
-            
-            <div className="w-12 h-[1px] bg-[#d9cbb8] mb-8"></div>
-            
-            <p className="font-serif text-[#6b6660] leading-relaxed mb-12">
-              {product.description}
-            </p>
-  
-            <div className="space-y-4">
-              <button onClick={() => setShowBooking(true)} 
-                className="w-full bg-[#2c2825] text-[#fdfbf7] font-serif uppercase tracking-widest text-sm py-5 hover:bg-[#1a1816] transition-colors min-h-[44px]">
-                Reserve Consultation
-              </button>
-            </div>
-          </div>
-        </div>
-        <ReviewsSection productId={product._id} />
-      </BridalLayout>
-    );
-  }
-
-  // --- DEFAULT ADULT UX HANDLER (Men, Women, Unisex) ---
-  return (
-    <div className="flex flex-col page-transition gap-10">
+  const content = (
+    <div className="max-w-[1440px] mx-auto animate-smooth-reveal">
       <Helmet><title>{product.name} — Boomcart</title></Helmet>
       
-      <div className="flex flex-col md:flex-row gap-10 lg:gap-16">
-        {/* Image */}
-        <div className="w-full md:w-1/2 aspect-[4/5] rounded-2xl overflow-hidden shadow-md border border-[#E5D9C5] bg-white">
-          <img src={product.images[0]?.url} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-102" />
-        </div>
+      {showBooking && <BookingModal productId={product._id} onClose={() => setShowBooking(false)} />}
 
-      {/* Info */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center">
-        <span className="text-xs tracking-[0.2em] uppercase mb-2 font-semibold text-[#D4AF37]">
-          {product.category} · {product.subCategory}
-        </span>
-        <h1 className="font-heading text-3xl sm:text-4xl font-bold text-[#1E3A3A] mb-3">{product.name}</h1>
+      <div className="flex flex-col lg:flex-row gap-0 lg:gap-16">
         
-        <div className="flex items-center gap-4 mb-6">
-          <span className="text-2xl sm:text-3xl font-bold text-[#C25A3C]">₹{product.price.toLocaleString()}</span>
-          {product.discountPrice > 0 && (
-            <span className="text-sm font-medium text-[#9eaa9f] line-through">₹{product.price.toLocaleString()}</span>
-          )}
-        </div>
+        {/* ── 60% LEFT: EDITORIAL GALLERY ── */}
+        <div className="w-full lg:w-[60%] flex flex-col">
+          
+          {/* Desktop: Stacked full-width images */}
+          <div className="hidden lg:flex flex-col gap-4">
+            {images.map((img, idx) => (
+              <img 
+                key={idx} 
+                src={img.url} 
+                alt={`${product.name} view ${idx + 1}`} 
+                className="w-full bg-[var(--color-border-light)] object-cover rounded-sm"
+              />
+            ))}
+          </div>
 
-        <p className="text-[#2C3E2F] text-sm sm:text-base leading-relaxed mb-8">{product.description}</p>
-        
-        {product.sizes?.length > 0 && (
-          <div className="mb-8">
-            <p className="text-xs font-bold text-[#6b7c6e] uppercase tracking-wider mb-3">Select Size</p>
-            <div className="flex flex-wrap gap-2.5">
-              {product.sizes.map(s => (
-                <button key={s.size} disabled={s.stock === 0} onClick={() => setSelectedSize(s.size)}
-                  className={`w-11 h-11 text-xs font-semibold rounded-full border transition-all ${
-                    s.stock === 0 ? 'bg-[#f0e8da] text-[#9eaa9f] border-[#f0e8da] line-through cursor-not-allowed' :
-                    selectedSize === s.size ? 'bg-[#1E3A3A] text-white border-[#1E3A3A] shadow-md scale-105' : 'border-[#E5D9C5] text-[#2C3E2F] hover:border-[#1E3A3A]'
-                  }`}>
-                  {s.size}
-                </button>
+          {/* Mobile: Swipeable Carousel */}
+          <div className="lg:hidden relative w-full h-[70vh] bg-[var(--color-border-light)]">
+            <div 
+              className="w-full h-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+              onScroll={(e) => {
+                const scrollLeft = e.target.scrollLeft;
+                const width = e.target.clientWidth;
+                setActiveImageIndex(Math.round(scrollLeft / width));
+              }}
+            >
+              {images.map((img, idx) => (
+                <img 
+                  key={idx} 
+                  src={img.url} 
+                  alt={`${product.name} view ${idx + 1}`} 
+                  className="w-full h-full flex-shrink-0 snap-center object-cover"
+                />
               ))}
             </div>
+            {/* Dots */}
+            {images.length > 1 && (
+              <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
+                {images.map((_, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`h-1.5 rounded-full transition-all duration-300 ${activeImageIndex === idx ? 'w-6 bg-[var(--color-primary)]' : 'w-1.5 bg-white/60'}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        )}
-        
-        <button 
-          onClick={handleAddToCart}
-          disabled={(!selectedSize && product.sizes?.length > 0) || product.stock === 0} 
-          className="w-full md:max-w-xs bg-[#C25A3C] hover:bg-[#1E3A3A] text-white font-bold py-4 rounded-full tracking-widest uppercase text-sm shadow-md hover:shadow-lg transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed min-h-[44px]">
-          {product.stock === 0 ? 'Out of Stock' : (selectedSize || !product.sizes?.length ? 'Add to Cart 🛒' : 'Pick a size first!')}
-        </button>
+        </div>
+
+        {/* ── 40% RIGHT: INFO (STICKY) ── */}
+        <div className="w-full lg:w-[40%] px-6 py-10 lg:px-0 lg:py-12">
+          <div className="lg:sticky lg:top-32 flex flex-col">
+            
+            {/* Breadcrumbs / Category */}
+            <span className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-4 block">
+              {product.category} {product.subCategory ? ` / ${product.subCategory}` : ''}
+            </span>
+
+            {/* Title */}
+            <h1 className="font-heading text-4xl lg:text-5xl font-bold text-[var(--color-primary)] leading-[1.1] mb-6">
+              {product.name}
+            </h1>
+
+            {/* Price */}
+            <div className="flex items-center gap-4 mb-8">
+              {isBridal && product.priceRange ? (
+                <span className="font-body text-xl font-bold text-[var(--color-text)]">{product.priceRange}</span>
+              ) : (
+                <>
+                  <span className="font-body text-2xl font-bold text-[var(--color-text)]">₹{price.toLocaleString()}</span>
+                  {product.discountPrice > 0 && (
+                    <span className="font-body text-lg font-medium text-[var(--color-text-light)] line-through">₹{product.price.toLocaleString()}</span>
+                  )}
+                </>
+              )}
+            </div>
+
+            <div className="w-12 h-[1px] bg-[var(--color-accent)] opacity-40 mb-8" />
+
+            {/* Description */}
+            <p className="font-body text-sm text-[var(--color-text)] opacity-90 leading-relaxed mb-10">
+              {product.description}
+            </p>
+
+            {/* Sizing */}
+            {!isBridal && product.sizes?.length > 0 && (
+              <div className="mb-10">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">Select Size</span>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {product.sizes.map(s => (
+                    <button 
+                      key={s.size} 
+                      disabled={s.stock === 0} 
+                      onClick={() => setSelectedSize(s.size)}
+                      className={`min-w-[3rem] h-12 px-4 font-body text-sm font-semibold border rounded-sm transition-all focus-visible:outline ${
+                        s.stock === 0 
+                          ? 'bg-[var(--color-background)] text-[var(--color-border)] border-[var(--color-border-light)] line-through cursor-not-allowed' 
+                          : selectedSize === s.size 
+                            ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)]' 
+                            : 'bg-white border-[var(--color-border)] text-[var(--color-text)] hover:border-[var(--color-primary)]'
+                      }`}
+                    >
+                      {s.size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* CTA */}
+            {isBridal ? (
+              <button 
+                onClick={() => setShowBooking(true)} 
+                className="w-full h-14 bg-[var(--color-primary)] text-white font-body text-sm font-bold uppercase tracking-[0.15em] rounded-sm transition-all hover:bg-black focus-visible:outline"
+              >
+                Reserve Consultation
+              </button>
+            ) : (
+              <button 
+                onClick={handleAddToCart}
+                disabled={(!selectedSize && product.sizes?.length > 0) || product.stock === 0} 
+                className="w-full h-14 bg-[var(--color-cta)] text-white font-body text-sm font-bold uppercase tracking-[0.15em] rounded-sm shadow-[0_4px_14px_rgba(194,90,60,0.3)] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none focus-visible:outline"
+              >
+                {product.stock === 0 ? 'Out of Stock' : (selectedSize || !product.sizes?.length ? 'Add to Bag' : 'Select a size')}
+              </button>
+            )}
+
+            {/* Trust Signals */}
+            <div className="mt-10 flex flex-col gap-4 py-6 border-y border-[var(--color-border-light)]">
+              <div className="flex items-center gap-3">
+                <span className="text-[var(--color-accent)]">✓</span>
+                <span className="font-body text-xs text-[var(--color-text-muted)]">Free global delivery on all luxury pieces</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[var(--color-accent)]">✓</span>
+                <span className="font-body text-xs text-[var(--color-text-muted)]">Complimentary returns within 14 days</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[var(--color-accent)]">✓</span>
+                <span className="font-body text-xs text-[var(--color-text-muted)]">Secure encrypted checkout</span>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
 
-      {/* Reviews rendered at full width below */}
-      <div className="w-full">
+      <div className="px-6 lg:px-12 py-20">
         <ReviewsSection productId={product._id} />
       </div>
     </div>
   );
+
+  // Wrap in appropriate layout if necessary
+  if (isBridal) {
+    return <BridalLayout>{content}</BridalLayout>;
+  }
+  
+  if (isKids) {
+    return <KidsLayout>{content}</KidsLayout>;
+  }
+
+  return content;
 }

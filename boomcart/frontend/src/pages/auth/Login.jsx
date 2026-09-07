@@ -3,14 +3,13 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Helmet } from 'react-helmet-async';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import './Auth.css';
 
 export default function Login() {
   const { login, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/';
-  const [form, setForm] = useState({ email:'', password:'' });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -20,36 +19,68 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-page">
+    <div className="min-h-[85vh] flex items-center justify-center bg-[var(--color-background)] px-4">
       <Helmet><title>Login — Boomcart</title></Helmet>
-      <div className="auth-card">
-        <h1 className="auth-logo">Boomcart</h1>
-        <p className="auth-subtitle">Welcome back! Sign in to continue.</p>
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Email Address</label>
-            <input type="email" className="form-input" placeholder="you@example.com" value={form.email}
-              onChange={e => setForm({...form, email:e.target.value})} required />
+      
+      <div className="w-full max-w-md bg-transparent lg:bg-white lg:p-12 lg:rounded-sm lg:border lg:border-[var(--color-border-light)] lg:shadow-sm">
+        
+        <div className="text-center mb-10">
+          <h1 className="font-heading text-4xl font-bold text-[var(--color-primary)] mb-3 tracking-tight">Login</h1>
+          <p className="font-body text-sm text-[var(--color-text-muted)]">Welcome back. Enter your details to continue.</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          
+          <div className="flex flex-col gap-2">
+            <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] ml-1">Email Address</label>
+            <input 
+              type="email" 
+              placeholder="you@example.com"
+              value={form.email}
+              onChange={e => setForm({...form, email: e.target.value})}
+              required
+              className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+            />
           </div>
-          <div className="form-group">
-            <label>Password</label>
-            <div className="password-wrapper">
-              <input type={showPassword ? 'text' : 'password'} className="form-input" placeholder="••••••••" value={form.password}
-                onChange={e => setForm({...form, password:e.target.value})} required style={{ paddingRight: '40px' }} />
-              <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+
+          <div className="flex flex-col gap-2 relative">
+            <div className="flex items-center justify-between ml-1">
+              <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">Password</label>
+              <Link to="/forgot-password" className="font-body text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-cta)] transition-colors">Forgot password?</Link>
+            </div>
+            <div className="relative">
+              <input 
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={form.password}
+                onChange={e => setForm({...form, password: e.target.value})}
+                required
+                className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] pr-12"
+              />
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-light)] hover:text-[var(--color-primary)] transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
                 {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
               </button>
             </div>
           </div>
-          <button className="btn btn-primary btn-block btn-lg auth-submit" type="submit" disabled={loading}>
-            {loading ? 'Signing in…' : 'Sign In'}
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full mt-4 h-12 bg-[var(--color-cta)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline"
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-        <div style={{ textAlign: 'right', marginTop: '16px', marginBottom: '8px' }}>
-          <Link to="/forgot-password" style={{ fontSize: '14px', color: 'var(--color-text-muted, #6b7c6e)', padding: '8px 4px', display: 'inline-block', fontWeight: '500', transition: 'color 0.2s' }}>Forgot password?</Link>
-        </div>
-        <div className="auth-switch" style={{ marginTop:20 }}>
-          Don't have an account? <Link to="/register">Create one</Link>
+
+        <div className="mt-8 text-center border-t border-[var(--color-border-light)] pt-8">
+          <p className="font-body text-sm text-[var(--color-text-muted)]">
+            Don't have an account? <Link to="/register" className="font-bold text-[var(--color-primary)] hover:text-[var(--color-cta)] transition-colors">Create one</Link>
+          </p>
         </div>
       </div>
     </div>

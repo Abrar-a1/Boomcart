@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiStar, FiCheckCircle } from 'react-icons/fi';
-import { getProductReviews, createReview } from '../../../services/reviewService';
-import { useAuth } from '../../../context/AuthContext';
+import { getProductReviews, createReview } from '../../services/reviewService';
+import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
 export default function ReviewsSection({ productId }) {

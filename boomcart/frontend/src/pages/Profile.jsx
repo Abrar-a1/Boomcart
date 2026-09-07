@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { FiUser, FiPackage, FiLock, FiEye, FiMapPin, FiHeart, FiTrash2, FiPlus, FiShield } from 'react-icons/fi';
+import { FiUser, FiPackage, FiLock, FiMapPin, FiHeart, FiTrash2, FiPlus, FiShield, FiEye } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { getMyOrders } from '../services/orderService';
 import { updateProfile, changePassword } from '../services/authService';
 import { addAddress, deleteAddress, getWishlist, toggleWishlist } from '../services/userService';
 import { useCart } from '../context/CartContext';
-import Loader from '../components/common/Loader';
 import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 
-const STATUS_BADGE = { pending:'badge-orange', confirmed:'badge-blue', processing:'badge-blue', shipped:'badge-blue', delivered:'badge-green', cancelled:'badge-red', refunded:'badge-gray' };
+const STATUS_BADGE = { pending:'bg-orange-100 text-orange-800', confirmed:'bg-blue-100 text-blue-800', processing:'bg-blue-100 text-blue-800', shipped:'bg-blue-100 text-blue-800', delivered:'bg-green-100 text-green-800', cancelled:'bg-red-100 text-red-800', refunded:'bg-gray-100 text-gray-800' };
 const STATES = ['Jammu & Kashmir','Delhi','Maharashtra','Karnataka','Tamil Nadu','Rajasthan','Uttar Pradesh','Gujarat','West Bengal','Punjab','Haryana','Kerala','Madhya Pradesh','Bihar','Assam','Himachal Pradesh','Other'];
 
 export default function Profile() {
@@ -98,90 +97,122 @@ export default function Profile() {
   ];
 
   return (
-    <div className="page">
+    <div className="w-full min-h-screen bg-[var(--color-background)] py-12 lg:py-20">
       <Helmet><title>My Profile — Boomcart</title></Helmet>
       
-      {/* ── Duplicate className FIXED here ── */}
-      <div className="container responsive-2col" style={{ display:'grid', gridTemplateColumns:'220px 1fr', gap:28, alignItems:'start' }}>
+      <div className="max-w-[1200px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row gap-10 lg:gap-16 items-start animate-smooth-reveal">
 
-        {/* Sidebar */}
-        <div className="card" style={{ padding:0, overflow:'hidden' }}>
-          <div style={{ padding:'24px 20px', background:'var(--navy)', textAlign:'center' }}>
-            <div style={{ width:64, height:64, borderRadius:'50%', background:'var(--gold)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 12px', fontSize:26, fontWeight:700, color:'var(--navy)' }}>
+        {/* ── SIDEBAR ── */}
+        <div className="w-full lg:w-[280px] shrink-0 bg-white border border-[var(--color-border-main)] rounded-sm overflow-hidden flex flex-col">
+          <div className="p-8 bg-[var(--color-primary)] text-center">
+            <div className="w-16 h-16 rounded-full bg-[var(--color-accent)] mx-auto mb-4 flex items-center justify-center font-heading text-3xl font-bold text-[var(--color-primary)]">
               {user?.name?.[0]?.toUpperCase()}
             </div>
-            <p style={{ color:'var(--white)', fontWeight:700, fontSize:15 }}>{user?.name}</p>
-            <p style={{ color:'rgba(255,255,255,.5)', fontSize:12, marginTop:2 }}>{user?.email}</p>
+            <p className="font-heading text-xl font-bold text-white mb-1">{user?.name}</p>
+            <p className="font-body text-xs text-white/60 mb-2">{user?.email}</p>
             {user?.role === 'admin' && (
-              <span style={{ display:'inline-flex', alignItems:'center', gap:4, marginTop:8, background:'rgba(232,197,71,.2)', color:'var(--gold)', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, letterSpacing:'.5px' }}>
-                <FiShield size={10}/> ADMIN
+              <span className="inline-flex items-center gap-1.5 mt-2 bg-[var(--color-accent)]/20 text-[var(--color-accent)] font-body text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm">
+                <FiShield size={12}/> ADMIN
               </span>
             )}
           </div>
-          {TABS.map(({ id, label, Icon }) => (
-            <button key={id} onClick={() => setTab(id)}
-              style={{ display:'flex', alignItems:'center', gap:10, width:'100%', padding:'13px 20px', background:tab===id?'var(--cream)':'transparent', color:tab===id?'var(--navy)':'var(--gray-500)', fontWeight:tab===id?700:400, fontSize:14, borderLeft:tab===id?'3px solid var(--navy)':'3px solid transparent', border:'none', cursor:'pointer', transition:'all .15s', textAlign:'left' }}>
-              <Icon size={16}/> {label}
-            </button>
-          ))}
+          <div className="flex flex-col py-2">
+            {TABS.map(({ id, label, Icon }) => (
+              <button 
+                key={id} 
+                onClick={() => setTab(id)}
+                className={`flex items-center gap-3 px-6 py-4 font-body text-sm text-left transition-colors focus-visible:outline ${
+                  tab === id 
+                    ? 'bg-[var(--color-background)] text-[var(--color-primary)] font-bold border-l-4 border-[var(--color-primary)]' 
+                    : 'text-[var(--color-text-muted)] hover:bg-[var(--color-background)]/50 border-l-4 border-transparent'
+                }`}
+              >
+                <Icon size={16}/> {label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Content panel */}
-        <div>
+        {/* ── CONTENT PANEL ── */}
+        <div className="flex-1 w-full min-w-0">
 
-          {/* ── Profile ── */}
+          {/* PROFILE */}
           {tab === 'profile' && (
-            <div className="card" style={{ padding:28 }}>
-              <h2 style={{ fontFamily:'var(--font-serif)', fontSize:20, color:'var(--navy)', marginBottom:24 }}>Personal Information</h2>
-              <form onSubmit={saveProfile} style={{ display:'flex', flexDirection:'column', gap:16, maxWidth:480 }}>
+            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 lg:p-12 animate-fade-in">
+              <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)] mb-10">Personal Information</h2>
+              <form onSubmit={saveProfile} className="flex flex-col gap-6 max-w-[500px]">
                 {[{n:'name',l:'Full Name',t:'text'},{n:'email',l:'Email Address',t:'email'}].map(f => (
-                  <div key={f.n} className="form-group">
-                    <label>{f.l}</label>
-                    <input type={f.t} className="form-input" value={profileForm[f.n]} onChange={e => setProfileForm({...profileForm,[f.n]:e.target.value})} />
+                  <div key={f.n} className="flex flex-col gap-2">
+                    <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{f.l}</label>
+                    <input 
+                      type={f.t} 
+                      className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" 
+                      value={profileForm[f.n]} 
+                      onChange={e => setProfileForm({...profileForm,[f.n]:e.target.value})} 
+                    />
                   </div>
                 ))}
-                <div className="form-group">
-                  <label>Role</label>
-                  <input className="form-input" value={user?.role} disabled style={{ background:'var(--gray-50)', color:'var(--gray-400)' }} />
+                <div className="flex flex-col gap-2">
+                  <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">Role</label>
+                  <input className="w-full px-4 py-3 bg-[var(--color-background)] border border-[var(--color-border-light)] rounded-sm font-body text-sm text-[var(--color-text-muted)] cursor-not-allowed" value={user?.role} disabled />
                 </div>
-                <button className="btn btn-primary" type="submit" disabled={saving} style={{ alignSelf:'flex-start' }}>
-                  {saving ? 'Saving…' : 'Save Changes'}
+                <button 
+                  className="mt-4 self-start px-8 py-3 bg-[var(--color-primary)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:bg-black focus-visible:outline disabled:opacity-50 disabled:cursor-not-allowed" 
+                  type="submit" 
+                  disabled={saving}
+                >
+                  {saving ? 'Saving...' : 'Save Changes'}
                 </button>
               </form>
             </div>
           )}
 
-          {/* ── Orders ── */}
+          {/* ORDERS */}
           {tab === 'orders' && (
-            <div className="card" style={{ padding:28 }}>
-              <h2 style={{ fontFamily:'var(--font-serif)', fontSize:20, color:'var(--navy)', marginBottom:24 }}>My Orders</h2>
-              {ordersLoading ? <Loader /> : orders.length === 0 ? (
-                <div className="empty-state">
-                  <FiPackage size={48} style={{ margin:'0 auto 16px', display:'block', opacity:.2 }} />
-                  <h3>No orders yet</h3>
-                  <Link to="/" className="btn btn-primary" style={{ marginTop:16 }}>Shop Now</Link>
+            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 lg:p-12 animate-fade-in">
+              <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)] mb-10">My Orders</h2>
+              {ordersLoading ? <div className="text-center text-[var(--color-text-muted)] py-10">Loading orders...</div> : orders.length === 0 ? (
+                <div className="text-center py-16">
+                  <FiPackage size={48} className="mx-auto text-[var(--color-text-light)] opacity-50 mb-6" />
+                  <h3 className="font-heading text-2xl font-bold text-[var(--color-primary)] mb-4">No orders yet</h3>
+                  <Link to="/" className="inline-flex items-center gap-2 px-8 py-3 bg-[var(--color-cta)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm hover:opacity-90 transition-opacity">
+                    Shop Now
+                  </Link>
                 </div>
               ) : (
-                <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+                <div className="flex flex-col gap-6">
                   {orders.map(o => (
-                    <div key={o._id} style={{ border:'1px solid var(--gray-100)', borderRadius:'var(--radius-lg)', padding:'16px 20px' }}>
-                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:10, marginBottom:12 }}>
+                    <div key={o._id} className="border border-[var(--color-border-main)] rounded-sm p-6 lg:p-8">
+                      <div className="flex flex-wrap justify-between items-start gap-4 mb-6 pb-6 border-b border-[var(--color-border-light)]">
                         <div>
-                          <p style={{ fontSize:13, fontWeight:700, color:'var(--navy)' }}>#{o._id.slice(-8).toUpperCase()}</p>
-                          <p style={{ fontSize:12, color:'var(--gray-400)' }}>{new Date(o.createdAt).toLocaleDateString('en-IN')}</p>
+                          <p className="font-heading text-xl font-bold text-[var(--color-primary)]">#{o._id.slice(-8).toUpperCase()}</p>
+                          <p className="font-body text-xs text-[var(--color-text-muted)] mt-1">{new Date(o.createdAt).toLocaleDateString('en-IN')}</p>
                         </div>
-                        <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-                          <span className={`badge ${STATUS_BADGE[o.orderStatus]||'badge-gray'}`}>{o.orderStatus.toUpperCase()}</span>
-                          <Link to={`/order/${o._id}`} className="btn btn-outline btn-sm"><FiEye size={13}/> Track</Link>
+                        <div className="flex items-center gap-4">
+                          <span className={`font-body text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-sm ${STATUS_BADGE[o.orderStatus]||'bg-gray-100 text-gray-800'}`}>
+                            {o.orderStatus}
+                          </span>
+                          <Link to={`/order/${o._id}`} className="inline-flex items-center gap-2 px-4 py-2 border border-[var(--color-primary)] text-[var(--color-primary)] font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-[var(--color-primary)] hover:text-white transition-colors">
+                            <FiEye size={12}/> Track
+                          </Link>
                         </div>
                       </div>
-                      <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:10 }}>
+                      <div className="flex flex-wrap gap-4 mb-6">
                         {o.orderItems.slice(0,4).map(item => (
-                          <img key={item._id} src={item.image} alt={item.name} style={{ width:48, height:58, objectFit:'cover', borderRadius:6 }} />
+                          <div key={item._id} className="w-16 h-20 bg-[var(--color-border-light)] rounded-sm overflow-hidden flex-shrink-0 border border-[var(--color-border-main)]">
+                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          </div>
                         ))}
-                        {o.orderItems.length > 4 && <div style={{ width:48, height:58, borderRadius:6, background:'var(--gray-100)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color:'var(--gray-500)' }}>+{o.orderItems.length-4}</div>}
+                        {o.orderItems.length > 4 && (
+                          <div className="w-16 h-20 bg-[var(--color-background)] border border-[var(--color-border-light)] rounded-sm flex items-center justify-center font-body text-xs font-bold text-[var(--color-text-muted)]">
+                            +{o.orderItems.length-4}
+                          </div>
+                        )}
                       </div>
-                      <p style={{ fontWeight:700, color:'var(--navy)', fontSize:15 }}>Total: ₹{o.totalPrice?.toLocaleString()}</p>
+                      <div className="flex justify-between items-end">
+                        <span className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">Order Total</span>
+                        <span className="font-heading text-xl font-bold text-[var(--color-primary)]">₹{o.totalPrice?.toLocaleString()}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -189,62 +220,65 @@ export default function Profile() {
             </div>
           )}
 
-          {/* ── Addresses ── */}
+          {/* ADDRESSES */}
           {tab === 'addresses' && (
-            <div className="card" style={{ padding:28 }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:24 }}>
-                <h2 style={{ fontFamily:'var(--font-serif)', fontSize:20, color:'var(--navy)' }}>Saved Addresses</h2>
-                <button className="btn btn-primary btn-sm" onClick={() => setShowAddrForm(!showAddrForm)}>
+            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 lg:p-12 animate-fade-in">
+              <div className="flex justify-between items-center mb-10">
+                <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)]">Saved Addresses</h2>
+                <button 
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] text-white font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors" 
+                  onClick={() => setShowAddrForm(!showAddrForm)}
+                >
                   <FiPlus size={14}/> {showAddrForm ? 'Cancel' : 'Add New'}
                 </button>
               </div>
 
               {showAddrForm && (
-                <form onSubmit={saveAddress} style={{ background:'var(--cream)', borderRadius:'var(--radius-lg)', padding:20, marginBottom:24 }}>
-                  <h4 style={{ color:'var(--navy)', marginBottom:16, fontWeight:700 }}>New Address</h4>
-                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-                    {[{n:'fullName',l:'Full Name',col:'1/-1'},{n:'phone',l:'Phone'},{n:'addressLine1',l:'Address Line 1',col:'1/-1'},{n:'addressLine2',l:'Address Line 2 (optional)',col:'1/-1'},{n:'city',l:'City'},{n:'pincode',l:'Pincode'}].map(f => (
-                      <div key={f.n} className="form-group" style={{ gridColumn:f.col||'auto' }}>
-                        <label style={{ fontSize:12 }}>{f.l}</label>
-                        <input className="form-input" style={{ fontSize:13 }} value={addrForm[f.n]} onChange={e => setAddrForm({...addrForm,[f.n]:e.target.value})} required={f.n!=='addressLine2'} />
+                <form onSubmit={saveAddress} className="bg-[var(--color-background)] border border-[var(--color-border-main)] rounded-sm p-8 mb-10">
+                  <h4 className="font-heading text-xl font-bold text-[var(--color-primary)] mb-6">New Address</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    {[{n:'fullName',l:'Full Name',col:'md:col-span-2'},{n:'phone',l:'Phone'},{n:'pincode',l:'Pincode'},{n:'addressLine1',l:'Address Line 1',col:'md:col-span-2'},{n:'addressLine2',l:'Address Line 2 (optional)',col:'md:col-span-2'},{n:'city',l:'City'}].map(f => (
+                      <div key={f.n} className={`flex flex-col gap-2 ${f.col || ''}`}>
+                        <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{f.l}</label>
+                        <input className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={addrForm[f.n]} onChange={e => setAddrForm({...addrForm,[f.n]:e.target.value})} required={f.n!=='addressLine2'} />
                       </div>
                     ))}
-                    <div className="form-group">
-                      <label style={{ fontSize:12 }}>State</label>
-                      <select className="form-input" style={{ fontSize:13 }} value={addrForm.state} onChange={e => setAddrForm({...addrForm,state:e.target.value})} required>
+                    <div className="flex flex-col gap-2">
+                      <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">State</label>
+                      <select className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={addrForm.state} onChange={e => setAddrForm({...addrForm,state:e.target.value})} required>
                         <option value="">Select state</option>
                         {STATES.map(s => <option key={s}>{s}</option>)}
                       </select>
                     </div>
-                    <div style={{ display:'flex', alignItems:'center', gap:8, gridColumn:'1/-1' }}>
-                      <input type="checkbox" id="isDefault" checked={addrForm.isDefault} onChange={e => setAddrForm({...addrForm,isDefault:e.target.checked})} />
-                      <label htmlFor="isDefault" style={{ fontSize:13 }}>Set as default address</label>
+                    <div className="flex items-center gap-3 md:col-span-2 mt-2">
+                      <input type="checkbox" id="isDefault" checked={addrForm.isDefault} onChange={e => setAddrForm({...addrForm,isDefault:e.target.checked})} className="w-4 h-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)]" />
+                      <label htmlFor="isDefault" className="font-body text-sm text-[var(--color-text)]">Set as default address</label>
                     </div>
                   </div>
-                  <button className="btn btn-primary btn-sm" type="submit" disabled={savingAddr} style={{ marginTop:12 }}>
-                    {savingAddr ? 'Saving…' : 'Save Address'}
+                  <button className="px-8 py-3 bg-[var(--color-primary)] text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors" type="submit" disabled={savingAddr}>
+                    {savingAddr ? 'Saving...' : 'Save Address'}
                   </button>
                 </form>
               )}
 
               {addresses.length === 0 ? (
-                <div className="empty-state" style={{ padding:'30px 0' }}>
-                  <FiMapPin size={40} style={{ margin:'0 auto 12px', display:'block', opacity:.2 }} />
-                  <p style={{ color:'var(--gray-400)' }}>No saved addresses yet.</p>
+                <div className="text-center py-16">
+                  <FiMapPin size={40} className="mx-auto text-[var(--color-text-light)] opacity-50 mb-6" />
+                  <p className="font-body text-[var(--color-text-muted)]">No saved addresses yet.</p>
                 </div>
               ) : (
-                <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {addresses.map(a => (
-                    <div key={a._id} style={{ border:'1px solid var(--gray-100)', borderRadius:'var(--radius-lg)', padding:'16px 20px', position:'relative' }}>
-                      {a.isDefault && <span className="badge badge-navy" style={{ position:'absolute', top:12, right:52, fontSize:10 }}>Default</span>}
-                      <button onClick={() => removeAddress(a._id)} style={{ position:'absolute', top:10, right:14, background:'none', border:'none', color:'var(--red)', cursor:'pointer', padding:4 }} title="Remove">
-                        <FiTrash2 size={15}/>
+                    <div key={a._id} className="relative border border-[var(--color-border-main)] rounded-sm p-6 flex flex-col items-start gap-4 hover:border-[var(--color-primary)] transition-colors group">
+                      {a.isDefault && <span className="absolute top-6 right-16 bg-[var(--color-background)] border border-[var(--color-border-light)] text-[var(--color-primary)] font-body text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm">Default</span>}
+                      <button onClick={() => removeAddress(a._id)} className="absolute top-6 right-6 text-[var(--color-text-light)] hover:text-[var(--color-cta)] transition-colors" title="Remove">
+                        <FiTrash2 size={18}/>
                       </button>
-                      <p style={{ fontWeight:700, color:'var(--navy)', fontSize:14 }}>{a.fullName}</p>
-                      <p style={{ fontSize:13, color:'var(--gray-600)', lineHeight:1.7, marginTop:4 }}>
+                      <p className="font-heading text-xl font-bold text-[var(--color-primary)] max-w-[80%] leading-tight">{a.fullName}</p>
+                      <p className="font-body text-sm text-[var(--color-text-muted)] leading-relaxed">
                         {a.addressLine1}{a.addressLine2?`, ${a.addressLine2}`:''}<br/>
                         {a.city}, {a.state} — {a.pincode}<br/>
-                        📞 {a.phone}
+                        <span className="inline-block mt-2 font-medium">📞 {a.phone}</span>
                       </p>
                     </div>
                   ))}
@@ -253,34 +287,34 @@ export default function Profile() {
             </div>
           )}
 
-          {/* ── Wishlist ── */}
+          {/* WISHLIST */}
           {tab === 'wishlist' && (
-            <div className="card" style={{ padding:28 }}>
-              <h2 style={{ fontFamily:'var(--font-serif)', fontSize:20, color:'var(--navy)', marginBottom:24 }}>My Wishlist</h2>
-              {wishLoading ? <Loader /> : wishItems.length === 0 ? (
-                <div className="empty-state" style={{ padding:'30px 0' }}>
-                  <FiHeart size={40} style={{ margin:'0 auto 12px', display:'block', opacity:.2 }} />
-                  <p style={{ color:'var(--gray-400)' }}>Your wishlist is empty.</p>
-                  <Link to="/" className="btn btn-primary btn-sm" style={{ marginTop:12 }}>Browse Products</Link>
+            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 lg:p-12 animate-fade-in">
+              <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)] mb-10">My Wishlist</h2>
+              {wishLoading ? <div className="text-center text-[var(--color-text-muted)] py-10">Loading wishlist...</div> : wishItems.length === 0 ? (
+                <div className="text-center py-16">
+                  <FiHeart size={40} className="mx-auto text-[var(--color-text-light)] opacity-50 mb-6" />
+                  <p className="font-body text-[var(--color-text-muted)] mb-6">Your wishlist is empty.</p>
+                  <Link to="/" className="inline-flex items-center gap-2 px-8 py-3 border border-[var(--color-primary)] text-[var(--color-primary)] font-body text-sm font-bold uppercase tracking-widest rounded-sm hover:bg-[var(--color-primary)] hover:text-white transition-colors">Browse Collection</Link>
                 </div>
               ) : (
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))', gap:14 }}>
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
                   {wishItems.map(item => {
                     const price = item.discountPrice > 0 ? item.discountPrice : item.price;
                     return (
-                      <div key={item._id} style={{ border:'1px solid var(--gray-100)', borderRadius:'var(--radius-lg)', overflow:'hidden', position:'relative' }}>
-                        <button onClick={() => removeWish(item._id)} style={{ position:'absolute', top:6, right:6, zIndex:2, width:28, height:28, borderRadius:'50%', background:'rgba(255,255,255,.9)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'var(--red)' }}>
-                          <FiTrash2 size={13}/>
+                      <div key={item._id} className="group relative border border-[var(--color-border-main)] rounded-sm overflow-hidden bg-[var(--color-background)]">
+                        <button onClick={() => removeWish(item._id)} className="absolute top-3 right-3 z-10 w-8 h-8 bg-white rounded-full flex items-center justify-center text-[var(--color-text-light)] hover:text-[var(--color-cta)] hover:scale-110 shadow-sm transition-all">
+                          <FiTrash2 size={14}/>
                         </button>
-                        <Link to={`/product/${item._id}`}>
-                          <img src={item.images[0]?.url} alt={item.name} style={{ width:'100%', aspectRatio:'3/4', objectFit:'cover' }} />
+                        <Link to={`/product/${item._id}`} className="block w-full aspect-[3/4] overflow-hidden">
+                          <img src={item.images[0]?.url} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         </Link>
-                        <div style={{ padding:'10px 12px' }}>
-                          <Link to={`/product/${item._id}`} style={{ fontSize:13, fontWeight:600, color:'var(--navy)', display:'block', marginBottom:6, lineHeight:1.3 }}>{item.name}</Link>
-                          <p style={{ fontWeight:700, color:'var(--navy)', fontSize:14, marginBottom:8 }}>₹{price.toLocaleString()}</p>
-                          <button className="btn btn-primary btn-block btn-sm" style={{ fontSize:12 }}
+                        <div className="p-4 bg-white flex flex-col gap-2">
+                          <Link to={`/product/${item._id}`} className="font-heading text-lg font-bold text-[var(--color-primary)] leading-tight group-hover:text-[var(--color-accent-dark)] transition-colors line-clamp-1">{item.name}</Link>
+                          <p className="font-body text-[15px] font-bold text-[var(--color-text)] mb-2">₹{price.toLocaleString()}</p>
+                          <button className="w-full py-2.5 bg-white border border-[var(--color-primary)] text-[var(--color-primary)] font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-[var(--color-primary)] hover:text-white transition-colors"
                             onClick={() => addToCart(item, 1, item.sizes?.[0]||'', item.colors?.[0]||'')}>
-                            Add to Cart
+                            Add to Bag
                           </button>
                         </div>
                       </div>
@@ -291,19 +325,19 @@ export default function Profile() {
             </div>
           )}
 
-          {/* ── Security ── */}
+          {/* SECURITY */}
           {tab === 'security' && (
-            <div className="card" style={{ padding:28 }}>
-              <h2 style={{ fontFamily:'var(--font-serif)', fontSize:20, color:'var(--navy)', marginBottom:24 }}>Change Password</h2>
-              <form onSubmit={savePassword} style={{ display:'flex', flexDirection:'column', gap:16, maxWidth:480 }}>
+            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 lg:p-12 animate-fade-in">
+              <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)] mb-10">Security Settings</h2>
+              <form onSubmit={savePassword} className="flex flex-col gap-6 max-w-[500px]">
                 {[{n:'currentPassword',l:'Current Password'},{n:'newPassword',l:'New Password'},{n:'confirm',l:'Confirm New Password'}].map(f => (
-                  <div key={f.n} className="form-group">
-                    <label>{f.l}</label>
-                    <input type="password" className="form-input" value={pwForm[f.n]} onChange={e => setPwForm({...pwForm,[f.n]:e.target.value})} placeholder="••••••••" />
+                  <div key={f.n} className="flex flex-col gap-2">
+                    <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{f.l}</label>
+                    <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={pwForm[f.n]} onChange={e => setPwForm({...pwForm,[f.n]:e.target.value})} />
                   </div>
                 ))}
-                <button className="btn btn-primary" type="submit" disabled={saving} style={{ alignSelf:'flex-start' }}>
-                  {saving ? 'Updating…' : 'Update Password'}
+                <button className="mt-4 self-start px-8 py-3 bg-[var(--color-primary)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:bg-black focus-visible:outline disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={saving}>
+                  {saving ? 'Updating...' : 'Update Password'}
                 </button>
               </form>
             </div>

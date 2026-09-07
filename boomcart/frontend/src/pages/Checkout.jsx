@@ -15,7 +15,7 @@ export default function Checkout() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [step, setStep]     = useState(1);
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [payMethod, setPayMethod] = useState('razorpay');
   const [idempotencyKey] = useState(() => {
@@ -25,7 +25,6 @@ export default function Checkout() {
     throw new Error('Secure randomUUID generation is not supported in this browser context.');
   });
   
-  // Redirect to cart if it becomes empty mid-checkout
   useEffect(() => { if (items.length === 0) navigate('/cart'); }, [items.length, navigate]);
 
   const [addr, setAddr] = useState({
@@ -61,18 +60,15 @@ export default function Checkout() {
         return;
       }
 
-      // Razorpay flow
       const { data: dbData } = await createOrder(orderData);
       const dbOrder = dbData.data;
       
-      // If server returned early due to idempotency and order is already paid, redirect
       if (dbData.message === 'Order already processed' && dbOrder.isPaid) {
         clearCart();
         navigate(`/order-success/${dbOrder._id}`);
         return;
       }
 
-      // The Razorpay order amount is calculated on the backend now
       const { data: rpData } = await createRazorpayOrder({ orderId: dbOrder._id });
       const rpOrder = rpData.data;
 
@@ -93,7 +89,7 @@ export default function Checkout() {
               resolve();
             } catch { reject(new Error('Payment verification failed')); }
           },
-          prefill: { name: user.name, email: user.email, contact: addr.phone },
+          prefill: { name: user?.name, email: user?.email, contact: addr.phone },
           theme: { color: '#1E3A3A' },
           modal: { ondismiss: () => reject(new Error('Payment cancelled')) },
         };
@@ -109,105 +105,171 @@ export default function Checkout() {
   };
 
   return (
-    <div className="page">
-      <Helmet><title>Checkout — Boomcart</title></Helmet>
-      <div className="container" style={{ maxWidth: 860 }}>
-        <h1 className="section-title" style={{ marginBottom: 28 }}>Checkout</h1>
+    <div className="w-full min-h-screen bg-[var(--color-background)] py-12 lg:py-20">
+      <Helmet><title>Secure Checkout — Boomcart</title></Helmet>
+      
+      <div className="max-w-[1100px] mx-auto px-6 lg:px-12 animate-smooth-reveal">
+        <h1 className="font-heading text-4xl lg:text-5xl font-bold text-[var(--color-primary)] mb-12">Checkout</h1>
 
-        {/* Step indicator */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginBottom: 36 }}>
-          {[{n:1,l:'Delivery Address',icon:FiMapPin},{n:2,l:'Payment',icon:FiCreditCard}].map((s, idx) => (
-            <div key={s.n} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14,
-                  background: step > s.n ? 'var(--green)' : step === s.n ? 'var(--primary)' : 'var(--gray-100)',
-                  color: step >= s.n ? 'var(--white)' : 'var(--text-light)' }}>
-                  {step > s.n ? <FiCheck size={16}/> : s.n}
+        {/* ── STEP INDICATOR ── */}
+        <div className="flex items-center mb-16 max-w-[600px]">
+          {[{n:1,l:'Delivery'},{n:2,l:'Payment'}].map((s, idx) => (
+            <div key={s.n} className="flex items-center flex-1">
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-body text-xs font-bold transition-colors ${
+                  step > s.n ? 'bg-[var(--color-primary)] text-white' : step === s.n ? 'bg-[var(--color-cta)] text-white' : 'bg-white border border-[var(--color-border-main)] text-[var(--color-text-muted)]'
+                }`}>
+                  {step > s.n ? <FiCheck size={14}/> : s.n}
                 </div>
-                <span style={{ fontSize: 14, fontWeight: 600, color: step >= s.n ? 'var(--primary)' : 'var(--text-light)' }}>{s.l}</span>
+                <span className={`font-body text-xs font-bold uppercase tracking-widest ${
+                  step >= s.n ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)]'
+                }`}>{s.l}</span>
               </div>
-              {idx === 0 && <div style={{ flex: 1, height: 2, background: step > 1 ? 'var(--primary)' : 'var(--border)', margin: '0 12px' }} />}
+              {idx === 0 && <div className={`flex-1 h-[1px] mx-6 transition-colors ${step > 1 ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border-main)]'}`} />}
             </div>
           ))}
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 320px', gap: 24, alignItems: 'start' }}>
-          <div>
-            {/* Step 1: Address */}
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
+          
+          {/* ── LEFT FORMS ── */}
+          <div className="w-full lg:w-[60%] flex flex-col gap-8">
+            
             {step === 1 && (
-              <div className="card" style={{ padding: 28 }}>
-                <h3 style={{ marginBottom: 20, fontFamily: 'var(--font-serif)', fontSize: 20, color: 'var(--primary)' }}>Delivery Address</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                  {[{n:'fullName',l:'Full Name',p:'John Doe',col:'1/-1'},{n:'phone',l:'Phone Number',p:'10-digit mobile'},{n:'addressLine1',l:'Address Line 1',p:'House no, Street',col:'1/-1'},{n:'addressLine2',l:'Address Line 2 (optional)',p:'Landmark, Area',col:'1/-1'},{n:'city',l:'City'},{n:'pincode',l:'Pincode',p:'6-digit'}].map(f => (
-                    <div key={f.n} className="form-group" style={{ gridColumn: f.col || 'auto' }}>
-                      <label>{f.l}</label>
-                      <input name={f.n} className="form-input" value={addr[f.n]} onChange={handleAddr} placeholder={f.p || ''} />
+              <div className="bg-transparent border border-[var(--color-border-main)] rounded-sm p-8 bg-white">
+                <h3 className="font-heading text-2xl font-bold text-[var(--color-primary)] mb-8">Shipping Address</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[{n:'fullName',l:'Full Name',p:'John Doe',col:'md:col-span-2'},
+                    {n:'phone',l:'Phone Number',p:'10-digit mobile'},
+                    {n:'pincode',l:'Pincode',p:'6-digit'},
+                    {n:'addressLine1',l:'Address Line 1',p:'House no, Street',col:'md:col-span-2'},
+                    {n:'addressLine2',l:'Address Line 2 (optional)',p:'Landmark, Area',col:'md:col-span-2'},
+                    {n:'city',l:'City'}].map(f => (
+                    <div key={f.n} className={`flex flex-col gap-2 ${f.col || ''}`}>
+                      <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{f.l}</label>
+                      <input 
+                        name={f.n} 
+                        value={addr[f.n]} 
+                        onChange={handleAddr} 
+                        placeholder={f.p || ''} 
+                        className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+                      />
                     </div>
                   ))}
-                  <div className="form-group">
-                    <label>State</label>
-                    <select name="state" className="form-input" value={addr.state} onChange={handleAddr}>
+                  <div className="flex flex-col gap-2">
+                    <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">State</label>
+                    <select 
+                      name="state" 
+                      value={addr.state} 
+                      onChange={handleAddr}
+                      className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+                    >
                       <option value="">Select state</option>
                       {STATES.map(s => <option key={s}>{s}</option>)}
                     </select>
                   </div>
                 </div>
-                <button className="btn btn-primary btn-lg" style={{ marginTop: 22 }} onClick={() => { if (validateAddr()) setStep(2); }}>
-                  Continue to Payment →
+
+                <button 
+                  onClick={() => { if (validateAddr()) setStep(2); }}
+                  className="mt-10 w-full md:w-auto px-10 py-4 bg-[var(--color-primary)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:bg-black focus-visible:outline"
+                >
+                  Continue to Payment
                 </button>
               </div>
             )}
 
-            {/* Step 2: Payment */}
             {step === 2 && (
-              <div className="card" style={{ padding: 28 }}>
-                <h3 style={{ marginBottom: 20, fontFamily: 'var(--font-serif)', fontSize: 20, color: 'var(--primary)' }}>Payment Method</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {[{v:'razorpay',l:'Pay Online (Razorpay)',sub:'Credit/Debit Card, UPI, Net Banking'},{v:'cod',l:'Cash on Delivery',sub:'Pay when your order arrives'}].map(opt => (
-                    <label key={opt.v} style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '16px 18px', border: `2px solid ${payMethod===opt.v?'var(--primary)':'var(--border)'}`, borderRadius: 'var(--radius-lg)', cursor: 'pointer', background: payMethod===opt.v?'var(--cream)':'var(--white)', transition: 'all .15s' }}>
-                      <input type="radio" name="pay" value={opt.v} checked={payMethod===opt.v} onChange={() => setPayMethod(opt.v)} style={{ marginTop: 3 }} />
+              <div className="bg-transparent border border-[var(--color-border-main)] rounded-sm p-8 bg-white animate-smooth-reveal">
+                <h3 className="font-heading text-2xl font-bold text-[var(--color-primary)] mb-8">Payment Method</h3>
+                
+                <div className="flex flex-col gap-4">
+                  {[{v:'razorpay',l:'Pay Online',sub:'Credit/Debit Card, UPI, Net Banking'},{v:'cod',l:'Cash on Delivery',sub:'Pay when your order arrives'}].map(opt => (
+                    <label 
+                      key={opt.v} 
+                      className={`flex items-start gap-4 p-5 border rounded-sm cursor-pointer transition-all ${
+                        payMethod === opt.v ? 'border-[var(--color-primary)] bg-[var(--color-background)]' : 'border-[var(--color-border-main)] bg-white hover:border-[var(--color-primary)]/50'
+                      }`}
+                    >
+                      <input 
+                        type="radio" 
+                        name="pay" 
+                        value={opt.v} 
+                        checked={payMethod === opt.v} 
+                        onChange={() => setPayMethod(opt.v)} 
+                        className="mt-1 w-4 h-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)]" 
+                      />
                       <div>
-                        <p style={{ fontWeight: 700, color: 'var(--primary)', fontSize: 15 }}>{opt.l}</p>
-                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>{opt.sub}</p>
+                        <p className="font-heading text-lg font-bold text-[var(--color-primary)] leading-none mb-1.5">{opt.l}</p>
+                        <p className="font-body text-xs text-[var(--color-text-muted)]">{opt.sub}</p>
                       </div>
                     </label>
                   ))}
                 </div>
-                <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
-                  <button className="btn btn-outline" onClick={() => setStep(1)}>← Back</button>
-                  <button className="btn btn-primary btn-lg" style={{ flex: 1 }} onClick={placeOrder} disabled={loading}>
-                    {loading ? 'Processing…' : payMethod === 'cod' ? 'Place Order' : 'Pay Now'}
+
+                <div className="flex gap-4 mt-10">
+                  <button 
+                    onClick={() => setStep(1)}
+                    className="px-6 py-4 bg-transparent text-[var(--color-text-muted)] font-body text-sm font-bold uppercase tracking-widest hover:text-[var(--color-primary)] transition-colors focus-visible:outline"
+                  >
+                    Back
+                  </button>
+                  <button 
+                    onClick={placeOrder} 
+                    disabled={loading}
+                    className="flex-1 py-4 bg-[var(--color-cta)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:opacity-90 shadow-[0_4px_14px_rgba(194,90,60,0.3)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline"
+                  >
+                    {loading ? 'Processing...' : payMethod === 'cod' ? 'Confirm Order' : 'Pay Securely'}
                   </button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Order summary */}
-          <div className="card" style={{ padding: 22, position: 'sticky', top: 100 }}>
-            <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: 18, color: 'var(--primary)', marginBottom: 16 }}>Your Order</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
-              {items.map(i => (
-                <div key={i._key} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                  <img src={i.image} alt={i.name} style={{ width: 44, height: 54, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', lineHeight: 1.3 }}>{i.name}</p>
-                    {i.size && <p style={{ fontSize: 11, color: 'var(--text-light)' }}>Size: {i.size}</p>}
-                    <p style={{ fontSize: 12, color: 'var(--primary)', fontWeight: 700 }}>₹{(i.price*i.quantity).toLocaleString()} ×{i.quantity}</p>
+          {/* ── RIGHT ORDER SUMMARY ── */}
+          <div className="w-full lg:w-[40%] lg:sticky lg:top-28">
+            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 shadow-sm">
+              <h4 className="font-heading text-2xl font-bold text-[var(--color-primary)] border-b border-[var(--color-border-light)] pb-4 mb-6">
+                Your Order
+              </h4>
+              
+              <div className="flex flex-col gap-6 mb-8 max-h-[300px] overflow-y-auto pr-2">
+                {items.map(i => (
+                  <div key={i._key} className="flex gap-4 items-center">
+                    <div className="w-16 h-20 bg-[var(--color-border-light)] rounded-sm overflow-hidden flex-shrink-0">
+                      <img src={i.image} alt={i.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-heading text-sm font-bold text-[var(--color-primary)] leading-tight mb-1">{i.name}</p>
+                      {i.size && <p className="font-body text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] mb-1">Size: {i.size}</p>}
+                      <p className="font-body text-xs font-bold text-[var(--color-text)]">₹{(i.price).toLocaleString()} <span className="font-normal text-[var(--color-text-muted)] ml-1">× {i.quantity}</span></p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            <hr className="divider" />
-            {[['Subtotal', `₹${itemsPrice.toLocaleString()}`],['Shipping', shippingPrice===0?'FREE':`₹${shippingPrice}`],['Tax','₹'+taxPrice]].map(([l,v]) => (
-              <div key={l} style={{ display:'flex', justifyContent:'space-between', fontSize:13, color:'var(--text-muted)', marginBottom:8 }}>
-                <span>{l}</span><span style={{ color: v==='FREE'?'var(--green)':undefined }}>{v}</span>
+                ))}
               </div>
-            ))}
-            <div style={{ display:'flex', justifyContent:'space-between', fontWeight:700, fontSize:17, color:'var(--primary)', borderTop:'2px solid var(--primary)', paddingTop:10, marginTop:4 }}>
-              <span>Total</span><span>₹{totalPrice.toLocaleString()}</span>
+              
+              <div className="border-t border-[var(--color-border-light)] pt-6 flex flex-col gap-3">
+                <div className="flex justify-between font-body text-sm text-[var(--color-text-muted)]">
+                  <span>Subtotal</span><span>₹{itemsPrice.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between font-body text-sm text-[var(--color-text-muted)]">
+                  <span>Delivery</span><span className="font-bold text-[var(--color-accent-dark)] uppercase text-[10px] tracking-widest mt-0.5">{shippingPrice === 0 ? 'Complimentary' : `₹${shippingPrice}`}</span>
+                </div>
+                {taxPrice > 0 && (
+                  <div className="flex justify-between font-body text-sm text-[var(--color-text-muted)]">
+                    <span>Tax</span><span>₹{taxPrice}</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="border-t border-[var(--color-border-main)] pt-6 mt-6 flex justify-between items-end">
+                <span className="font-heading text-xl font-bold text-[var(--color-primary)]">Total</span>
+                <span className="font-body text-2xl font-bold text-[var(--color-cta)]">₹{totalPrice.toLocaleString()}</span>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>

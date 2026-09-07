@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiHeart, FiShoppingCart, FiStar } from 'react-icons/fi';
-import { useCart } from '../../context/CartContext';
+import { FiHeart, FiStar } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { toggleWishlist } from '../../services/userService';
 import toast from 'react-hot-toast';
 
 export default function ProductCard({ product }) {
-  const { addToCart } = useCart();
   const { user, wishlistIds, toggleWishlistId } = useAuth();
   const [wishlisted, setWishlisted] = useState(() => wishlistIds.includes(product._id));
   const [hoverImg, setHoverImg] = useState(false);
@@ -27,106 +25,74 @@ export default function ProductCard({ product }) {
     } catch { toast.error('Failed to update wishlist'); }
   };
 
-  const handleAddToCart = (e) => {
-    e.preventDefault();
-    if (product.stock === 0) return;
-    addToCart(product, 1, product.sizes?.[0] || '', product.colors?.[0] || '');
-  };
-
   return (
-    <Link to={`/product/${product._id}`} className="group" style={{ display: 'block', backgroundColor: '#fff', borderRadius: '12px', overflow: 'hidden', border: '1px solid #E5D9C5', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', transition: 'all 0.3s ease' }}>
-      {/* Image */}
-      <div
-        style={{ position: 'relative', aspectRatio: '4/5', overflow: 'hidden', backgroundColor: '#FDF7F0' }}
+    <Link to={`/product/${product._id}`} className="group block w-full bg-transparent">
+      
+      {/* ── IMAGE ── */}
+      <div 
+        className="relative w-full aspect-[4/5] rounded-sm overflow-hidden bg-[var(--color-border-light)] mb-4"
         onMouseEnter={() => setHoverImg(true)}
         onMouseLeave={() => setHoverImg(false)}
       >
         <img
           src={(hoverImg && product.images[1]?.url) ? product.images[1].url : product.images[0]?.url}
           alt={product.name}
-          className="group-hover:scale-105"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
-        {/* Discount badge */}
+        
+        {/* Discount Badge */}
         {discount > 0 && (
-          <span style={{ position: 'absolute', top: '10px', left: '10px', backgroundColor: '#C25A3C', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '999px' }}>
+          <span className="absolute top-3 left-3 bg-[var(--color-cta)] text-white font-body text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm">
             {discount}% OFF
           </span>
         )}
+
         {/* Out of stock overlay */}
         {product.stock === 0 && (
-          <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: '14px', letterSpacing: '0.05em' }}>Out of Stock</span>
+          <div className="absolute inset-0 bg-[var(--color-background)]/70 backdrop-blur-[2px] flex items-center justify-center">
+            <span className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-primary)] bg-white/90 px-4 py-2 rounded-sm shadow-sm">Out of Stock</span>
           </div>
         )}
+
         {/* Wishlist button */}
-        <div className="opacity-0 group-hover:opacity-100" style={{ position: 'absolute', top: '10px', right: '10px', transition: 'opacity 0.3s ease' }}>
-          <button
-            style={{
-              width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: 'none', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', transition: 'all 0.2s ease',
-              backgroundColor: wishlisted ? '#fde8e4' : '#fff',
-              color: wishlisted ? '#B85C4B' : '#2C3E2F',
-            }}
-            onClick={handleWishlist}
-            title="Wishlist"
-          >
-            <FiHeart size={14} />
-          </button>
-        </div>
+        <button
+          onClick={handleWishlist}
+          title="Wishlist"
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 focus-visible:outline shadow-sm
+            ${wishlisted ? 'bg-[var(--color-cta)] text-white opacity-100' : 'bg-white text-[var(--color-text-muted)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-cta)] hover:scale-110'}`}
+        >
+          <FiHeart size={14} className={wishlisted ? 'fill-current' : ''} />
+        </button>
       </div>
 
-      {/* Info — box model: each element has explicit margin, no flex gap */}
-      <div style={{ padding: '16px 16px 20px 16px' }}>
-        {/* Category label */}
-        <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#9eaa9f', fontWeight: 600, marginBottom: '8px' }}>
-          {product.category} · {product.subCategory}
-        </p>
+      {/* ── DETAILS ── */}
+      <div className="flex flex-col text-left">
+        
+        {/* Brand / Category (Small, Muted) */}
+        <span className="font-body text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-muted)] mb-1">
+          {product.brand || product.category}
+        </span>
 
-        {/* Product name */}
-        <h3 className="font-heading line-clamp-2 group-hover:text-[#C25A3C]" style={{ fontSize: '17px', fontWeight: 700, color: '#1E3A3A', lineHeight: 1.35, marginBottom: '8px', transition: 'color 0.3s ease' }}>
+        {/* Title (Medium, Serif) */}
+        <h3 className="font-heading text-xl font-bold text-[var(--color-primary)] leading-tight mb-2 group-hover:text-[var(--color-accent-dark)] transition-colors line-clamp-1">
           {product.name}
         </h3>
 
-        {/* Star ratings */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-            {[1,2,3,4,5].map(star => (
-              <FiStar
-                key={star}
-                size={12}
-                style={{ color: star <= Math.round(product.ratings || 0) ? '#D4AF37' : '#E5D9C5' }}
-                fill={star <= Math.round(product.ratings || 0) ? 'currentColor' : 'none'}
-              />
-            ))}
+        {/* Reviews */}
+        {(product.numReviews > 0) && (
+          <div className="flex items-center gap-1 mb-2">
+            <FiStar size={10} className="text-[var(--color-accent)] fill-current" />
+            <span className="font-body text-[11px] font-medium text-[var(--color-text-muted)]">{product.ratings?.toFixed(1)}</span>
           </div>
-          {product.numReviews > 0 && (
-            <span style={{ fontSize: '11px', color: '#9eaa9f', fontWeight: 500 }}>({product.numReviews})</span>
-          )}
+        )}
+
+        {/* Price (Bold, Sans-serif) */}
+        <div className="flex items-center gap-3">
+          <span className="font-body text-[15px] font-bold text-[var(--color-text)]">₹{price.toLocaleString()}</span>
+          {discount > 0 && <span className="font-body text-[13px] font-medium text-[var(--color-text-light)] line-through">₹{product.price.toLocaleString()}</span>}
         </div>
 
-        {/* Price */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-          <span style={{ fontSize: '20px', fontWeight: 700, color: '#C25A3C' }}>₹{price.toLocaleString()}</span>
-          {discount > 0 && <span style={{ fontSize: '14px', fontWeight: 500, color: '#9eaa9f', textDecoration: 'line-through' }}>₹{product.price.toLocaleString()}</span>}
-        </div>
-
-        {/* Add to Cart button */}
-        <button
-          style={{
-            width: '100%', minHeight: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-            backgroundColor: '#C25A3C', color: '#fff', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em',
-            borderRadius: '999px', border: 'none', cursor: 'pointer', boxShadow: '0 2px 8px rgba(194,90,60,0.2)', transition: 'all 0.3s ease',
-            opacity: product.stock === 0 ? 0.4 : 1,
-          }}
-          className="hover:bg-[#1E3A3A] hover:shadow-md"
-          onClick={handleAddToCart}
-          disabled={product.stock === 0}
-        >
-          <FiShoppingCart size={14} />
-          {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-        </button>
       </div>
     </Link>
   );

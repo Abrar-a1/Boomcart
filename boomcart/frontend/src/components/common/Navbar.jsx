@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { FiShoppingCart, FiHeart, FiUser, FiSearch, FiMenu, FiX, FiLogOut, FiPackage, FiShield } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../store/useStore';
@@ -9,12 +9,23 @@ export default function Navbar() {
   const cart = useStore((state) => state.cart);
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
   const navigate = useNavigate();
-  const [, setSearchParams] = useSearchParams();
-  const [query, setQuery] = useState('');
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get('keyword') || '');
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const dropRef = useRef(null);
+  
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const handler = (e) => { if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false); };
@@ -23,7 +34,11 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
 
@@ -46,76 +61,75 @@ export default function Navbar() {
     ['Sale', '/?isFeatured=true'],
   ];
 
+  const currentPath = location.pathname + location.search;
+  const isActive = (href) => {
+    if (href === '/') return location.pathname === '/' && location.search === '';
+    return currentPath === href;
+  };
+
   return (
-    <header style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: '#1E3A3A', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
-      {/* Container — constrained max-width, centered */}
-      <div style={{ maxWidth: '1100px', margin: '0 auto', paddingLeft: '24px', paddingRight: '24px' }}>
-        {/* Main row — flexbox with items vertically centered */}
-        <div style={{ display: 'flex', alignItems: 'center', height: '72px' }}>
+    <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[var(--color-background)] shadow-sm' : 'bg-[var(--color-background)]'}`}>
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+        <div className="flex items-center justify-between h-20">
           
-          {/* ── Left: Logo ── */}
-          <div style={{ flexShrink: 0 }}>
-            <Link to="/" className="font-heading" 
-              style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '-0.02em', color: '#ffffff', transition: 'color 0.3s ease' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#D4AF37'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = '#ffffff'; }}
-            >
-              Boomcart
+          {/* ── Left: Wordmark ── */}
+          <div className="flex-shrink-0">
+            <Link to="/" className="font-heading text-2xl lg:text-3xl font-bold tracking-tight text-[var(--color-primary)] hover:opacity-80 transition-opacity focus-visible:outline">
+              BOOMCART
             </Link>
           </div>
 
-          {/* ── Center: Navigation — box model: each link has its own padding ── */}
-          <nav className="hidden md:flex" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            {NAV_LINKS.map(([label, href]) => (
-              <Link key={label} to={href}
-                style={{ 
-                  display: 'inline-block',
-                  padding: '8px 16px',
-                  margin: '0 4px',
-                  fontSize: '13px', 
-                  fontWeight: 600, 
-                  letterSpacing: '0.06em', 
-                  textTransform: 'uppercase', 
-                  color: 'rgba(255,255,255,0.85)',
-                  whiteSpace: 'nowrap',
-                  transition: 'color 0.3s ease',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.color = '#D4AF37'; }}
-                onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; }}
-              >
-                {label}
-              </Link>
-            ))}
+          {/* ── Center: Desktop Navigation ── */}
+          <nav className="hidden lg:flex flex-1 justify-center items-center space-x-8">
+            {NAV_LINKS.map(([label, href]) => {
+              const active = isActive(href);
+              return (
+                <Link 
+                  key={label} 
+                  to={href}
+                  className={`font-body text-[13px] font-semibold uppercase tracking-[0.06em] transition-colors duration-200 focus-visible:outline ${
+                    active 
+                      ? 'text-[var(--color-primary)]' 
+                      : 'text-[var(--color-text-muted)] hover:text-[var(--color-primary)]'
+                  }`}
+                >
+                  {label}
+                  {active && <span className="block h-[1px] w-full bg-[var(--color-primary)] mt-0.5" />}
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* ── Right: Actions — box model: each icon has its own margin ── */}
-          <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+          {/* ── Right: Actions ── */}
+          <div className="flex-shrink-0 flex items-center space-x-2 sm:space-x-4">
             
-            {/* Search — single button, no duplicates */}
-            <div className="static md:relative" style={{ marginRight: '16px' }}>
+            {/* Search */}
+            <div className="relative">
               {!searchOpen ? (
                 <button 
                   onClick={() => setSearchOpen(true)}
-                  style={{ alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '999px', fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.15)', backgroundColor: 'transparent', cursor: 'pointer', transition: 'all 0.3s ease', display: 'inline-flex' }}
-                  aria-label="Search"
+                  aria-label="Open search"
+                  className="flex items-center justify-center w-10 h-10 text-[var(--color-primary)] hover:bg-black/5 transition-colors duration-200 rounded-sm focus-visible:outline"
                 >
-                  <FiSearch size={16} />
-                  <span className="hidden sm:inline">Search...</span>
+                  <FiSearch size={20} />
                 </button>
               ) : (
-                <form onSubmit={handleSearch} className="animate-fade-in absolute inset-x-4 md:inset-x-auto md:right-0 md:w-[320px]" style={{ top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', backgroundColor: '#fff', borderRadius: '999px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', border: '2px solid #D4AF37', zIndex: 100 }}>
+                <form 
+                  onSubmit={handleSearch} 
+                  className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center bg-white border border-[var(--color-border-light)] rounded-sm shadow-sm overflow-hidden w-[240px] sm:w-[300px] z-10 animate-slide-in"
+                >
                   <input
                     autoFocus
                     type="text"
                     placeholder="Search products..."
                     value={query}
                     onChange={e => setQuery(e.target.value)}
-                    style={{ flex: 1, padding: '10px 20px', fontSize: '14px', outline: 'none', border: 'none', color: '#2C3E2F' }}
+                    className="flex-1 px-4 py-2 text-sm font-body text-[var(--color-text)] bg-transparent border-none outline-none"
                   />
-                  <button type="submit" style={{ padding: '10px 16px', backgroundColor: '#FDF7F0', border: 'none', cursor: 'pointer', color: '#1E3A3A', transition: 'background-color 0.3s' }}>
+                  <button type="submit" aria-label="Submit search" className="px-3 text-[var(--color-primary)] hover:opacity-80 transition-opacity">
                     <FiSearch size={18} />
                   </button>
-                  <button type="button" onClick={() => setSearchOpen(false)} style={{ padding: '10px 12px', border: 'none', backgroundColor: 'transparent', cursor: 'pointer', color: '#2C3E2F', transition: 'color 0.3s' }}>
+                  <button type="button" onClick={() => setSearchOpen(false)} aria-label="Close search" className="px-3 border-l border-[var(--color-border-light)] text-[var(--color-text-muted)] hover:text-black transition-colors">
                     <FiX size={18} />
                   </button>
                 </form>
@@ -124,84 +138,85 @@ export default function Navbar() {
 
             {/* Wishlist */}
             {user && (
-              <Link to="/wishlist" className="hidden sm:flex"
-                style={{ width: '40px', height: '40px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'rgba(255,255,255,0.85)', marginRight: '12px', transition: 'color 0.3s ease' }}
-                onMouseEnter={e => { e.currentTarget.style.color = '#D4AF37'; }}
-                onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; }}
+              <Link 
+                to="/wishlist"
                 aria-label="Wishlist"
+                className="hidden sm:flex items-center justify-center w-10 h-10 text-[var(--color-primary)] hover:bg-black/5 transition-colors duration-200 rounded-sm focus-visible:outline"
               >
-                <FiHeart size={22} />
+                <FiHeart size={20} />
               </Link>
             )}
 
             {/* Cart */}
-            <Link to="/cart" 
-              style={{ position: 'relative', width: '40px', height: '40px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'rgba(255,255,255,0.85)', marginRight: '12px', transition: 'color 0.3s ease' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#D4AF37'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; }}
-              aria-label="Cart"
+            <Link 
+              to="/cart"
+              aria-label={`Cart with ${cartCount} items`}
+              className="relative flex items-center justify-center w-10 h-10 text-[var(--color-primary)] hover:bg-black/5 transition-colors duration-200 rounded-sm focus-visible:outline"
             >
-              <FiShoppingCart size={22} />
+              <FiShoppingCart size={20} />
               {cartCount > 0 && (
-                <span style={{ position: 'absolute', top: '-4px', right: '-4px', minWidth: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '11px', fontWeight: 700, padding: '0 6px', backgroundColor: '#C25A3C', color: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.15)' }}>
+                <span className="absolute top-1 right-0 flex items-center justify-center w-[18px] h-[18px] text-[10px] font-bold text-white bg-[var(--color-cta)] rounded-full">
                   {cartCount}
                 </span>
               )}
             </Link>
 
-            {/* User Account / Login */}
+            {/* User Account */}
             {user ? (
-              <div style={{ position: 'relative' }} className="hidden sm:block" ref={dropRef}>
-                <button onClick={() => setDropOpen(!dropOpen)}
-                  style={{ width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px', backgroundColor: '#D4AF37', color: '#1E3A3A', border: 'none', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', transition: 'transform 0.2s' }}
-                  aria-label="Account"
+              <div className="relative hidden sm:block" ref={dropRef}>
+                <button 
+                  onClick={() => setDropOpen(!dropOpen)}
+                  aria-label="Account menu"
+                  aria-expanded={dropOpen}
+                  className="flex items-center justify-center w-10 h-10 text-sm font-bold text-[var(--color-background)] bg-[var(--color-primary)] hover:bg-black transition-colors duration-200 rounded-full focus-visible:outline"
                 >
                   {user.name?.[0]?.toUpperCase()}
                 </button>
                 {dropOpen && (
-                  <div className="animate-slide-down" style={{ position: 'absolute', right: 0, top: '100%', marginTop: '16px', width: '240px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', overflow: 'hidden', zIndex: 50, border: '1px solid #E5D9C5' }}>
-                    <div style={{ padding: '16px 20px', backgroundColor: '#FDF7F0', borderBottom: '1px solid #E5D9C5' }}>
-                      <p style={{ fontWeight: 600, fontSize: '14px', color: '#1E3A3A', marginBottom: '4px' }}>{user.name}</p>
-                      <p style={{ fontSize: '12px', color: '#6b7c6e', margin: 0 }}>{user.email}</p>
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-[var(--color-border-light)] rounded-sm shadow-md overflow-hidden z-50 animate-slide-down">
+                    <div className="px-5 py-4 border-b border-[var(--color-border-light)] bg-black/5">
+                      <p className="font-body text-sm font-semibold text-[var(--color-primary)] truncate">{user.name}</p>
+                      <p className="font-body text-xs text-[var(--color-text-muted)] truncate mt-0.5">{user.email}</p>
                     </div>
-                    <div style={{ padding: '8px 0' }}>
-                      <Link to="/profile" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 20px', fontSize: '14px', fontWeight: 500, color: '#2C3E2F', transition: 'background-color 0.2s' }} onClick={() => setDropOpen(false)} className="hover:bg-[#FDF7F0]">
-                        <FiUser size={16}/> My Profile
+                    <div className="py-2">
+                      <Link to="/profile" className="flex items-center gap-3 px-5 py-2.5 font-body text-sm font-medium text-[var(--color-text)] hover:bg-black/5 transition-colors" onClick={() => setDropOpen(false)}>
+                        <FiUser size={16} /> My Profile
                       </Link>
-                      <Link to="/profile?tab=orders" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 20px', fontSize: '14px', fontWeight: 500, color: '#2C3E2F', transition: 'background-color 0.2s' }} onClick={() => setDropOpen(false)} className="hover:bg-[#FDF7F0]">
-                        <FiPackage size={16}/> My Orders
+                      <Link to="/profile?tab=orders" className="flex items-center gap-3 px-5 py-2.5 font-body text-sm font-medium text-[var(--color-text)] hover:bg-black/5 transition-colors" onClick={() => setDropOpen(false)}>
+                        <FiPackage size={16} /> My Orders
                       </Link>
                       {isAdmin && (
-                        <Link to="/admin" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 20px', fontSize: '14px', fontWeight: 700, color: '#D4AF37', transition: 'background-color 0.2s' }} onClick={() => setDropOpen(false)} className="hover:bg-[#FDF7F0]">
-                          <FiShield size={16}/> Admin Panel
+                        <Link to="/admin" className="flex items-center gap-3 px-5 py-2.5 font-body text-sm font-bold text-[var(--color-accent-dark)] hover:bg-black/5 transition-colors" onClick={() => setDropOpen(false)}>
+                          <FiShield size={16} /> Admin Panel
                         </Link>
                       )}
                     </div>
-                    <div style={{ borderTop: '1px solid #E5D9C5', padding: '8px 0' }}>
-                      <button style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 20px', fontSize: '14px', fontWeight: 500, color: '#C25A3C', border: 'none', backgroundColor: 'transparent', cursor: 'pointer', transition: 'background-color 0.2s' }}
-                        onClick={() => { logout(); setDropOpen(false); navigate('/'); }} className="hover:bg-[#fde8e4]">
-                        <FiLogOut size={16}/> Logout
+                    <div className="border-t border-[var(--color-border-light)] py-2">
+                      <button 
+                        className="w-full flex items-center gap-3 px-5 py-2.5 font-body text-sm font-medium text-[var(--color-cta)] hover:bg-black/5 transition-colors text-left"
+                        onClick={() => { logout(); setDropOpen(false); navigate('/'); }}
+                      >
+                        <FiLogOut size={16} /> Logout
                       </button>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              <Link to="/login" className="hidden sm:inline-flex"
-                style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', padding: '10px 24px', marginLeft: '8px', minHeight: '40px', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', borderRadius: '999px', border: '1.5px solid #D4AF37', color: '#D4AF37', backgroundColor: 'transparent', transition: 'all 0.3s ease' }}
-                onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#D4AF37'; e.currentTarget.style.color = '#1E3A3A'; }}
-                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#D4AF37'; }}
+              <Link 
+                to="/login"
+                className="hidden sm:inline-flex items-center justify-center h-10 px-6 font-body text-xs font-bold uppercase tracking-widest text-[var(--color-primary)] border border-[var(--color-primary)] rounded-sm hover:bg-[var(--color-primary)] hover:text-[var(--color-background)] transition-colors duration-200 focus-visible:outline"
               >
                 Login
               </Link>
             )}
 
-            {/* Mobile Menu Toggle */}
-            <button className="md:hidden"
-              style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px', border: 'none', backgroundColor: 'transparent', color: 'rgba(255,255,255,0.85)', cursor: 'pointer', transition: 'color 0.3s' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#D4AF37'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; }}
-              onClick={() => setMenuOpen(true)} aria-label="Menu"
+            {/* Mobile Menu Trigger */}
+            <button 
+              aria-label="Open mobile menu"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(true)}
+              className="lg:hidden flex items-center justify-center w-10 h-10 text-[var(--color-primary)] hover:bg-black/5 transition-colors duration-200 rounded-sm focus-visible:outline"
             >
               <FiMenu size={24} />
             </button>
@@ -212,76 +227,123 @@ export default function Navbar() {
 
       {/* ── Mobile Drawer ── */}
       {menuOpen && (
-        <>
-          <div style={{ position: 'fixed', inset: 0, zIndex: 200, backgroundColor: 'rgba(30,58,58,0.6)', backdropFilter: 'blur(4px)', transition: 'opacity 0.3s' }} onClick={() => setMenuOpen(false)} />
-          <div className="animate-slide-in" style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: '320px', maxWidth: '85vw', backgroundColor: '#FDF7F0', zIndex: 201, boxShadow: '-8px 0 32px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column' }}>
-            {/* Drawer header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', backgroundColor: '#1E3A3A' }}>
-              <span className="font-heading" style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', color: '#fff' }}>Menu</span>
-              <button onClick={() => setMenuOpen(false)}
-                style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: 'none', backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer', transition: 'background-color 0.2s' }} aria-label="Close"
+        <div className="lg:hidden">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 z-[100] bg-black/40 transition-opacity duration-300"
+            onClick={() => setMenuOpen(false)}
+            aria-hidden="true"
+          />
+          
+          {/* Drawer */}
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile navigation"
+            className="fixed inset-y-0 right-0 z-[110] w-[300px] max-w-[85vw] bg-[var(--color-background)] border-l border-[var(--color-border-light)] shadow-xl flex flex-col animate-slide-in"
+          >
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between px-6 h-20 border-b border-[var(--color-border-light)]">
+              <span className="font-heading text-xl font-bold tracking-tight text-[var(--color-primary)]">Menu</span>
+              <button 
+                onClick={() => setMenuOpen(false)}
+                aria-label="Close menu"
+                className="flex items-center justify-center w-10 h-10 text-[var(--color-primary)] hover:bg-black/5 rounded-sm transition-colors duration-200 focus-visible:outline"
               >
                 <FiX size={22} />
               </button>
             </div>
 
-            {/* Drawer content — box model: each item has its own padding/margin */}
-            <div style={{ padding: '24px', flex: 1, overflowY: 'auto' }}>
-              {/* Search */}
-              <form onSubmit={handleSearch} style={{ display: 'flex', borderRadius: '999px', overflow: 'hidden', border: '1px solid #E5D9C5', backgroundColor: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', marginBottom: '32px' }}>
-                <input type="text" placeholder="Search products..." value={query} onChange={e => setQuery(e.target.value)}
-                  style={{ flex: 1, padding: '12px 20px', fontSize: '14px', backgroundColor: 'transparent', outline: 'none', border: 'none', color: '#2C3E2F' }} />
-                <button type="submit" style={{ padding: '12px 20px', color: '#fff', backgroundColor: '#1E3A3A', border: 'none', cursor: 'pointer', transition: 'opacity 0.3s' }}><FiSearch size={18}/></button>
+            {/* Drawer Content */}
+            <div className="flex-1 overflow-y-auto py-6 px-6 scrollbar-hide">
+              {/* Mobile Search */}
+              <form onSubmit={handleSearch} className="flex items-center bg-white border border-[var(--color-border-light)] rounded-sm overflow-hidden mb-8 focus-within:border-[var(--color-primary)] transition-colors">
+                <input 
+                  type="text" 
+                  placeholder="Search products..." 
+                  value={query} 
+                  onChange={e => setQuery(e.target.value)}
+                  className="flex-1 px-4 py-3 text-sm font-body text-[var(--color-text)] bg-transparent outline-none"
+                  aria-label="Search input"
+                />
+                <button type="submit" aria-label="Submit search" className="px-4 text-[var(--color-primary)] hover:opacity-80 transition-opacity">
+                  <FiSearch size={18} />
+                </button>
               </form>
 
               {/* Categories */}
-              <div style={{ marginBottom: '32px' }}>
-                <span style={{ display: 'block', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#9eaa9f', marginBottom: '12px' }}>Categories</span>
-                {NAV_LINKS.map(([label, href]) => (
-                  <Link key={label} to={href} 
-                    style={{ display: 'block', padding: '12px 16px', marginBottom: '4px', fontSize: '15px', fontWeight: 600, color: '#1E3A3A', borderRadius: '12px', transition: 'background-color 0.2s' }} 
-                    className="hover:bg-white hover:shadow-sm"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {label}
-                  </Link>
-                ))}
+              <div className="mb-8">
+                <span className="block text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] mb-4">Categories</span>
+                <nav className="flex flex-col space-y-1">
+                  {NAV_LINKS.map(([label, href]) => {
+                    const active = isActive(href);
+                    return (
+                      <Link 
+                        key={label} 
+                        to={href} 
+                        className={`block px-4 py-3 font-body text-sm font-semibold uppercase tracking-wider rounded-sm transition-colors focus-visible:outline ${
+                          active ? 'text-[var(--color-primary)] bg-black/5' : 'text-[var(--color-text-muted)] hover:bg-black/5'
+                        }`}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        {label}
+                      </Link>
+                    );
+                  })}
+                </nav>
               </div>
 
-              {/* Account links */}
-              <div style={{ paddingTop: '24px', borderTop: '1px solid #E5D9C5' }}>
-                <span style={{ display: 'block', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#9eaa9f', marginBottom: '12px' }}>Account</span>
-                <Link to="/cart" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 16px', marginBottom: '4px', fontSize: '15px', fontWeight: 500, color: '#2C3E2F', borderRadius: '12px', transition: 'background-color 0.2s' }} className="hover:bg-white hover:shadow-sm" onClick={() => setMenuOpen(false)}>
-                  <div style={{ position: 'relative' }}>
-                    <FiShoppingCart size={20}/>
-                    {cartCount > 0 && <span style={{ position: 'absolute', top: '-6px', right: '-8px', backgroundColor: '#C25A3C', color: '#fff', fontSize: '10px', fontWeight: 700, width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>{cartCount}</span>}
-                  </div>
-                  Shopping Cart
-                </Link>
-                {user && <Link to="/wishlist" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 16px', marginBottom: '4px', fontSize: '15px', fontWeight: 500, color: '#2C3E2F', borderRadius: '12px', transition: 'background-color 0.2s' }} className="hover:bg-white hover:shadow-sm" onClick={() => setMenuOpen(false)}><FiHeart size={20}/> Wishlist</Link>}
-                {user && <Link to="/profile" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 16px', marginBottom: '4px', fontSize: '15px', fontWeight: 500, color: '#2C3E2F', borderRadius: '12px', transition: 'background-color 0.2s' }} className="hover:bg-white hover:shadow-sm" onClick={() => setMenuOpen(false)}><FiUser size={20}/> My Profile</Link>}
-                {isAdmin && <Link to="/admin" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 16px', marginBottom: '4px', fontSize: '15px', fontWeight: 700, color: '#D4AF37', borderRadius: '12px', transition: 'background-color 0.2s' }} className="hover:bg-white hover:shadow-sm" onClick={() => setMenuOpen(false)}><FiShield size={20}/> Admin Panel</Link>}
+              {/* Account Links */}
+              <div className="pt-6 border-t border-[var(--color-border-light)]">
+                <span className="block text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] mb-4">Account</span>
+                <nav className="flex flex-col space-y-1">
+                  <Link to="/cart" onClick={() => setMenuOpen(false)} className="flex items-center gap-4 px-4 py-3 font-body text-base font-medium text-[var(--color-text)] rounded-sm hover:bg-black/5 transition-colors focus-visible:outline">
+                    <div className="relative">
+                      <FiShoppingCart size={20} />
+                      {cartCount > 0 && <span className="absolute -top-1.5 -right-2 bg-[var(--color-cta)] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">{cartCount}</span>}
+                    </div>
+                    Shopping Cart
+                  </Link>
+                  {user && (
+                    <>
+                      <Link to="/wishlist" onClick={() => setMenuOpen(false)} className="flex items-center gap-4 px-4 py-3 font-body text-base font-medium text-[var(--color-text)] rounded-sm hover:bg-black/5 transition-colors focus-visible:outline">
+                        <FiHeart size={20} /> Wishlist
+                      </Link>
+                      <Link to="/profile" onClick={() => setMenuOpen(false)} className="flex items-center gap-4 px-4 py-3 font-body text-base font-medium text-[var(--color-text)] rounded-sm hover:bg-black/5 transition-colors focus-visible:outline">
+                        <FiUser size={20} /> My Profile
+                      </Link>
+                    </>
+                  )}
+                  {isAdmin && (
+                    <Link to="/admin" onClick={() => setMenuOpen(false)} className="flex items-center gap-4 px-4 py-3 font-body text-base font-bold text-[var(--color-accent-dark)] rounded-sm hover:bg-black/5 transition-colors focus-visible:outline">
+                      <FiShield size={20} /> Admin Panel
+                    </Link>
+                  )}
+                </nav>
               </div>
             </div>
 
-            {/* Drawer footer */}
-            <div style={{ padding: '24px', backgroundColor: '#fff', borderTop: '1px solid #E5D9C5' }}>
+            {/* Drawer Footer */}
+            <div className="p-6 border-t border-[var(--color-border-light)]">
               {user ? (
                 <button 
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px 24px', fontSize: '14px', fontWeight: 700, borderRadius: '999px', border: 'none', cursor: 'pointer', backgroundColor: '#C25A3C', color: '#fff', boxShadow: '0 4px 12px rgba(194,90,60,0.3)', transition: 'all 0.3s' }}
-                  onClick={() => { logout(); setMenuOpen(false); navigate('/'); }}>
-                  <FiLogOut size={18}/> Sign Out
+                  className="w-full flex items-center justify-center gap-2 py-3 px-6 font-body text-sm font-bold text-[var(--color-background)] bg-[var(--color-primary)] hover:opacity-90 rounded-sm transition-opacity focus-visible:outline"
+                  onClick={() => { logout(); setMenuOpen(false); navigate('/'); }}
+                >
+                  <FiLogOut size={18} /> Sign Out
                 </button>
               ) : (
-                <Link to="/login" 
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px 24px', fontSize: '14px', fontWeight: 700, borderRadius: '999px', backgroundColor: '#D4AF37', color: '#1E3A3A', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.3s' }} 
-                  onClick={() => setMenuOpen(false)}>
-                  <FiUser size={18}/> Login / Register
+                <Link 
+                  to="/login" 
+                  className="w-full flex items-center justify-center gap-2 py-3 px-6 font-body text-sm font-bold uppercase tracking-widest text-[var(--color-background)] bg-[var(--color-primary)] hover:opacity-90 rounded-sm transition-opacity focus-visible:outline"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <FiUser size={18} /> Login / Register
                 </Link>
               )}
             </div>
           </div>
-        </>
+        </div>
       )}
     </header>
   );

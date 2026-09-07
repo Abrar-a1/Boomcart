@@ -4,7 +4,6 @@ import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import './Auth.css';
 
 export default function Register() {
   const { register, verifyRegistration, loading } = useAuth();
@@ -55,14 +54,19 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-page">
+    <div className="min-h-[85vh] flex items-center justify-center bg-[var(--color-background)] px-4 py-12">
       <Helmet><title>Create Account — Boomcart</title></Helmet>
-      <div className="auth-card">
-        <h1 className="auth-logo">Boomcart</h1>
-        <p className="auth-subtitle">
-          {!otpSent ? 'Create your free account today.' : `Enter the OTP sent to ${form.email}`}
-        </p>
-        <form className="auth-form" onSubmit={handleSubmit}>
+      
+      <div className="w-full max-w-md bg-transparent lg:bg-white lg:p-12 lg:rounded-sm lg:border lg:border-[var(--color-border-light)] lg:shadow-sm">
+        
+        <div className="text-center mb-10">
+          <h1 className="font-heading text-4xl font-bold text-[var(--color-primary)] mb-3 tracking-tight">Create Account</h1>
+          <p className="font-body text-sm text-[var(--color-text-muted)]">
+            {!otpSent ? 'Join Boomcart today.' : `Enter the OTP sent to ${form.email}`}
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           {!otpSent ? (
             <>
               {[
@@ -71,50 +75,86 @@ export default function Register() {
                 {n:'password',l:'Password',          t:'password', p:'Min. 6 characters'},
                 {n:'confirm', l:'Confirm Password',  t:'password', p:'Re-enter password'},
               ].map(f => (
-                <div key={f.n} className="form-group">
-                  <label>{f.l}</label>
+                <div key={f.n} className="flex flex-col gap-2 relative">
+                  <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] ml-1">{f.l}</label>
                   {f.t === 'password' ? (
-                    <div className="password-wrapper">
-                      <input type={showPassword ? 'text' : 'password'} className="form-input" placeholder={f.p}
-                        value={form[f.n]} onChange={e => setForm({...form, [f.n]: e.target.value})} required style={{ paddingRight: '40px' }} />
-                      <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                    <div className="relative">
+                      <input 
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder={f.p}
+                        value={form[f.n]}
+                        onChange={e => setForm({...form, [f.n]: e.target.value})}
+                        required
+                        className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] pr-12"
+                      />
+                      <button 
+                        type="button" 
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-light)] hover:text-[var(--color-primary)] transition-colors"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
                         {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
                       </button>
                     </div>
                   ) : (
-                    <input type={f.t} className="form-input" placeholder={f.p}
-                      value={form[f.n]} onChange={e => setForm({...form, [f.n]: e.target.value})} required />
+                    <input 
+                      type={f.t}
+                      placeholder={f.p}
+                      value={form[f.n]}
+                      onChange={e => setForm({...form, [f.n]: e.target.value})}
+                      required
+                      className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+                    />
                   )}
                 </div>
               ))}
             </>
           ) : (
-            <div className="form-group">
-              <label>6-Digit OTP</label>
-              <input type="text" className="form-input" placeholder="Enter OTP from email"
-                value={otp} onChange={e => setOtp(e.target.value)} required maxLength={6} style={{ letterSpacing: '2px', fontWeight: 'bold' }} />
-              <div style={{ marginTop: 8, fontSize: 13, textAlign: 'right' }}>
+            <div className="flex flex-col gap-2">
+              <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] ml-1">6-Digit OTP</label>
+              <input 
+                type="text" 
+                placeholder="Enter OTP from email"
+                value={otp} 
+                onChange={e => setOtp(e.target.value)} 
+                required 
+                maxLength={6}
+                className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-lg font-bold tracking-[0.2em] text-center text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+              />
+              <div className="mt-2 text-right text-xs">
                 {canResend ? (
-                  <button type="button" onClick={handleResend} disabled={loading} style={{ background:'none', border:'none', color:'var(--color-primary)', cursor:'pointer', fontWeight:'bold', padding:0 }}>
+                  <button type="button" onClick={handleResend} disabled={loading} className="font-bold text-[var(--color-primary)] hover:text-[var(--color-cta)] transition-colors">
                     Resend OTP
                   </button>
                 ) : (
-                  <span style={{ color: '#888' }}>Didn't receive code? Resend in {countdown}s</span>
+                  <span className="text-[var(--color-text-light)] font-body text-xs">Didn't receive code? Resend in {countdown}s</span>
                 )}
               </div>
             </div>
           )}
-          <button className="btn btn-primary btn-block btn-lg auth-submit" type="submit" disabled={loading}>
-            {loading ? 'Processing…' : (!otpSent ? 'Send OTP' : 'Verify & Create Account')}
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full mt-4 h-12 bg-[var(--color-cta)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline"
+          >
+            {loading ? 'Processing...' : (!otpSent ? 'Send OTP' : 'Verify & Create Account')}
           </button>
         </form>
-        <div className="auth-switch" style={{ marginTop: 20 }}>
+
+        <div className="mt-8 text-center border-t border-[var(--color-border-light)] pt-8">
           {!otpSent ? (
-            <>Already have an account? <Link to="/login">Sign in</Link></>
+            <p className="font-body text-sm text-[var(--color-text-muted)]">
+              Already have an account? <Link to="/login" className="font-bold text-[var(--color-primary)] hover:text-[var(--color-cta)] transition-colors">Sign in</Link>
+            </p>
           ) : (
-            <button type="button" style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', textDecoration: 'underline', padding: 0, fontSize: 13 }}
-                onClick={() => setOtpSent(false)} disabled={loading}>
-                ← Back to registration
+            <button 
+              type="button" 
+              onClick={() => setOtpSent(false)} 
+              disabled={loading}
+              className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-primary)] hover:text-[var(--color-cta)] transition-colors"
+            >
+              ← Back to registration
             </button>
           )}
         </div>
