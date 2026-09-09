@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { sendOtp, verifyOtp } from '../../services/authService';
 import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
+import AuthLayout from '../../layouts/AuthLayout';
 
 export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
@@ -65,34 +66,36 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center bg-[var(--color-background)] px-4 py-12">
+    <AuthLayout>
       <Helmet><title>Forgot Password — Boomcart</title></Helmet>
       
-      <div className="w-full max-w-md bg-transparent lg:bg-white lg:p-12 lg:rounded-sm lg:border lg:border-[var(--color-border-light)] lg:shadow-sm">
-        
-        <div className="text-center mb-10">
-          <h1 className="font-heading text-4xl font-bold text-[var(--color-primary)] mb-3 tracking-tight">Recover Password</h1>
+      <div className="w-full">
+        <div className="mb-10">
+          <span className="block font-body text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-3">
+            {!otpSent ? 'Account Recovery' : 'Verification'}
+          </span>
+          <h1 className="font-heading text-4xl lg:text-5xl font-bold text-[var(--color-primary)] mb-3 tracking-tight">Recover Password</h1>
           <p className="font-body text-sm text-[var(--color-text-muted)]">
-            {!otpSent ? 'Enter your email to receive a password reset OTP.' : `Enter the OTP sent to ${email}`}
+            {!otpSent ? 'Enter your email to receive a password reset code.' : `Enter the OTP sent to ${email}`}
           </p>
         </div>
 
-        <form onSubmit={!otpSent ? handleSendOtp : handleVerifyOtp} className="flex flex-col gap-6">
+        <form onSubmit={!otpSent ? handleSendOtp : handleVerifyOtp} className="flex flex-col gap-8">
           {!otpSent ? (
-            <div className="flex flex-col gap-2 relative">
-              <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] ml-1">Email Address</label>
+            <div className="flex flex-col gap-1 relative">
+              <label className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">Email Address</label>
               <input 
                 type="email" 
                 placeholder="you@example.com"
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
                 required 
-                className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+                className="w-full py-2 bg-transparent border-b border-[var(--color-border-main)] rounded-none font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-accent)] placeholder:text-[var(--color-text-light)]"
               />
             </div>
           ) : (
-            <div className="flex flex-col gap-2 relative">
-              <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] ml-1">6-Digit OTP</label>
+            <div className="flex flex-col gap-1 relative">
+              <label className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">6-Digit OTP</label>
               <input 
                 type="text" 
                 placeholder="Enter OTP from email"
@@ -100,15 +103,15 @@ export default function ForgotPassword() {
                 onChange={e => setOtp(e.target.value)} 
                 required 
                 maxLength={6} 
-                className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-lg font-bold tracking-[0.2em] text-center text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+                className="w-full py-3 bg-transparent border-b border-[var(--color-border-main)] rounded-none font-body text-2xl tracking-[0.3em] text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-accent)] placeholder:text-[var(--color-text-light)] placeholder:text-sm placeholder:tracking-normal placeholder:font-normal"
               />
-              <div className="mt-2 text-right text-xs">
+              <div className="mt-2 text-xs">
                 {canResend ? (
-                  <button type="button" onClick={handleResend} disabled={loading} className="font-bold text-[var(--color-primary)] hover:text-[var(--color-cta)] transition-colors">
+                  <button type="button" onClick={handleResend} disabled={loading} className="font-bold text-[var(--color-primary)] hover:text-[var(--color-accent)] transition-colors focus-visible:outline">
                     Resend OTP
                   </button>
                 ) : (
-                  <span className="text-[var(--color-text-light)] font-body text-xs">Didn't receive code? Resend in {countdown}s</span>
+                  <span className="text-[var(--color-text-light)] font-body text-[11px]">Didn't receive code? Resend in {countdown}s</span>
                 )}
               </div>
             </div>
@@ -117,29 +120,29 @@ export default function ForgotPassword() {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full mt-4 h-12 bg-[var(--color-cta)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline"
+            className="w-full mt-2 h-12 bg-[var(--color-primary)] text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline"
           >
             {loading ? 'Processing...' : (!otpSent ? 'Send OTP' : 'Verify OTP')}
           </button>
         </form>
 
-        <div className="mt-8 text-center border-t border-[var(--color-border-light)] pt-8">
+        <div className="mt-8 pt-8">
           {!otpSent ? (
-            <p className="font-body text-sm text-[var(--color-text-muted)]">
-              Remember it? <Link to="/login" className="font-bold text-[var(--color-primary)] hover:text-[var(--color-cta)] transition-colors">Back to login</Link>
+            <p className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">
+              Remember it? <Link to="/login" className="text-[var(--color-primary)] underline underline-offset-4 hover:text-[var(--color-accent)] transition-colors">Back to login</Link>
             </p>
           ) : (
             <button 
               type="button" 
               onClick={() => setOtpSent(false)} 
               disabled={loading}
-              className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-primary)] hover:text-[var(--color-cta)] transition-colors"
+              className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors focus-visible:outline"
             >
               ← Use a different email
             </button>
           )}
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

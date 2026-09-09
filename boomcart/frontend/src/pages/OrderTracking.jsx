@@ -53,7 +53,7 @@ export default function OrderTracking() {
             <h1 className="font-heading text-4xl font-bold text-[var(--color-primary)] mb-2">Order Tracking</h1>
             <p className="font-body text-xs text-[var(--color-text-muted)]">Order #{order._id.slice(-10).toUpperCase()}</p>
           </div>
-          <span className={`font-body text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-sm ${isCancelled ? 'bg-red-50 text-red-700 border border-red-200' : order.orderStatus === 'delivered' ? 'bg-[var(--color-background)] text-[var(--color-accent-dark)] border border-[var(--color-border-light)]' : 'bg-[var(--color-primary)] text-white'}`}>
+          <span className={`font-body text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-sm ${isCancelled ? 'bg-[var(--color-error-light)] text-[var(--color-error)] border border-[var(--color-error)]' : order.orderStatus === 'delivered' ? 'bg-[var(--color-background)] text-[var(--color-accent-dark)] border border-[var(--color-border-light)]' : 'bg-[var(--color-primary)] text-white'}`}>
             {order.orderStatus}
           </span>
         </div>
@@ -109,13 +109,13 @@ export default function OrderTracking() {
             </div>
           </div>
         ) : (
-          <div className="bg-red-50 border border-red-200 rounded-sm p-6 mb-8 flex items-center gap-4">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-600 shadow-sm shrink-0">
+          <div className="bg-[var(--color-error-light)] border border-[var(--color-error)] opacity-80 rounded-sm p-6 mb-8 flex items-center gap-4">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[var(--color-error)] shadow-sm shrink-0">
               <FiX size={20} />
             </div>
             <div>
-              <p className="font-heading text-lg font-bold text-red-900 leading-tight">Order {order.orderStatus}</p>
-              <p className="font-body text-xs text-red-700 mt-1">This order has been {order.orderStatus} and will not be shipped.</p>
+              <p className="font-heading text-lg font-bold text-[var(--color-error)] leading-tight">Order {order.orderStatus}</p>
+              <p className="font-body text-xs text-[var(--color-error)] mt-1">This order has been {order.orderStatus} and will not be shipped.</p>
             </div>
           </div>
         )}
@@ -159,7 +159,7 @@ export default function OrderTracking() {
           </Link>
           {['pending','confirmed'].includes(order.orderStatus) && (
             <button 
-              className="flex items-center justify-center px-8 py-4 bg-red-50 text-red-700 font-body text-xs font-bold uppercase tracking-widest rounded-sm border border-red-200 hover:bg-red-100 transition-colors focus-visible:outline w-full sm:w-auto disabled:opacity-50" 
+              className="flex items-center justify-center px-8 py-4 bg-[var(--color-error-light)] text-[var(--color-error)] font-body text-xs font-bold uppercase tracking-widest rounded-sm border border-[var(--color-error)] hover:opacity-80 transition-opacity focus-visible:outline w-full sm:w-auto disabled:opacity-50" 
               onClick={handleCancel} 
               disabled={cancelling}
             >
