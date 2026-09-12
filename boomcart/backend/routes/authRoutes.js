@@ -8,6 +8,7 @@ const validate = require('../middleware/validate');
 const { authSchemas } = require('../validators');
 
 
+r.get('/csrf', (req, res) => res.status(200).json({ success: true }));
 r.post('/send-otp', authLimiter, validate(authSchemas.sendOtp), sendOtp);
 r.post('/verify-otp', otpVerifyLimiter, validate(authSchemas.verifyOtp), verifyOtp);
 r.post('/reset-password', validate(authSchemas.resetPassword), resetPassword);

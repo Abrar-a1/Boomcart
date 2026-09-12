@@ -8,6 +8,9 @@ const api = axios.create({
   baseURL,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+  withXSRFToken: true,
 });
 
 let isRefreshing = false;
@@ -73,5 +76,6 @@ export const fetchProducts = (filters) => api.get('/products', { params: filters
 export const fetchProductById = (id) => api.get(`/products/${id}`);
 export const bookAppointment = (data) => api.post('/appointments', data);
 export const getMyBookings = () => api.get('/appointments/my-bookings');
+export const initCsrf = () => api.get('/auth/csrf');
 
 export default api;
