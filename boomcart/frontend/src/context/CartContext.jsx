@@ -22,7 +22,39 @@ const reducer = (state, action) => {
 
 export const CartProvider = ({ children }) => {
   const [items, dispatch] = useReducer(reducer, [], () => {
-    try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch { return []; }
+    try { 
+      const stored = localStorage.getItem(CART_KEY);
+      
+      if (!localStorage.getItem('boomcart_cart_migrated_v1')) {
+        if (!stored || JSON.parse(stored).length === 0) {
+          // MIGRATION: Read legacy boomcart-storage if boomcart_cart is missing/empty
+          const legacy = localStorage.getItem('boomcart-storage');
+          if (legacy) {
+            const legacyParsed = JSON.parse(legacy);
+            if (legacyParsed?.state?.cart && Array.isArray(legacyParsed.state.cart)) {
+              const migrated = legacyParsed.state.cart.map(item => ({
+                _key: `${item.productId}_${item.selectedSize || ''}_`,
+                product: item.productId,
+                name: item.name,
+                image: item.image,
+                price: item.price, // faithfully preserve legacy price
+                quantity: item.quantity,
+                size: item.selectedSize || '',
+                color: ''
+              }));
+              localStorage.setItem(CART_KEY, JSON.stringify(migrated));
+              localStorage.setItem('boomcart_cart_migrated_v1', 'true');
+              return migrated;
+            }
+          }
+        }
+        localStorage.setItem('boomcart_cart_migrated_v1', 'true');
+      }
+
+      if (stored) return JSON.parse(stored);
+      
+      return []; 
+    } catch { return []; }
   });
 
   useEffect(() => { localStorage.setItem(CART_KEY, JSON.stringify(items)); }, [items]);

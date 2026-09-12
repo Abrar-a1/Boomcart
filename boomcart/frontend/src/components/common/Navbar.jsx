@@ -2,13 +2,12 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { FiShoppingCart, FiHeart, FiUser, FiSearch, FiMenu, FiX, FiLogOut, FiPackage, FiShield, FiArrowRight } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
-import { useStore } from '../../store/useStore';
+import { useCart } from '../../context/CartContext';
 import PageContainer from './PageContainer';
 
 export default function Navbar() {
   const { user, logout, isAdmin } = useAuth();
-  const cart = useStore((state) => state.cart);
-  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const { cartCount } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();

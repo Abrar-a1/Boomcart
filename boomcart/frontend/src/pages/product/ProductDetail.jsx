@@ -12,7 +12,7 @@ import ProductCard from '../../components/product/ProductCard';
 import Button from '../../components/common/Button';
 import EmptyState from '../../components/common/EmptyState';
 import { Helmet } from 'react-helmet-async';
-import { useStore } from '../../store/useStore';
+import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -34,8 +34,7 @@ export default function ProductDetail() {
   // Mobile Gallery State
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  const addToCart = useStore(state => state.addToCart);
-  const cart = useStore(state => state.cart);
+  const { items: cart, addToCart } = useCart();
 
   useEffect(() => {
     productService.getProductById(id)
@@ -87,7 +86,7 @@ export default function ProductDetail() {
   const isKids   = ['kids', 'boys', 'girls'].includes(product.category);
 
   // Check how many of this item/size are already in cart
-  const cartItem = cart.find(item => item.product._id === product._id && item.size === selectedSize);
+  const cartItem = cart.find(item => item.product === product._id && item.size === selectedSize);
   const qtyInCart = cartItem ? cartItem.quantity : 0;
   
   const sizeObj = product.sizes?.find(s => s.size === selectedSize);
@@ -105,8 +104,7 @@ export default function ProductDetail() {
   const handleAddToCart = () => {
     if (!product.sizes?.length) {
       if (product.stock === 0) return toast.error('Out of stock');
-      addToCart(product, null, quantity);
-      toast.success('Added to bag');
+      addToCart(product, quantity, '', '');
       setQuantity(1);
       return;
     }
@@ -115,8 +113,7 @@ export default function ProductDetail() {
     if (isOutOfStock) return toast.error('Selected size is out of stock');
     if (isMaxReached) return toast.error('Maximum available quantity reached in cart');
 
-    addToCart(product, selectedSize, quantity);
-    toast.success('Added to bag');
+    addToCart(product, quantity, selectedSize, '');
     setQuantity(1);
   };
 

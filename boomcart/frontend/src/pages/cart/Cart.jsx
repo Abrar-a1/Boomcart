@@ -1,16 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useStore } from '../../store/useStore';
+import { useCart } from '../../context/CartContext';
 import { FiTrash2, FiMinus, FiPlus, FiArrowRight } from 'react-icons/fi';
 import { Helmet } from 'react-helmet-async';
 import PageContainer from '../../components/common/PageContainer';
 
 export default function Cart() {
   const navigate = useNavigate();
-  const { cart, removeFromCart, increaseQuantity, decreaseQuantity, clearCart } = useStore();
-
-  const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const { items: cart, cartCount: totalItems, itemsPrice: subtotal, updateQuantity, removeFromCart, clearCart } = useCart();
 
   if (cart.length === 0) {
     return (
@@ -56,7 +53,7 @@ export default function Cart() {
 
             <div className="flex flex-col gap-8">
               {cart.map((item) => (
-                <div key={`${item.productId}-${item.selectedSize}`} className="flex items-start gap-6 group">
+                <div key={item._key} className="flex items-start gap-6 group">
                   
                   {/* Image */}
                   <div className="w-28 h-36 lg:w-32 lg:h-40 bg-[var(--color-border-light)] rounded-sm overflow-hidden flex-shrink-0">
@@ -75,7 +72,7 @@ export default function Cart() {
                           {item.name}
                         </h3>
                         <p className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] mb-4 block">
-                          Size: {item.selectedSize || 'N/A'}
+                          Size: {item.size || 'N/A'}
                         </p>
                       </div>
                       <span className="font-body text-lg font-bold text-[var(--color-text)] shrink-0">
@@ -87,7 +84,7 @@ export default function Cart() {
                       {/* Quantity */}
                       <div className="flex items-center border border-[var(--color-border)] rounded-sm overflow-hidden">
                         <button 
-                          onClick={() => decreaseQuantity(item.productId, item.selectedSize)}
+                          onClick={() => updateQuantity(item._key, item.quantity - 1)}
                           disabled={item.quantity <= 1}
                           className="w-10 h-10 flex items-center justify-center bg-white text-[var(--color-text)] hover:bg-[var(--color-border-light)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline"
                           aria-label="Decrease quantity"
@@ -98,7 +95,7 @@ export default function Cart() {
                           {item.quantity}
                         </span>
                         <button 
-                          onClick={() => increaseQuantity(item.productId, item.selectedSize)}
+                          onClick={() => updateQuantity(item._key, item.quantity + 1)}
                           className="w-10 h-10 flex items-center justify-center bg-white text-[var(--color-text)] hover:bg-[var(--color-border-light)] transition-colors focus-visible:outline"
                           aria-label="Increase quantity"
                         >
@@ -108,7 +105,7 @@ export default function Cart() {
                       
                       {/* Remove */}
                       <button 
-                        onClick={() => removeFromCart(item.productId, item.selectedSize)}
+                        onClick={() => removeFromCart(item._key)}
                         className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-[var(--color-cta)] transition-colors flex items-center gap-1.5 focus-visible:outline"
                       >
                         <FiTrash2 size={14} /> Remove
