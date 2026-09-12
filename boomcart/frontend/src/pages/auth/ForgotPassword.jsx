@@ -90,7 +90,7 @@ export default function ForgotPassword() {
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
                 required 
-                className="w-full py-2 bg-transparent border-b border-[var(--color-border-main)] rounded-none font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-accent)] placeholder:text-[var(--color-text-light)]"
+                className="w-full py-2 bg-transparent border-b border-[var(--color-border-light)] rounded-none font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-accent)] placeholder:text-[var(--color-text-light)]"
               />
             </div>
           ) : (
@@ -103,7 +103,7 @@ export default function ForgotPassword() {
                 onChange={e => setOtp(e.target.value)} 
                 required 
                 maxLength={6} 
-                className="w-full py-3 bg-transparent border-b border-[var(--color-border-main)] rounded-none font-body text-2xl tracking-[0.3em] text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-accent)] placeholder:text-[var(--color-text-light)] placeholder:text-sm placeholder:tracking-normal placeholder:font-normal"
+                className="w-full py-3 bg-transparent border-b border-[var(--color-border-light)] rounded-none font-body text-2xl tracking-[0.3em] text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-accent)] placeholder:text-[var(--color-text-light)] placeholder:text-sm placeholder:tracking-normal placeholder:font-normal"
               />
               <div className="mt-2 text-xs">
                 {canResend ? (

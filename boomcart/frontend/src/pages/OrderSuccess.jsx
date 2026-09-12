@@ -19,7 +19,7 @@ export default function OrderSuccess() {
     <div className="w-full min-h-screen bg-[var(--color-background)] py-12 lg:py-20 flex items-center justify-center px-6">
       <Helmet><title>Order Confirmed — Boomcart</title></Helmet>
       
-      <div className="max-w-[600px] w-full bg-white border border-[var(--color-border-main)] rounded-sm p-10 lg:p-16 text-center animate-smooth-reveal shadow-sm">
+      <div className="max-w-[600px] w-full bg-white border border-[var(--color-border)] rounded-sm p-10 lg:p-16 text-center animate-smooth-reveal shadow-sm">
         
         <div className="w-20 h-20 bg-[var(--color-background)] rounded-full flex items-center justify-center mx-auto mb-8 border border-[var(--color-border-light)]">
           <FiCheck size={32} className="text-[var(--color-primary)]" />
@@ -32,7 +32,7 @@ export default function OrderSuccess() {
 
         {order && (
           <div className="bg-[var(--color-background)] border border-[var(--color-border-light)] rounded-sm p-8 mb-10 text-left">
-            <div className="flex justify-between items-center mb-6 border-b border-[var(--color-border-main)] pb-6">
+            <div className="flex justify-between items-center mb-6 border-b border-[var(--color-border-light)] pb-6">
               <div>
                 <p className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] mb-1">Order ID</p>
                 <p className="font-heading text-xl font-bold text-[var(--color-primary)]">#{order._id.slice(-8).toUpperCase()}</p>

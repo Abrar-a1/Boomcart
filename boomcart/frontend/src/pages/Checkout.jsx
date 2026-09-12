@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
-import { FiMapPin, FiCreditCard, FiCheck } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { FiCheck } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { createOrder } from '../services/orderService';
 import { createRazorpayOrder, verifyPayment } from '../services/paymentService';
 import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
+import PageContainer from '../components/common/PageContainer';
 
 const STATES = ['Jammu & Kashmir','Delhi','Maharashtra','Karnataka','Tamil Nadu','Rajasthan','Uttar Pradesh','Gujarat','West Bengal','Punjab','Haryana','Kerala','Madhya Pradesh','Bihar','Assam','Himachal Pradesh','Other'];
 
@@ -105,10 +106,9 @@ export default function Checkout() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[var(--color-background)] py-12 lg:py-20">
-      <Helmet><title>Secure Checkout — Boomcart</title></Helmet>
-      
-      <div className="max-w-[1100px] mx-auto px-6 lg:px-12 animate-smooth-reveal">
+    <div className="w-full min-h-screen bg-[var(--color-background)] pt-12 pb-24">
+      <Helmet><title>Secure Checkout | Boomcart</title></Helmet>
+      <PageContainer variant="functional" className="animate-smooth-reveal">
         <h1 className="font-heading text-4xl lg:text-5xl font-bold text-[var(--color-primary)] mb-12">Checkout</h1>
 
         {/* ── STEP INDICATOR ── */}
@@ -117,7 +117,7 @@ export default function Checkout() {
             <div key={s.n} className="flex items-center flex-1">
               <div className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-body text-xs font-bold transition-colors ${
-                  step > s.n ? 'bg-[var(--color-primary)] text-white' : step === s.n ? 'bg-[var(--color-cta)] text-white' : 'bg-white border border-[var(--color-border-main)] text-[var(--color-text-muted)]'
+                  step > s.n ? 'bg-[var(--color-primary)] text-white' : step === s.n ? 'bg-[var(--color-cta)] text-white' : 'bg-white border border-[var(--color-border)] text-[var(--color-text-muted)]'
                 }`}>
                   {step > s.n ? <FiCheck size={14}/> : s.n}
                 </div>
@@ -125,7 +125,7 @@ export default function Checkout() {
                   step >= s.n ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)]'
                 }`}>{s.l}</span>
               </div>
-              {idx === 0 && <div className={`flex-1 h-[1px] mx-6 transition-colors ${step > 1 ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border-main)]'}`} />}
+              {idx === 0 && <div className={`flex-1 h-[1px] mx-6 transition-colors ${step > 1 ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border-light)]'}`} />}
             </div>
           ))}
         </div>
@@ -136,7 +136,7 @@ export default function Checkout() {
           <div className="w-full lg:w-[60%] flex flex-col gap-8">
             
             {step === 1 && (
-              <div className="bg-transparent border border-[var(--color-border-main)] rounded-sm p-8 bg-white">
+              <div className="bg-transparent border border-[var(--color-border)] rounded-sm p-8 bg-white">
                 <h3 className="font-heading text-2xl font-bold text-[var(--color-primary)] mb-8">Shipping Address</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -153,7 +153,7 @@ export default function Checkout() {
                         value={addr[f.n]} 
                         onChange={handleAddr} 
                         placeholder={f.p || ''} 
-                        className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+                        className="w-full px-4 py-3 bg-white border border-[var(--color-border)] rounded-sm font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
                       />
                     </div>
                   ))}
@@ -163,7 +163,7 @@ export default function Checkout() {
                       name="state" 
                       value={addr.state} 
                       onChange={handleAddr}
-                      className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+                      className="w-full px-4 py-3 bg-white border border-[var(--color-border)] rounded-sm font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
                     >
                       <option value="">Select state</option>
                       {STATES.map(s => <option key={s}>{s}</option>)}
@@ -181,7 +181,7 @@ export default function Checkout() {
             )}
 
             {step === 2 && (
-              <div className="bg-transparent border border-[var(--color-border-main)] rounded-sm p-8 bg-white animate-smooth-reveal">
+              <div className="bg-transparent border border-[var(--color-border)] rounded-sm p-8 bg-white animate-smooth-reveal">
                 <h3 className="font-heading text-2xl font-bold text-[var(--color-primary)] mb-8">Payment Method</h3>
                 
                 <div className="flex flex-col gap-4">
@@ -189,7 +189,7 @@ export default function Checkout() {
                     <label 
                       key={opt.v} 
                       className={`flex items-start gap-4 p-5 border rounded-sm cursor-pointer transition-all ${
-                        payMethod === opt.v ? 'border-[var(--color-primary)] bg-[var(--color-background)]' : 'border-[var(--color-border-main)] bg-white hover:border-[var(--color-primary)]/50'
+                        payMethod === opt.v ? 'border-[var(--color-primary)] bg-[var(--color-background)]' : 'border-[var(--color-border)] bg-white hover:border-[var(--color-primary)]/50'
                       }`}
                     >
                       <input 
@@ -229,7 +229,7 @@ export default function Checkout() {
 
           {/* ── RIGHT ORDER SUMMARY ── */}
           <div className="w-full lg:w-[40%] lg:sticky lg:top-28">
-            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 shadow-sm">
+            <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 shadow-sm">
               <h4 className="font-heading text-2xl font-bold text-[var(--color-primary)] border-b border-[var(--color-border-light)] pb-4 mb-6">
                 Your Order
               </h4>
@@ -263,15 +263,14 @@ export default function Checkout() {
                 )}
               </div>
               
-              <div className="border-t border-[var(--color-border-main)] pt-6 mt-6 flex justify-between items-end">
+              <div className="border-t border-[var(--color-border-light)] pt-6 mt-6 flex justify-between items-end">
                 <span className="font-heading text-xl font-bold text-[var(--color-primary)]">Total</span>
                 <span className="font-body text-2xl font-bold text-[var(--color-cta)]">₹{totalPrice.toLocaleString()}</span>
               </div>
             </div>
           </div>
-
         </div>
-      </div>
+      </PageContainer>
     </div>
   );
 }

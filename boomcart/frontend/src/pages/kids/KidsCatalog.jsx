@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { FiArrowLeft } from 'react-icons/fi';
 import ProductCard from '../../components/product/ProductCard';
 import productService from '../../services/productService';
+import PageContainer from '../../components/common/PageContainer';
 
 export default function KidsCatalog() {
   const [products, setProducts] = useState([]);
@@ -54,63 +55,48 @@ export default function KidsCatalog() {
   );
 
   return (
-    <div style={{ width: '100%', backgroundColor: '#FFF8F0', minHeight: '60vh' }}>
+    <div className="w-full bg-[var(--color-background)] min-h-[60vh]">
       <Helmet><title>Kids Collection — Boomcart</title></Helmet>
 
-      {/* ── Hero Banner — unique kids design with large image background ── */}
-      <div style={{
-        position: 'relative',
-        overflow: 'hidden',
-        minHeight: '340px',
-        backgroundColor: '#FFF8F0',
-        display: 'flex',
-        alignItems: 'center',
-      }}>
-        {/* Background Image */}
+      {/* ── Hero Banner ── */}
+      <section className="relative overflow-hidden min-h-[400px] bg-[var(--color-background)] flex items-center">
         <img
           src="/images/kids-hero.png"
           alt="Kids Collection"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         />
-        {/* Gradient overlay for readability */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(255,248,240,0.95) 0%, rgba(255,248,240,0.85) 50%, rgba(255,248,240,0.2) 100%)' }} />
+        {/* Dark scrim for legibility matching Home */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent lg:from-black/70 lg:via-black/20 lg:to-transparent" />
 
         {/* Decorative floating elements */}
-        <div className="animate-float" style={{ position: 'absolute', top: '20px', right: '60px', fontSize: '40px', opacity: 0.2 }}>🧸</div>
-        <div className="animate-float" style={{ position: 'absolute', bottom: '30px', left: '40px', fontSize: '32px', opacity: 0.15, animationDelay: '1s' }}>⭐</div>
-        <div className="animate-float" style={{ position: 'absolute', top: '50%', right: '15%', fontSize: '28px', opacity: 0.15, animationDelay: '2s' }}>🎈</div>
+        <div className="animate-float absolute top-5 right-16 text-4xl opacity-20">🧸</div>
+        <div className="animate-float absolute bottom-8 left-10 text-3xl opacity-15" style={{ animationDelay: '1s' }}>⭐</div>
+        <div className="animate-float absolute top-1/2 right-[15%] text-2xl opacity-15" style={{ animationDelay: '2s' }}>🎈</div>
 
-        {/* Content — box model: explicit padding and margin on every child */}
-        <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '56px 32px 64px 32px', position: 'relative', zIndex: 10 }}>
-          {/* Breadcrumb */}
-          <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', marginBottom: '24px' }}>
-            <Link to="/" style={{ color: '#1E3A3A', transition: 'color 0.3s', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#D4AF37'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = '#1E3A3A'; }}>
+        <PageContainer className="relative z-10 py-16">
+          <nav className="flex items-center gap-2 text-sm mb-6">
+            <Link to="/" className="text-white hover:text-[var(--color-accent)] transition-colors inline-flex items-center gap-1">
               <FiArrowLeft size={14} /> Home
             </Link>
-            <span style={{ color: '#9eaa9f' }}>/</span>
-            <span style={{ color: '#6b7c6e', fontWeight: 600 }}>Kids</span>
+            <span className="text-white/40">/</span>
+            <span className="text-white/90 font-semibold">Kids</span>
           </nav>
 
-          {/* Title block */}
-          <span style={{ display: 'block', fontSize: '11px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C25A3C', marginBottom: '12px' }}>
+          <span className="inline-block text-[10px] font-bold tracking-[0.2em] uppercase text-white mb-6 bg-black/30 px-4 py-2 backdrop-blur-sm rounded-sm border border-white/20">
             For Little Ones
           </span>
-          <h1 className="font-heading" style={{ fontSize: '48px', fontWeight: 700, color: '#1E3A3A', lineHeight: 1.1, marginBottom: '16px' }}>
+          <h1 className="font-heading text-5xl lg:text-7xl font-bold text-white leading-[1.1] mb-6 drop-shadow-lg">
             Kids Collection
           </h1>
-          <p style={{ fontSize: '16px', color: '#2C3E2F', opacity: 0.75, maxWidth: '420px', lineHeight: 1.7, marginBottom: '20px' }}>
+          <p className="text-base text-white/90 max-w-[440px] leading-[1.7] mb-8 drop-shadow-sm font-medium">
             Durable, colorful, and fun fabrics for your little ones. Explore playful styles designed for comfort and adventure.
           </p>
-          <div style={{ width: '60px', height: '3px', backgroundColor: '#D4AF37', borderRadius: '2px' }} />
-        </div>
-      </div>
+        </PageContainer>
+      </section>
 
       {/* ── Products Grid ── */}
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 32px 64px 32px' }}>
-        {/* Product count */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px', paddingBottom: '16px', borderBottom: '1px solid #E5D9C5' }}>
+      <PageContainer className="py-12 lg:py-16">
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-[var(--color-border-light)]">
           <h2 className="font-heading" style={{ fontSize: '24px', color: '#1E3A3A', fontWeight: 700, margin: 0 }}>
             All Kids Products
           </h2>
@@ -120,8 +106,8 @@ export default function KidsCatalog() {
         </div>
 
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
-            {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-6 2xl:gap-8">
+            {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         ) : error ? (
           <div style={{ borderRadius: '12px', padding: '24px', textAlign: 'center', backgroundColor: '#fde8e4', color: '#B85C4B', border: '1px solid #B85C4B' }}>
@@ -142,13 +128,13 @@ export default function KidsCatalog() {
             </Link>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-6 2xl:gap-8">
             {products.map(product => (
               <ProductCard key={product._id} product={product} />
             ))}
           </div>
         )}
-      </div>
+      </PageContainer>
     </div>
   );
 }

@@ -57,7 +57,7 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 1000 });
 // Strict rate limit only on login/register to deter credential stuffing (max 30 requests per 15 minutes per IP)
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, message: 'Too many attempts, try again after 15 minutes' });
 // Transaction limit for orders/payments to prevent abuse/spam

@@ -302,30 +302,4 @@
   margin-bottom: 4px;
 }
 
-/* ─── Responsive ─────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .pd-grid {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-}
-
-@media (max-width: 600px) {
-  .pd-images {
-    flex-direction: column;
-  }
-
-  .pd-thumbs {
-    flex-direction: row;
-    width: 100%;
-  }
-
-  .pd-thumb {
-    width: 60px;
-    height: 72px;
-  }
-
-  .pd-name {
-    font-size: 22px;
-  }
-}
+/* Responsive handling moved to Tailwind classes in ProductDetail.jsx */

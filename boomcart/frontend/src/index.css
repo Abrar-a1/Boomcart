@@ -13,6 +13,9 @@
   --color-text: #2C3E2F;
   --color-text-muted: #6b7c6e;
   --color-text-light: #9eaa9f;
+  /* Border tokens:
+     --color-border is for solid structural edges like cards, inputs, and primary containers.
+     --color-border-light is strictly for subtle hairline dividers between list items or sections. */
   --color-border: #E5D9C5;
   --color-border-light: #f0e8da;
   --color-error: #B85C4B;
@@ -25,28 +28,30 @@
 }
 
 /* ── Base ──────────────────────────────────────────────────── */
-html, body { overflow-x: hidden; }
-html { scroll-behavior: smooth; }
+@layer base {
+  html, body { overflow-x: hidden; }
+  html { scroll-behavior: smooth; }
 
-body {
-  background-color: var(--color-background);
-  color: var(--color-text);
-  font-family: var(--font-body);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    color: var(--color-primary);
+    line-height: 1.2;
+  }
+
+  a { text-decoration: none; color: inherit; }
+  button { font-family: inherit; cursor: pointer; }
+  img { max-width: 100%; display: block; }
+  ul { list-style: none; padding: 0; margin: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 }
-
-h1, h2, h3, h4 {
-  font-family: var(--font-heading);
-  color: var(--color-primary);
-  line-height: 1.2;
-}
-
-a { text-decoration: none; color: inherit; }
-button { font-family: inherit; cursor: pointer; }
-img { max-width: 100%; display: block; }
-ul { list-style: none; padding: 0; margin: 0; }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* ── Utilities ─────────────────────────────────────────────── */
 .line-clamp-2 {
@@ -64,6 +69,16 @@ ul { list-style: none; padding: 0; margin: 0; }
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@layer components {
+  .card {
+    background-color: #ffffff;
+    border: 1px solid var(--color-border-light);
+    border-radius: 4px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    padding: 2rem;
+  }
 }
 
 /* ── Skeleton ──────────────────────────────────────────────── */
@@ -143,6 +158,48 @@ label:has(input:focus-visible) > div:first-child {
   to   { transform: translateX(0); }
 }
 .animate-slide-in { animation: slideInRight 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+/* ── Auth Slider Animations ───────────────────────────────── */
+.auth-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-form-panel {
+  transition: transform 0.7s ease, opacity 0.7s ease, filter 0.7s ease;
+}
+
+.auth-form-panel.slide-out-left {
+  transform: translateX(-120%);
+  opacity: 0;
+  filter: blur(10px);
+}
+
+.auth-form-panel.slide-out-right {
+  transform: translateX(120%);
+  opacity: 0;
+  filter: blur(10px);
+}
+
+.auth-form-panel.slide-in {
+  transform: translateX(0);
+  opacity: 1;
+  filter: blur(0);
+}
+
+.auth-welcome-panel {
+  transition: transform 0.7s ease, border-radius 0.7s ease;
+}
+
+.auth-welcome-panel.panel-right {
+  transform: translateX(0);
+  border-radius: 0 12px 12px 0;
+}
+
+.auth-welcome-panel.panel-left {
+  transform: translateX(-100%);
+  border-radius: 12px 0 0 12px;
+}
 
 /* ── Accessibility ─────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {

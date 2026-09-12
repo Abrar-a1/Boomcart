@@ -99,7 +99,7 @@ export default function ReviewsSection({ productId }) {
 
       {/* Write Review Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white border border-[var(--color-border-main)] p-8 rounded-sm shadow-sm mb-12 animate-slide-down">
+        <form onSubmit={handleSubmit} className="bg-white border border-[var(--color-border)] p-8 rounded-sm shadow-sm mb-12 animate-slide-down">
           <h3 className="font-heading text-2xl font-bold mb-6 text-[var(--color-primary)]">Share your thoughts</h3>
           
           <div className="mb-6">

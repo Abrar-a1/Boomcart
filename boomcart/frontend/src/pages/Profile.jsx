@@ -8,6 +8,7 @@ import { addAddress, deleteAddress, getWishlist, toggleWishlist } from '../servi
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
+import PageContainer from '../components/common/PageContainer';
 
 const STATUS_BADGE = { pending:'bg-orange-100 text-orange-800', confirmed:'bg-blue-100 text-blue-800', processing:'bg-blue-100 text-blue-800', shipped:'bg-blue-100 text-blue-800', delivered:'bg-green-100 text-green-800', cancelled:'bg-red-100 text-red-800', refunded:'bg-gray-100 text-gray-800' };
 const STATES = ['Jammu & Kashmir','Delhi','Maharashtra','Karnataka','Tamil Nadu','Rajasthan','Uttar Pradesh','Gujarat','West Bengal','Punjab','Haryana','Kerala','Madhya Pradesh','Bihar','Assam','Himachal Pradesh','Other'];
@@ -100,10 +101,10 @@ export default function Profile() {
     <div className="w-full min-h-screen bg-[var(--color-background)] py-12 lg:py-20">
       <Helmet><title>My Profile — Boomcart</title></Helmet>
       
-      <div className="max-w-[1200px] mx-auto px-6 lg:px-12 flex flex-col lg:flex-row gap-10 lg:gap-16 items-start animate-smooth-reveal">
+      <PageContainer variant="functional" className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start animate-smooth-reveal">
 
         {/* ── SIDEBAR ── */}
-        <div className="w-full lg:w-[280px] shrink-0 bg-white border border-[var(--color-border-main)] rounded-sm overflow-hidden flex flex-col">
+        <div className="w-full lg:w-[280px] shrink-0 bg-white border border-[var(--color-border)] rounded-sm overflow-hidden flex flex-col">
           <div className="p-8 bg-[var(--color-primary)] text-center">
             <div className="w-16 h-16 rounded-full bg-[var(--color-accent)] mx-auto mb-4 flex items-center justify-center font-heading text-3xl font-bold text-[var(--color-primary)]">
               {user?.name?.[0]?.toUpperCase()}
@@ -138,7 +139,7 @@ export default function Profile() {
 
           {/* PROFILE */}
           {tab === 'profile' && (
-            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 lg:p-12 animate-fade-in">
+            <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 lg:p-12 animate-fade-in">
               <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)] mb-10">Personal Information</h2>
               <form onSubmit={saveProfile} className="flex flex-col gap-6 max-w-[500px]">
                 {[{n:'name',l:'Full Name',t:'text'},{n:'email',l:'Email Address',t:'email'}].map(f => (
@@ -146,7 +147,7 @@ export default function Profile() {
                     <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{f.l}</label>
                     <input 
                       type={f.t} 
-                      className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" 
+                      className="w-full px-4 py-3 bg-white border border-[var(--color-border)] rounded-sm font-body text-sm text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" 
                       value={profileForm[f.n]} 
                       onChange={e => setProfileForm({...profileForm,[f.n]:e.target.value})} 
                     />
@@ -169,7 +170,7 @@ export default function Profile() {
 
           {/* ORDERS */}
           {tab === 'orders' && (
-            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 lg:p-12 animate-fade-in">
+            <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 lg:p-12 animate-fade-in">
               <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)] mb-10">My Orders</h2>
               {ordersLoading ? <div className="text-center text-[var(--color-text-muted)] py-10">Loading orders...</div> : orders.length === 0 ? (
                 <div className="text-center py-16">
@@ -182,7 +183,7 @@ export default function Profile() {
               ) : (
                 <div className="flex flex-col gap-6">
                   {orders.map(o => (
-                    <div key={o._id} className="border border-[var(--color-border-main)] rounded-sm p-6 lg:p-8">
+                    <div key={o._id} className="border border-[var(--color-border)] rounded-sm p-6 lg:p-8">
                       <div className="flex flex-wrap justify-between items-start gap-4 mb-6 pb-6 border-b border-[var(--color-border-light)]">
                         <div>
                           <p className="font-heading text-xl font-bold text-[var(--color-primary)]">#{o._id.slice(-8).toUpperCase()}</p>
@@ -199,7 +200,7 @@ export default function Profile() {
                       </div>
                       <div className="flex flex-wrap gap-4 mb-6">
                         {o.orderItems.slice(0,4).map(item => (
-                          <div key={item._id} className="w-16 h-20 bg-[var(--color-border-light)] rounded-sm overflow-hidden flex-shrink-0 border border-[var(--color-border-main)]">
+                          <div key={item._id} className="w-16 h-20 bg-[var(--color-border-light)] rounded-sm overflow-hidden flex-shrink-0 border border-[var(--color-border)]">
                             <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                           </div>
                         ))}
@@ -222,7 +223,7 @@ export default function Profile() {
 
           {/* ADDRESSES */}
           {tab === 'addresses' && (
-            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 lg:p-12 animate-fade-in">
+            <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 lg:p-12 animate-fade-in">
               <div className="flex justify-between items-center mb-10">
                 <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)]">Saved Addresses</h2>
                 <button 
@@ -234,18 +235,18 @@ export default function Profile() {
               </div>
 
               {showAddrForm && (
-                <form onSubmit={saveAddress} className="bg-[var(--color-background)] border border-[var(--color-border-main)] rounded-sm p-8 mb-10">
+                <form onSubmit={saveAddress} className="bg-[var(--color-background)] border border-[var(--color-border)] rounded-sm p-8 mb-10">
                   <h4 className="font-heading text-xl font-bold text-[var(--color-primary)] mb-6">New Address</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {[{n:'fullName',l:'Full Name',col:'md:col-span-2'},{n:'phone',l:'Phone'},{n:'pincode',l:'Pincode'},{n:'addressLine1',l:'Address Line 1',col:'md:col-span-2'},{n:'addressLine2',l:'Address Line 2 (optional)',col:'md:col-span-2'},{n:'city',l:'City'}].map(f => (
                       <div key={f.n} className={`flex flex-col gap-2 ${f.col || ''}`}>
                         <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{f.l}</label>
-                        <input className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={addrForm[f.n]} onChange={e => setAddrForm({...addrForm,[f.n]:e.target.value})} required={f.n!=='addressLine2'} />
+                        <input className="w-full px-4 py-3 bg-white border border-[var(--color-border)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={addrForm[f.n]} onChange={e => setAddrForm({...addrForm,[f.n]:e.target.value})} required={f.n!=='addressLine2'} />
                       </div>
                     ))}
                     <div className="flex flex-col gap-2">
                       <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">State</label>
-                      <select className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={addrForm.state} onChange={e => setAddrForm({...addrForm,state:e.target.value})} required>
+                      <select className="w-full px-4 py-3 bg-white border border-[var(--color-border)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={addrForm.state} onChange={e => setAddrForm({...addrForm,state:e.target.value})} required>
                         <option value="">Select state</option>
                         {STATES.map(s => <option key={s}>{s}</option>)}
                       </select>
@@ -269,7 +270,7 @@ export default function Profile() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {addresses.map(a => (
-                    <div key={a._id} className="relative border border-[var(--color-border-main)] rounded-sm p-6 flex flex-col items-start gap-4 hover:border-[var(--color-primary)] transition-colors group">
+                    <div key={a._id} className="relative border border-[var(--color-border)] rounded-sm p-6 flex flex-col items-start gap-4 hover:border-[var(--color-primary)] transition-colors group">
                       {a.isDefault && <span className="absolute top-6 right-16 bg-[var(--color-background)] border border-[var(--color-border-light)] text-[var(--color-primary)] font-body text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm">Default</span>}
                       <button onClick={() => removeAddress(a._id)} className="absolute top-6 right-6 text-[var(--color-text-light)] hover:text-[var(--color-cta)] transition-colors" title="Remove">
                         <FiTrash2 size={18}/>
@@ -289,7 +290,7 @@ export default function Profile() {
 
           {/* WISHLIST */}
           {tab === 'wishlist' && (
-            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 lg:p-12 animate-fade-in">
+            <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 lg:p-12 animate-fade-in">
               <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)] mb-10">My Wishlist</h2>
               {wishLoading ? <div className="text-center text-[var(--color-text-muted)] py-10">Loading wishlist...</div> : wishItems.length === 0 ? (
                 <div className="text-center py-16">
@@ -302,7 +303,7 @@ export default function Profile() {
                   {wishItems.map(item => {
                     const price = item.discountPrice > 0 ? item.discountPrice : item.price;
                     return (
-                      <div key={item._id} className="group relative border border-[var(--color-border-main)] rounded-sm overflow-hidden bg-[var(--color-background)]">
+                      <div key={item._id} className="group relative border border-[var(--color-border)] rounded-sm overflow-hidden bg-[var(--color-background)]">
                         <button onClick={() => removeWish(item._id)} className="absolute top-3 right-3 z-10 w-8 h-8 bg-white rounded-full flex items-center justify-center text-[var(--color-text-light)] hover:text-[var(--color-cta)] hover:scale-110 shadow-sm transition-all">
                           <FiTrash2 size={14}/>
                         </button>
@@ -327,13 +328,13 @@ export default function Profile() {
 
           {/* SECURITY */}
           {tab === 'security' && (
-            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 lg:p-12 animate-fade-in">
+            <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 lg:p-12 animate-fade-in">
               <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)] mb-10">Security Settings</h2>
               <form onSubmit={savePassword} className="flex flex-col gap-6 max-w-[500px]">
                 {[{n:'currentPassword',l:'Current Password'},{n:'newPassword',l:'New Password'},{n:'confirm',l:'Confirm New Password'}].map(f => (
                   <div key={f.n} className="flex flex-col gap-2">
                     <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{f.l}</label>
-                    <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-white border border-[var(--color-border-main)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={pwForm[f.n]} onChange={e => setPwForm({...pwForm,[f.n]:e.target.value})} />
+                    <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-white border border-[var(--color-border)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={pwForm[f.n]} onChange={e => setPwForm({...pwForm,[f.n]:e.target.value})} />
                   </div>
                 ))}
                 <button className="mt-4 self-start px-8 py-3 bg-[var(--color-primary)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:bg-black focus-visible:outline disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={saving}>
@@ -344,7 +345,7 @@ export default function Profile() {
           )}
 
         </div>
-      </div>
+      </PageContainer>
     </div>
   );
 }

@@ -48,7 +48,7 @@ export default function OrderTracking() {
       
       <div className="max-w-[800px] mx-auto px-6 lg:px-12 animate-smooth-reveal">
 
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-10 border-b border-[var(--color-border-main)] pb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-10 border-b border-[var(--color-border-light)] pb-6">
           <div>
             <h1 className="font-heading text-4xl font-bold text-[var(--color-primary)] mb-2">Order Tracking</h1>
             <p className="font-body text-xs text-[var(--color-text-muted)]">Order #{order._id.slice(-10).toUpperCase()}</p>
@@ -58,7 +58,7 @@ export default function OrderTracking() {
           </span>
         </div>
 
-        <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 mb-8 flex flex-col md:flex-row gap-8 justify-between shadow-sm">
+        <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 mb-8 flex flex-col md:flex-row gap-8 justify-between shadow-sm">
           <div className="flex flex-col gap-1">
             <span className="font-body text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">Date</span>
             <span className="font-body text-sm font-bold text-[var(--color-text)]">{new Date(order.createdAt).toLocaleDateString('en-IN')}</span>
@@ -80,12 +80,12 @@ export default function OrderTracking() {
         </div>
 
         {!isCancelled ? (
-          <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 lg:p-10 mb-8 shadow-sm">
+          <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 lg:p-10 mb-8 shadow-sm">
             <h3 className="font-heading text-2xl font-bold text-[var(--color-primary)] mb-10">Shipment Progress</h3>
             
             <div className="relative flex justify-between">
               {/* Progress Bar Background */}
-              <div className="absolute top-5 left-[10%] right-[10%] h-[2px] bg-[var(--color-border-main)] z-0" />
+              <div className="absolute top-5 left-[10%] right-[10%] h-[2px] bg-[var(--color-border)] z-0" />
               {/* Progress Bar Fill */}
               <div 
                 className="absolute top-5 left-[10%] right-[10%] h-[2px] bg-[var(--color-primary)] z-0 transition-all duration-700 ease-out" 
@@ -97,7 +97,7 @@ export default function OrderTracking() {
                 const Icon = s.icon;
                 return (
                   <div key={s.status} className="relative z-10 flex flex-col items-center gap-3 w-1/5">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${done ? 'bg-[var(--color-primary)] text-white shadow-md scale-110' : 'bg-white border-2 border-[var(--color-border-main)] text-[var(--color-text-light)]'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${done ? 'bg-[var(--color-primary)] text-white shadow-md scale-110' : 'bg-white border-2 border-[var(--color-border)] text-[var(--color-text-light)]'}`}>
                       <Icon size={16} />
                     </div>
                     <span className={`font-body text-[10px] uppercase tracking-widest text-center transition-colors ${done ? 'font-bold text-[var(--color-primary)]' : 'font-medium text-[var(--color-text-light)]'}`}>
@@ -120,7 +120,7 @@ export default function OrderTracking() {
           </div>
         )}
 
-        <div className="bg-white border border-[var(--color-border-main)] rounded-sm mb-8 shadow-sm">
+        <div className="bg-white border border-[var(--color-border)] rounded-sm mb-8 shadow-sm">
           <div className="p-6 border-b border-[var(--color-border-light)]">
             <h4 className="font-heading text-xl font-bold text-[var(--color-primary)]">Items in this order</h4>
           </div>
@@ -141,7 +141,7 @@ export default function OrderTracking() {
           </div>
         </div>
 
-        <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-6 lg:p-8 mb-10 shadow-sm">
+        <div className="bg-white border border-[var(--color-border)] rounded-sm p-6 lg:p-8 mb-10 shadow-sm">
           <h4 className="font-heading text-xl font-bold text-[var(--color-primary)] mb-6">Delivery Details</h4>
           <div className="flex flex-col gap-1">
             <p className="font-body text-sm font-bold text-[var(--color-text)] mb-2">{order.shippingAddress?.fullName}</p>

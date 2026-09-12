@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
 import { FiInstagram, FiTwitter, FiFacebook } from 'react-icons/fi';
+import PageContainer from './PageContainer';
 
 export default function Footer() {
   return (
     <footer style={{ backgroundColor: '#1E3A3A' }}>
       {/* Main content — constrained max-width, centered */}
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '56px 32px 48px 32px' }}>
+      <PageContainer className="py-14">
         {/* Grid — uses CSS grid for even column distribution */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '40px' }}>
 
@@ -97,11 +98,11 @@ export default function Footer() {
           </div>
 
         </div>
-      </div>
+      </PageContainer>
 
       {/* Bottom bar — constrained, centered */}
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '20px 32px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+        <PageContainer className="py-5 flex flex-wrap items-center justify-between gap-4">
           <p style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.4)', margin: 0 }}>
             © {new Date().getFullYear()} Boomcart. All rights reserved.
           </p>
@@ -111,7 +112,7 @@ export default function Footer() {
               <span key={p} style={{ fontWeight: 700, letterSpacing: '0.06em', color: 'rgba(255,255,255,0.7)' }}>{p}</span>
             ))}
           </div>
-        </div>
+        </PageContainer>
       </div>
     </footer>
   );

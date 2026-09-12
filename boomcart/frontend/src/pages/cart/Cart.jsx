@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
 import { FiTrash2, FiMinus, FiPlus, FiArrowRight } from 'react-icons/fi';
 import { Helmet } from 'react-helmet-async';
+import PageContainer from '../../components/common/PageContainer';
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -35,13 +36,12 @@ export default function Cart() {
   return (
     <div className="w-full min-h-screen bg-[var(--color-background)] pt-12 pb-24">
       <Helmet><title>Your Bag ({totalItems}) | Boomcart</title></Helmet>
-      
-      <div className="max-w-[1200px] mx-auto px-6 lg:px-12 animate-smooth-reveal">
+      <PageContainer variant="functional" className="animate-smooth-reveal">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
           
           {/* ── BAG ITEMS ── */}
           <div className="w-full lg:w-[65%] flex flex-col">
-            <div className="flex justify-between items-end border-b border-[var(--color-border-main)] pb-6 mb-8">
+            <div className="flex justify-between items-end border-b border-[var(--color-border-light)] pb-6 mb-8">
               <div>
                 <h1 className="font-heading text-4xl lg:text-5xl font-bold text-[var(--color-primary)] leading-none">Your Bag</h1>
                 <span className="font-body text-sm text-[var(--color-text-muted)] mt-2 block">{totalItems} {totalItems === 1 ? 'item' : 'items'}</span>
@@ -85,7 +85,7 @@ export default function Cart() {
 
                     <div className="mt-auto flex justify-between items-end">
                       {/* Quantity */}
-                      <div className="flex items-center border border-[var(--color-border-main)] rounded-sm overflow-hidden">
+                      <div className="flex items-center border border-[var(--color-border)] rounded-sm overflow-hidden">
                         <button 
                           onClick={() => decreaseQuantity(item.productId, item.selectedSize)}
                           disabled={item.quantity <= 1}
@@ -123,7 +123,7 @@ export default function Cart() {
 
           {/* ── ORDER SUMMARY ── */}
           <div className="w-full lg:w-[35%] lg:sticky lg:top-28">
-            <div className="bg-white border border-[var(--color-border-main)] rounded-sm p-8 shadow-sm">
+            <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 shadow-sm">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-primary)] border-b border-[var(--color-border-light)] pb-4 mb-6">
                 Order Summary
               </h2>
@@ -157,9 +157,8 @@ export default function Cart() {
               </div>
             </div>
           </div>
-
         </div>
-      </div>
+      </PageContainer>
     </div>
   );
 }

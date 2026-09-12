@@ -17,8 +17,7 @@ import OrderTracking from './pages/OrderTracking';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
 import CompleteProfile from './pages/CompleteProfile';
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
+import AuthPage from './pages/auth/AuthPage';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 import NotFound from './pages/NotFound';
@@ -26,14 +25,9 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
 import AdminOrders from './pages/admin/Orders';
 import AdminUsers from './pages/admin/Users';
+import PageContainer from './components/common/PageContainer';
 
-function PageContainer() {
-  return (
-    <div className="w-full max-w-[1100px] px-4 md:px-6 lg:px-8 py-6">
-      <Outlet />
-    </div>
-  );
-}
+
 
 export default function App() {
   return (
@@ -41,21 +35,21 @@ export default function App() {
       {/* ── Single global Navbar ── */}
       <Navbar />
 
-      <main className="flex-grow flex justify-center">
+      <main className="flex-grow w-full flex flex-col">
         <Routes>
-          {/* Full-width catalog pages */}
+          {/* Full-bleed catalog and auth pages */}
+          <Route path="/"                       element={<Home />} />
           <Route path="/kids"                   element={<KidsCatalog />} />
           <Route path="/bridal"                 element={<BridalCatalog />} />
+          <Route path="/login"                  element={<AuthPage />} />
+          <Route path="/register"               element={<AuthPage />} />
+          <Route path="/forgot-password"        element={<ForgotPassword />} />
+          <Route path="/reset-password"         element={<ResetPassword />} />
 
           {/* Centered container pages */}
-          <Route element={<PageContainer />}>
-            <Route path="/"                       element={<Home />} />
+          <Route element={<PageContainer className="py-6"><Outlet /></PageContainer>}>
             <Route path="/product/:id"            element={<ProductDetail />} />
             <Route path="/cart"                   element={<Cart />} />
-            <Route path="/login"                  element={<Login />} />
-            <Route path="/register"               element={<Register />} />
-            <Route path="/forgot-password"        element={<ForgotPassword />} />
-            <Route path="/reset-password"         element={<ResetPassword />} />
 
             {/* Protected (logged-in users only) */}
             <Route element={<ProtectedRoute />}>

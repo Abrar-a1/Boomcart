@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-do
 import { FiShoppingCart, FiHeart, FiUser, FiSearch, FiMenu, FiX, FiLogOut, FiPackage, FiShield, FiArrowRight } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../store/useStore';
+import PageContainer from './PageContainer';
 
 export default function Navbar() {
   const { user, logout, isAdmin } = useAuth();
@@ -65,91 +66,85 @@ export default function Navbar() {
   };
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-700 ease-in-out ${scrolled ? 'bg-[var(--color-background)] shadow-sm py-4' : 'bg-[var(--color-background)] py-6'}`}>
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
-        <div className="flex items-center justify-between">
+    <header className={`sticky top-0 z-50 transition-all duration-500 ease-in-out bg-[var(--color-primary)] text-[var(--color-background)] ${scrolled ? 'shadow-sm py-4' : 'py-5'}`}>
+      <PageContainer>
+        <div className="flex items-center justify-between w-full">
           
           {/* ── Mobile Left: Hamburger ── */}
           <div className="flex lg:hidden flex-1 justify-start">
             <button 
               aria-label="Open mobile menu"
+              aria-expanded={menuOpen}
               onClick={() => setMenuOpen(true)}
-              className="text-[var(--color-primary)] hover:opacity-80 transition-opacity p-2 -ml-2"
+              className="hover:text-[var(--color-accent)] transition-colors p-2 focus-visible:outline"
             >
               <FiMenu size={24} />
             </button>
           </div>
 
           {/* ── Desktop Left / Mobile Center: Wordmark ── */}
-          <div className="flex-shrink-0 flex justify-center lg:justify-start lg:w-1/4">
-            <Link to="/" className="font-heading text-2xl lg:text-3xl font-bold tracking-[0.05em] text-[var(--color-primary)] transition-opacity hover:opacity-80">
+          <div className="flex-1 flex justify-center lg:justify-start shrink-0">
+            <Link to="/" className="font-heading text-2xl lg:text-[26px] tracking-[0.08em] transition-colors hover:text-[var(--color-accent)] focus-visible:outline">
               BOOMCART
             </Link>
           </div>
 
           {/* ── Center: Desktop Navigation ── */}
-          <nav className="hidden lg:flex flex-1 justify-center items-center gap-8 xl:gap-12">
+          <nav className="hidden lg:flex flex-none justify-center items-center gap-8">
             {NAV_LINKS.map(([label, href]) => {
               const active = isActive(href);
               return (
                 <Link 
                   key={label} 
                   to={href}
-                  className={`font-body text-[11px] font-bold uppercase tracking-[0.15em] transition-colors duration-300 underline-hover ${
-                    active ? 'text-[var(--color-primary)]' : 'text-[var(--color-text)] hover:text-[var(--color-primary)] opacity-80 hover:opacity-100'
+                  className={`relative font-body text-xs tracking-[0.15em] transition-colors duration-300 pb-1 group focus-visible:outline ${
+                    active ? 'text-[var(--color-accent)] font-bold' : 'text-white/80 hover:text-[var(--color-accent)]'
                   }`}
                 >
                   {label}
+                  <span className={`absolute bottom-0 left-0 w-full h-[1px] bg-[var(--color-accent)] transition-transform duration-300 origin-left ${
+                    active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                  }`} />
                 </Link>
               );
             })}
           </nav>
 
           {/* ── Right: Actions ── */}
-          <div className="flex flex-1 justify-end items-center space-x-6 sm:space-x-8">
+          <div className="flex-1 flex justify-end items-center gap-6 shrink-0">
             
             {/* Desktop Search */}
             <div className="hidden lg:block relative">
               <button 
                 onClick={() => setSearchOpen(true)}
-                className="text-[var(--color-primary)] hover:opacity-70 transition-opacity p-2 flex items-center gap-2"
+                className="hover:text-[var(--color-accent)] transition-colors flex items-center gap-2 focus-visible:outline"
+                aria-label="Search"
               >
-                <FiSearch size={20} />
-                <span className="font-body text-[11px] font-bold uppercase tracking-[0.1em]">Search</span>
+                <FiSearch size={18} />
+                <span className="font-body text-[10px] font-bold tracking-[0.1em] uppercase">Search</span>
               </button>
               
               {/* Expandable Search Panel */}
               {searchOpen && (
                 <>
-                  <div className="fixed inset-0 bg-black/20 z-[60] backdrop-blur-sm transition-opacity" onClick={() => setSearchOpen(false)} />
-                  <div className="absolute top-0 right-0 w-[min(450px,calc(100vw-3rem))] bg-[var(--color-background)] border border-[var(--color-border-light)] shadow-xl z-[70] animate-slide-down rounded-sm overflow-hidden">
-                    <form onSubmit={e => handleSearch(e)} className="flex items-center border-b border-[var(--color-border-light)] p-2">
+                  <div className="fixed inset-0 z-[60]" onClick={() => setSearchOpen(false)} />
+                  <div className="absolute top-1/2 -translate-y-1/2 right-0 flex items-center bg-white border border-[var(--color-border)] rounded-sm shadow-xl z-[70] overflow-hidden min-w-[320px] transition-all duration-300 focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)]/30">
+                    <form onSubmit={e => handleSearch(e)} className="flex items-center w-full">
                       <input
                         autoFocus
                         type="text"
                         placeholder="Search for elegant pieces..."
                         value={query}
                         onChange={e => setQuery(e.target.value)}
-                        className="flex-1 px-4 py-4 font-body text-sm bg-transparent outline-none text-[var(--color-primary)] placeholder:text-[var(--color-text-light)]"
+                        className="flex-1 px-4 py-2.5 font-body text-sm bg-transparent outline-none text-[var(--color-text)] placeholder:text-[var(--color-text-muted)]"
                       />
-                      <button type="submit" className="p-4 text-[var(--color-primary)] hover:opacity-70 transition-opacity">
-                        <FiArrowRight size={20} />
+                      <button type="submit" className="px-3 text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors">
+                        <FiArrowRight size={18} />
+                      </button>
+                      <button type="button" onClick={() => setSearchOpen(false)} className="px-3 py-3 border-l border-[var(--color-border-light)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors">
+                        <FiX size={16} />
                       </button>
                     </form>
-                    <div className="p-8">
-                      <h4 className="font-body text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] mb-4">Trending Now</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {['Bridal Lehengas', 'Mens Sherwani', 'Velvet', 'Festive Collection'].map(term => (
-                          <button 
-                            key={term} 
-                            onClick={() => { setQuery(term); handleSearch(null, term); }}
-                            className="px-4 py-2 border border-[var(--color-border-light)] rounded-sm font-body text-xs text-[var(--color-text)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-colors"
-                          >
-                            {term}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 </>
               )}
@@ -159,7 +154,7 @@ export default function Navbar() {
             <button 
               aria-label="Open search"
               onClick={() => setMenuOpen(true)}
-              className="lg:hidden text-[var(--color-primary)] hover:opacity-70 transition-opacity p-2"
+              className="lg:hidden hover:text-[var(--color-accent)] transition-colors p-2 focus-visible:outline"
             >
               <FiSearch size={20} />
             </button>
@@ -168,9 +163,9 @@ export default function Navbar() {
             <Link 
               to="/wishlist"
               aria-label="Wishlist"
-              className="text-[var(--color-primary)] hover:opacity-70 transition-opacity p-2 hidden sm:block"
+              className="hover:text-[var(--color-accent)] transition-colors hidden sm:block focus-visible:outline"
             >
-              <FiHeart size={20} />
+              <FiHeart size={18} />
             </Link>
 
             {/* User Account */}
@@ -178,24 +173,27 @@ export default function Navbar() {
               {user ? (
                 <button 
                   onClick={() => setDropOpen(!dropOpen)}
-                  className="flex items-center justify-center w-8 h-8 text-[10px] font-bold text-[var(--color-background)] bg-[var(--color-primary)] hover:opacity-80 transition-opacity rounded-full"
+                  aria-expanded={dropOpen}
+                  aria-haspopup="true"
+                  className="flex items-center justify-center w-8 h-8 text-[11px] font-bold text-[var(--color-primary)] bg-[var(--color-accent)] hover:opacity-90 transition-opacity rounded-full focus-visible:outline"
+                  aria-label="Account Menu"
                 >
                   {user.name?.[0]?.toUpperCase()}
                 </button>
               ) : (
-                <Link to="/login" className="text-[var(--color-primary)] hover:opacity-70 transition-opacity p-2 flex items-center gap-2">
-                  <FiUser size={20} />
-                  <span className="font-body text-[11px] font-bold uppercase tracking-[0.1em]">Account</span>
+                <Link to="/login" className="hover:text-[var(--color-accent)] transition-colors flex items-center gap-2 focus-visible:outline">
+                  <FiUser size={18} />
+                  <span className="font-body text-[10px] font-bold tracking-[0.1em] uppercase">Account</span>
                 </Link>
               )}
               
               {dropOpen && user && (
-                <div className="absolute right-0 top-full mt-4 w-64 bg-[var(--color-background)] border border-[var(--color-border-light)] rounded-sm shadow-xl z-50 animate-slide-down">
-                  <div className="px-6 py-5 border-b border-[var(--color-border-light)] bg-white/50">
+                <div className="absolute right-0 top-full mt-4 w-64 bg-[var(--color-background)] border border-[var(--color-border-light)] rounded-md shadow-xl z-50 animate-slide-down text-[var(--color-text)]">
+                  <div className="px-6 py-5 border-b border-[var(--color-border-light)] bg-white">
                     <p className="font-heading text-lg font-bold text-[var(--color-primary)] truncate">{user.name}</p>
                     <p className="font-body text-xs text-[var(--color-text-muted)] truncate mt-1">{user.email}</p>
                   </div>
-                  <div className="py-2">
+                  <div className="py-2 bg-white">
                     <Link to="/profile" className="flex items-center gap-4 px-6 py-3 font-body text-xs uppercase tracking-widest text-[var(--color-text)] hover:bg-black/5 transition-colors" onClick={() => setDropOpen(false)}>
                       <FiUser size={14} /> My Profile
                     </Link>
@@ -208,7 +206,7 @@ export default function Navbar() {
                       </Link>
                     )}
                   </div>
-                  <div className="border-t border-[var(--color-border-light)] py-2">
+                  <div className="border-t border-[var(--color-border-light)] py-2 bg-white rounded-b-md">
                     <button 
                       className="w-full flex items-center gap-4 px-6 py-3 font-body text-xs uppercase tracking-widest text-[var(--color-cta)] hover:bg-black/5 transition-colors text-left"
                       onClick={() => { logout(); setDropOpen(false); navigate('/'); }}
@@ -223,20 +221,23 @@ export default function Navbar() {
             {/* Cart */}
             <Link 
               to="/cart"
-              className="relative text-[var(--color-primary)] hover:opacity-70 transition-opacity p-2 flex items-center gap-2"
+              className="hover:text-[var(--color-accent)] transition-colors flex items-center gap-2 relative focus-visible:outline"
+              aria-label={`Bag, ${cartCount} items`}
             >
-              <FiShoppingCart size={20} />
-              <span className="hidden lg:block font-body text-[11px] font-bold uppercase tracking-[0.1em]">Bag</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 lg:top-0 lg:-right-3 flex items-center justify-center w-[18px] h-[18px] text-[9px] font-bold text-white bg-[var(--color-cta)] rounded-full shadow-sm">
-                  {cartCount}
-                </span>
-              )}
+              <div className="relative flex items-center justify-center p-1">
+                <FiShoppingCart size={18} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2 flex items-center justify-center w-[16px] h-[16px] text-[8px] font-bold text-[var(--color-background)] bg-[var(--color-cta)] rounded-full shadow-sm">
+                    {cartCount}
+                  </span>
+                )}
+              </div>
+              <span className="hidden lg:block font-body text-[10px] font-bold tracking-[0.1em] uppercase">Bag</span>
             </Link>
             
           </div>
         </div>
-      </div>
+      </PageContainer>
 
       {/* ── Mobile Drawer ── */}
       {menuOpen && (
@@ -266,18 +267,18 @@ export default function Navbar() {
             <div className="flex-1 overflow-y-auto scrollbar-hide">
               {/* Search */}
               <div className="p-6 border-b border-[var(--color-border-light)]">
-                <form onSubmit={e => handleSearch(e)} className="flex items-center border-b border-[var(--color-border-main)] py-2">
-                  <FiSearch size={20} className="text-[var(--color-text-light)] mr-4" />
+                <form onSubmit={e => handleSearch(e)} className="flex items-center bg-white border border-[var(--color-border)] rounded-sm py-2.5 px-4 transition-all duration-300 focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)]/30">
+                  <FiSearch size={18} className="text-[var(--color-text-muted)] mr-3 shrink-0" />
                   <input 
                     type="text" 
                     placeholder="Search..." 
                     value={query} 
                     onChange={e => setQuery(e.target.value)}
-                    className="flex-1 bg-transparent border-none outline-none font-body text-sm text-[var(--color-primary)] placeholder:text-[var(--color-text-light)]"
+                    className="flex-1 bg-transparent border-none outline-none font-body text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] w-full"
                   />
                   {query && (
-                    <button type="submit" className="text-[var(--color-primary)]">
-                      <FiArrowRight size={20} />
+                    <button type="submit" className="text-[var(--color-primary)] shrink-0 ml-2">
+                      <FiArrowRight size={18} />
                     </button>
                   )}
                 </form>

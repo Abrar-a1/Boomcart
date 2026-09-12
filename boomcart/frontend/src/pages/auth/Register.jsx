@@ -5,6 +5,8 @@ import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import AuthLayout from '../../layouts/AuthLayout';
+import Input from '../../components/common/Input';
+import Button from '../../components/common/Button';
 
 export default function Register() {
   const { register, verifyRegistration, loading } = useAuth();
@@ -59,107 +61,119 @@ export default function Register() {
       <Helmet><title>Create Account — Boomcart</title></Helmet>
       
       <div className="w-full">
-        <div className="mb-10">
-          <span className="block font-body text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-3">
-            {!otpSent ? 'Join Us' : 'Verification'}
-          </span>
-          <h1 className="font-heading text-4xl lg:text-5xl font-bold text-[var(--color-primary)] mb-3 tracking-tight">
-            {!otpSent ? 'Create Account' : 'Enter OTP'}
-          </h1>
-          <p className="font-body text-sm text-[var(--color-text-muted)]">
-            {!otpSent ? 'Experience modern Indian luxury.' : `Enter the 6-digit code sent to ${form.email}`}
-          </p>
+        <div className="w-full text-center mb-10">
+          <h1 className="font-heading text-4xl lg:text-5xl font-bold text-white mb-3 drop-shadow-md">Register</h1>
+          <p className="font-body text-sm text-white/80">Experience modern Indian luxury.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-8 mt-10">
           {!otpSent ? (
             <>
-              {[
-                {n:'name',    l:'Full Name',         t:'text',     p:'John Doe'},
-                {n:'email',   l:'Email Address',     t:'email',    p:'you@example.com'},
-                {n:'password',l:'Password',          t:'password', p:'Min. 6 characters'},
-                {n:'confirm', l:'Confirm Password',  t:'password', p:'Re-enter password'},
-              ].map(f => (
-                <div key={f.n} className="flex flex-col gap-1 relative">
-                  <label className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{f.l}</label>
-                  {f.t === 'password' ? (
-                    <div className="relative">
-                      <input 
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder={f.p}
-                        value={form[f.n]}
-                        onChange={e => setForm({...form, [f.n]: e.target.value})}
-                        required
-                        className="w-full py-2 bg-transparent border-b border-[var(--color-border-main)] rounded-none font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-accent)] placeholder:text-[var(--color-text-light)] pr-10"
-                      />
-                      <button 
-                        type="button" 
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 text-[var(--color-text-light)] hover:text-[var(--color-primary)] transition-colors focus-visible:outline"
-                        aria-label={showPassword ? "Hide password" : "Show password"}
-                      >
-                        {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
-                      </button>
-                    </div>
-                  ) : (
-                    <input 
-                      type={f.t}
-                      placeholder={f.p}
-                      value={form[f.n]}
-                      onChange={e => setForm({...form, [f.n]: e.target.value})}
-                      required
-                      className="w-full py-2 bg-transparent border-b border-[var(--color-border-main)] rounded-none font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-accent)] placeholder:text-[var(--color-text-light)]"
-                    />
-                  )}
-                </div>
-              ))}
+              <Input 
+                label="Full Name"
+                type="text" 
+                placeholder=""
+                value={form.name}
+                onChange={e => setForm({...form, name: e.target.value})}
+                required
+                variant="glass"
+              />
+
+              <Input 
+                label="Email Address"
+                type="email" 
+                placeholder=""
+                value={form.email}
+                onChange={e => setForm({...form, email: e.target.value})}
+                required
+                variant="glass"
+              />
+
+              <Input 
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder=""
+                value={form.password}
+                onChange={e => setForm({...form, password: e.target.value})}
+                required
+                variant="glass"
+                rightElement={
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-white/70 hover:text-white transition-colors focus-visible:outline"
+                  >
+                    {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                  </button>
+                }
+              />
+
+              <Input 
+                label="Confirm Password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder=""
+                value={form.confirmPassword}
+                onChange={e => setForm({...form, confirmPassword: e.target.value})}
+                required
+                variant="glass"
+                rightElement={
+                  <button 
+                    type="button" 
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="text-white/70 hover:text-white transition-colors focus-visible:outline"
+                  >
+                    {showConfirmPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                  </button>
+                }
+              />
             </>
           ) : (
-            <div className="flex flex-col gap-1">
-              <label className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">6-Digit OTP</label>
-              <input 
+            <div className="flex flex-col gap-2">
+              <Input 
+                label="Verification Code (OTP)"
                 type="text" 
-                placeholder="Enter OTP from email"
-                value={otp} 
-                onChange={e => setOtp(e.target.value)} 
-                required 
+                placeholder="Enter 6-digit code"
+                value={form.otp}
+                onChange={e => setForm({...form, otp: e.target.value})}
+                required
+                variant="glass"
+                className="text-center tracking-[0.5em] text-lg font-bold"
                 maxLength={6}
-                className="w-full py-3 bg-transparent border-b border-[var(--color-border-main)] rounded-none font-body text-2xl tracking-[0.3em] text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-accent)] placeholder:text-[var(--color-text-light)] placeholder:text-sm placeholder:tracking-normal placeholder:font-normal"
               />
-              <div className="mt-2 text-xs">
+              <div className="mt-1 text-xs text-center">
                 {canResend ? (
-                  <button type="button" onClick={handleResend} disabled={loading} className="font-bold text-[var(--color-primary)] hover:text-[var(--color-accent)] transition-colors focus-visible:outline">
+                  <button type="button" onClick={handleResend} disabled={loading} className="font-bold text-white hover:text-white/80 transition-colors focus-visible:outline">
                     Resend OTP
                   </button>
                 ) : (
-                  <span className="text-[var(--color-text-light)] font-body text-[11px]">Didn't receive code? Resend in {countdown}s</span>
+                  <span className="text-white/70 font-body text-[11px]">Didn't receive code? Resend in {countdown}s</span>
                 )}
               </div>
             </div>
           )}
 
-          <button 
+          <Button 
             type="submit" 
-            disabled={loading}
-            className="w-full mt-2 h-12 bg-[var(--color-primary)] text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline"
+            isLoading={loading}
+            className="w-full mt-4 font-bold tracking-widest min-h-[52px] bg-white text-[var(--color-primary)] hover:bg-white/90 rounded-md shadow-lg"
           >
-            {loading ? 'Processing...' : (!otpSent ? 'Create Account' : 'Verify & Sign In')}
-          </button>
+            {loading ? 'Creating...' : (!otpSent ? 'Create Account' : 'Verify & Register')}
+          </Button>
         </form>
 
-        <div className="mt-8 pt-8">
+        <div className="mt-8 text-center">
           {!otpSent ? (
-            <p className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">
-              Already have an account? <Link to="/login" className="text-[var(--color-primary)] underline underline-offset-4 hover:text-[var(--color-accent)] transition-colors">Sign in</Link>
+            <p className="font-body text-xs text-white/80">
+              Already have an account? <Link to="/login" className="text-white font-bold hover:text-white/80 transition-colors ml-1">Sign in</Link>
             </p>
           ) : (
             <button 
-              type="button" 
-              onClick={() => setOtpSent(false)} 
+              type="button"
+              onClick={() => setOtpSent(false)}
               disabled={loading}
-              className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors focus-visible:outline"
+              className="font-body text-[11px] font-bold uppercase tracking-[0.1em] text-white/80 hover:text-white transition-colors"
             >
-              ← Back to registration
+              Back to Registration
             </button>
           )}
         </div>

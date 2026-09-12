@@ -58,7 +58,7 @@ export default function ResetPassword() {
                   value={f.v}
                   onChange={e => f.set(e.target.value)}
                   required
-                  className="w-full py-2 bg-transparent border-b border-[var(--color-border-main)] rounded-none font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-accent)] placeholder:text-[var(--color-text-light)] pr-10"
+                  className="w-full py-2 bg-transparent border-b border-[var(--color-border-light)] rounded-none font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-accent)] placeholder:text-[var(--color-text-light)] pr-10"
                 />
                 <button 
                   type="button" 

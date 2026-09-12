@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { FiHeart, FiMinus, FiPlus, FiChevronDown, FiChevronUp, FiCheckCircle } from 'react-icons/fi';
 import KidsLayout from '../../layouts/KidsLayout';
 import BridalLayout from '../../layouts/BridalLayout';
@@ -7,7 +7,10 @@ import productService from '../../services/productService';
 import { toggleWishlist } from '../../services/userService';
 import BookingModal from '../../components/booking/BookingModal';
 import ReviewsSection from '../../components/product/ReviewsSection';
+import PageContainer from '../../components/common/PageContainer';
 import ProductCard from '../../components/product/ProductCard';
+import Button from '../../components/common/Button';
+import EmptyState from '../../components/common/EmptyState';
 import { Helmet } from 'react-helmet-async';
 import { useStore } from '../../store/useStore';
 import { useAuth } from '../../context/AuthContext';
@@ -15,6 +18,7 @@ import toast from 'react-hot-toast';
 
 export default function ProductDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showBooking, setShowBooking] = useState(false);
@@ -45,14 +49,39 @@ export default function ProductDetail() {
             const relData = relRes.data.data || relRes.data.products || [];
             setRelatedProducts(relData.filter(p => p._id !== prod._id).slice(0, 4));
           })
-          .catch(() => {});
+          .catch(err => console.error("Failed to fetch related products:", err));
       })
       .catch(err => console.error(err))
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="min-h-[85vh] flex items-center justify-center font-body text-sm text-[var(--color-text-muted)] animate-pulse">Loading piece...</div>;
-  if (!product) return <div className="min-h-[85vh] flex items-center justify-center font-body text-sm font-bold text-[var(--color-error)]">Product Not Found</div>;
+  if (loading) {
+    return (
+      <PageContainer className="min-h-[85vh] flex flex-col lg:flex-row gap-0 lg:gap-12 xl:gap-20 py-16">
+        <div className="w-full lg:w-[60%] flex flex-col gap-4">
+          <div className="skeleton aspect-[4/5] w-full rounded-sm" />
+        </div>
+        <div className="w-full lg:w-[40%] flex flex-col gap-4 mt-10 lg:mt-0">
+          <div className="skeleton h-4 w-32 rounded-sm mb-4" />
+          <div className="skeleton h-12 w-3/4 rounded-sm mb-4" />
+          <div className="skeleton h-6 w-24 rounded-sm mb-8" />
+          <div className="skeleton h-14 w-full rounded-sm" />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-[85vh] flex items-center justify-center">
+        <EmptyState 
+          title="Product Not Found" 
+          description="The piece you're looking for might be out of stock or unavailable."
+          action={<Button variant="primary" onClick={() => navigate('/')}>Back to Shop</Button>}
+        />
+      </div>
+    );
+  }
 
   const isBridal = product.category === 'bridal';
   const isKids   = ['kids', 'boys', 'girls'].includes(product.category);
@@ -111,8 +140,8 @@ export default function ProductDetail() {
       
       {showBooking && <BookingModal productId={product._id} onClose={() => setShowBooking(false)} />}
 
-      {/* ── DESKTOP SPLIT LAYOUT ── */}
-      <div className="max-w-[1440px] mx-auto lg:px-12 flex flex-col lg:flex-row gap-0 lg:gap-12 xl:gap-20">
+      {/* Main product layout */}
+      <PageContainer className="flex flex-col lg:flex-row gap-0 lg:gap-12 xl:gap-20" variant="commerce">
         
         {/* ── 60% LEFT: EDITORIAL GALLERY (2-COLUMN GRID) ── */}
         <div className="w-full lg:w-[58%] xl:w-[60%] flex flex-col">
@@ -191,7 +220,7 @@ export default function ProductDetail() {
               )}
             </div>
 
-            <div className="w-full h-[1px] bg-[var(--color-border-main)] mb-8" />
+            <div className="w-full h-[1px] bg-[var(--color-border-light)] mb-8" />
 
             {/* Sizing */}
             {!isBridal && product.sizes?.length > 0 && (
@@ -211,12 +240,12 @@ export default function ProductDetail() {
                         key={s.size} 
                         disabled={isOut} 
                         onClick={() => { setSelectedSize(s.size); setQuantity(1); }}
-                        className={`min-w-[3.5rem] h-10 px-4 font-body text-xs font-semibold rounded-sm transition-all focus-visible:outline ${
+                        className={`min-w-[3.5rem] min-h-[44px] px-4 font-body text-xs font-semibold rounded-sm transition-all focus-visible:outline ${
                           isOut
                             ? 'bg-[var(--color-background)] text-[var(--color-border)] border border-[var(--color-border-light)] line-through cursor-not-allowed' 
                             : isSelected
                               ? 'bg-[var(--color-primary)] text-white border border-[var(--color-primary)]' 
-                              : 'bg-transparent border border-[var(--color-border-main)] text-[var(--color-text)] hover:border-[var(--color-primary)]'
+                              : 'bg-transparent border border-[var(--color-border)] text-[var(--color-text)] hover:border-[var(--color-primary)]'
                         }`}
                       >
                         {s.size}
@@ -230,16 +259,17 @@ export default function ProductDetail() {
             {/* Actions: Quantity & Add to Bag */}
             <div className="hidden lg:flex flex-col gap-4 mb-10">
               {isBridal ? (
-                <button 
+                <Button 
+                  variant="primary"
                   onClick={() => setShowBooking(true)} 
-                  className="w-full h-14 bg-[var(--color-primary)] text-white font-body text-xs font-bold uppercase tracking-[0.15em] rounded-sm transition-colors hover:bg-black focus-visible:outline"
+                  className="w-full h-14 font-bold uppercase tracking-[0.15em]"
                 >
                   Reserve Consultation
-                </button>
+                </Button>
               ) : (
                 <div className="flex items-center gap-4">
                   {/* Quantity */}
-                  <div className="flex items-center justify-between border border-[var(--color-border-main)] rounded-sm h-14 w-32 px-2">
+                  <div className="flex items-center justify-between border border-[var(--color-border)] rounded-sm h-14 w-32 px-2">
                     <button 
                       aria-label="Decrease quantity"
                       onClick={() => handleQuantity('dec')} 
@@ -260,19 +290,20 @@ export default function ProductDetail() {
                   </div>
                   
                   {/* Add to Bag */}
-                  <button 
+                  <Button 
+                    variant="primary"
                     onClick={handleAddToCart}
                     disabled={(!selectedSize && product.sizes?.length > 0) || isOutOfStock} 
-                    className="flex-1 h-14 bg-[var(--color-cta)] text-white font-body text-xs font-bold uppercase tracking-[0.15em] rounded-sm transition-all hover:bg-[var(--color-cta-dark)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline"
+                    className="flex-1 h-14 font-bold uppercase tracking-[0.15em]"
                   >
                     {isOutOfStock ? 'Out of Stock' : (!selectedSize && product.sizes?.length > 0) ? 'Select Size' : 'Add to Bag'}
-                  </button>
+                  </Button>
                   
                   {/* Wishlist */}
                   <button
                     aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
                     onClick={handleWishlist}
-                    className={`h-14 w-14 flex items-center justify-center border rounded-sm transition-colors focus-visible:outline ${isWishlisted ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white' : 'border-[var(--color-border-main)] text-[var(--color-primary)] hover:border-[var(--color-primary)]'}`}
+                    className={`h-14 w-14 flex items-center justify-center border rounded-sm transition-colors focus-visible:outline ${isWishlisted ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white' : 'border-[var(--color-border)] text-[var(--color-primary)] hover:border-[var(--color-primary)]'}`}
                   >
                     <FiHeart size={20} className={isWishlisted ? 'fill-current' : ''} />
                   </button>
@@ -281,10 +312,10 @@ export default function ProductDetail() {
             </div>
 
             {/* Accordions */}
-            <div className="flex flex-col border-t border-[var(--color-border-main)]">
+            <div className="flex flex-col border-t border-[var(--color-border-light)]">
               
               {/* Description */}
-              <div className="border-b border-[var(--color-border-main)]">
+              <div className="border-b border-[var(--color-border-light)]">
                 <button 
                   aria-expanded={activeAccordion === 'details'}
                   aria-controls="details-care-content"
@@ -309,7 +340,7 @@ export default function ProductDetail() {
               </div>
 
               {/* Delivery */}
-              <div className="border-b border-[var(--color-border-main)]">
+              <div className="border-b border-[var(--color-border-light)]">
                 <button 
                   aria-expanded={activeAccordion === 'delivery'}
                   aria-controls="delivery-returns-content"
@@ -338,32 +369,34 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
-      </div>
+      </PageContainer>
 
       {/* ── MOBILE STICKY CTA ── */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-[var(--color-border-main)] p-4 pb-[env(safe-area-inset-bottom,16px)] z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-        <div className="flex items-center gap-4 max-w-lg mx-auto">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-[var(--color-border-light)] p-4 pb-[env(safe-area-inset-bottom,16px)] z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+        <div className="flex items-center gap-4 w-full">
           {isBridal ? (
-            <button 
+            <Button 
+              variant="primary"
               onClick={() => setShowBooking(true)} 
-              className="flex-1 h-12 bg-[var(--color-primary)] text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm transition-colors focus-visible:outline"
+              className="flex-1 h-12 font-bold uppercase tracking-widest"
             >
               Reserve Consultation
-            </button>
+            </Button>
           ) : (
-            <button 
+            <Button 
+              variant="primary"
               onClick={handleAddToCart}
               disabled={(!selectedSize && product.sizes?.length > 0) || isOutOfStock} 
-              className="flex-1 h-12 bg-[var(--color-cta)] text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm transition-colors active:bg-[var(--color-cta-dark)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline"
+              className="flex-1 h-12 font-bold uppercase tracking-widest"
             >
               {isOutOfStock ? 'Out of Stock' : (!selectedSize && product.sizes?.length > 0) ? 'Select Size' : `Add to Bag • ₹${price.toLocaleString()}`}
-            </button>
+            </Button>
           )}
           
           <button
             aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
             onClick={handleWishlist}
-            className={`w-12 h-12 flex items-center justify-center border rounded-sm shrink-0 transition-colors focus-visible:outline ${isWishlisted ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white' : 'border-[var(--color-border-main)] text-[var(--color-primary)]'}`}
+            className={`w-12 h-12 flex items-center justify-center border rounded-sm shrink-0 transition-colors focus-visible:outline ${isWishlisted ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white' : 'border-[var(--color-border)] text-[var(--color-primary)]'}`}
           >
             <FiHeart size={20} className={isWishlisted ? 'fill-current' : ''} />
           </button>
@@ -372,20 +405,20 @@ export default function ProductDetail() {
 
       {/* ── RELATED PRODUCTS ── */}
       {relatedProducts.length > 0 && (
-        <div className="px-6 lg:px-12 py-16 lg:py-24 max-w-[1440px] mx-auto border-t border-[var(--color-border-light)] mt-12 lg:mt-24">
+        <PageContainer className="py-16 lg:py-24 border-t border-[var(--color-border-light)] mt-12 lg:mt-24">
           <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)] mb-10">You May Also Like</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-10">
             {relatedProducts.map(p => (
               <ProductCard key={p._id} product={p} />
             ))}
           </div>
-        </div>
+        </PageContainer>
       )}
 
       {/* ── REVIEWS ── */}
-      <div className="px-6 lg:px-12 py-20 bg-white">
+      <PageContainer className="py-20 bg-white">
         <ReviewsSection productId={product._id} />
-      </div>
+      </PageContainer>
     </div>
   );
 

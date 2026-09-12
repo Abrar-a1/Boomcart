@@ -102,17 +102,17 @@ export default function ProductDetail() {
             <span>{product.name}</span>
           </div>
 
-          <div className="pd-grid">
+          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
             {/* Images */}
-            <div className="pd-images">
-              <div className="pd-thumbs">
+            <div className="flex flex-col-reverse lg:flex-row gap-3 lg:gap-4">
+              <div className="flex flex-row lg:flex-col gap-2 lg:gap-3 overflow-x-auto snap-x pb-2 lg:pb-0 w-full lg:w-[72px] shrink-0" style={{ scrollbarWidth: 'none' }}>
                 {product.images.map((img, i) => (
-                  <button key={i} className={`pd-thumb ${i === activeImg ? 'active' : ''}`} onClick={() => setActiveImg(i)}>
+                  <button key={i} className={`pd-thumb shrink-0 snap-center w-[60px] h-[75px] lg:w-full lg:h-[88px] ${i === activeImg ? 'active' : ''}`} onClick={() => setActiveImg(i)}>
                     <img src={img.url} alt={`View ${i+1}`} />
                   </button>
                 ))}
               </div>
-              <div className="pd-main-img">
+              <div className="pd-main-img w-full">
                 <img src={product.images[activeImg]?.url} alt={product.name} />
                 {discount > 0 && <span className="pd-discount-badge">{discount}% OFF</span>}
               </div>
@@ -131,9 +131,9 @@ export default function ProductDetail() {
             )}
 
             {/* Info */}
-            <div className="pd-info">
+            <div className="pd-info w-full">
               <span className="badge badge-navy">{product.category} · {product.subCategory}</span>
-              <h1 className="pd-name">{product.name}</h1>
+              <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl text-[var(--color-primary)] mt-3 mb-2 leading-tight">{product.name}</h1>
 
               <div className="pd-rating-row">
                 <Stars rating={Math.round(product.ratings)} />
@@ -188,11 +188,11 @@ export default function ProductDetail() {
                 </span>
               </div>
 
-              <div className="pd-ctas">
-                <button className="btn btn-primary pd-btn" onClick={handleAddToCart} disabled={product.stock === 0}>
+              <div className="flex flex-col sm:flex-row gap-3 mb-6 w-full">
+                <button className="btn btn-primary w-full sm:flex-1 justify-center" onClick={handleAddToCart} disabled={product.stock === 0}>
                   <FiShoppingCart /> Add to Cart
                 </button>
-                <button className={`btn btn-outline pd-btn ${wishlisted ? 'pd-btn--wishlisted' : ''}`} onClick={handleWishlist}>
+                <button className={`btn btn-outline w-full sm:flex-1 justify-center ${wishlisted ? 'pd-btn--wishlisted' : ''}`} onClick={handleWishlist}>
                   <FiHeart /> {wishlisted ? 'Wishlisted' : 'Wishlist'}
                 </button>
               </div>
@@ -232,10 +232,13 @@ export default function ProductDetail() {
                   {user && (
                     <form className="review-form" onSubmit={handleReview}>
                       <h4 style={{ marginBottom: 14, color: 'var(--navy)', fontFamily: 'var(--font-serif)' }}>Write a Review</h4>
-                      <div className="star-picker">
+                      <div className="star-picker flex-wrap items-center gap-1">
                         {[1,2,3,4,5].map(s => (
                           <button key={s} type="button"
-                            style={{ fontSize: 28, background: 'none', border: 'none', cursor: 'pointer', color: s <= reviewForm.rating ? 'var(--gold)' : 'var(--gray-200)', transition: 'color .15s' }}
+                            aria-label={`${s} Star${s > 1 ? 's' : ''}`}
+                            aria-pressed={s <= reviewForm.rating}
+                            className="text-3xl md:text-4xl p-1 md:p-2 transition-colors bg-transparent border-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none rounded-sm"
+                            style={{ color: s <= reviewForm.rating ? 'var(--gold)' : 'var(--gray-200)' }}
                             onClick={() => setReviewForm({...reviewForm, rating: s})}>★</button>
                         ))}
                       </div>

@@ -30,7 +30,7 @@ export default function ProductCard({ product }) {
       
       {/* ── IMAGE ── */}
       <div 
-        className="relative w-full aspect-[3/4] md:aspect-[4/5] rounded-sm overflow-hidden bg-[var(--color-border-light)] mb-4 lg:mb-6"
+        className="relative w-full aspect-[3/4] md:aspect-[4/5] rounded-sm overflow-hidden bg-[var(--color-border-light)] border border-[var(--color-border-light)] shadow-sm mb-4 lg:mb-6"
         onMouseEnter={() => setHoverImg(true)}
         onMouseLeave={() => setHoverImg(false)}
       >
@@ -85,13 +85,13 @@ export default function ProductCard({ product }) {
         </div>
 
         {/* Title */}
-        <h3 className="font-heading text-xl lg:text-2xl font-bold text-[var(--color-primary)] leading-tight mb-2 group-hover:text-[var(--color-text-muted)] transition-colors line-clamp-1">
+        <h3 className="font-heading text-base md:text-xl lg:text-2xl font-bold text-[var(--color-primary)] leading-tight mb-1.5 md:mb-2 group-hover:text-[var(--color-text-muted)] transition-colors line-clamp-1">
           {product.name}
         </h3>
 
         {/* Price */}
-        <div className="flex items-center gap-3">
-          <span className="font-body text-sm font-bold text-[var(--color-text)]">₹{price.toLocaleString()}</span>
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+          <span className="font-body text-sm md:text-base font-bold text-[var(--color-text)]">₹{price.toLocaleString()}</span>
           {discount > 0 && <span className="font-body text-xs font-semibold text-[var(--color-text-light)] line-through">₹{product.price.toLocaleString()}</span>}
         </div>
 
