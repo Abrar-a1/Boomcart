@@ -29,11 +29,18 @@ const createRazorpayOrder = asyncHandler(async (req, res) => {
   if (!amount || amount <= 0) { res.status(400); throw new Error('Invalid order amount'); }
 
   const receiptStr = `rcpt_${orderId}`.slice(0, 40);
-  const rpOrder = await razorpay.orders.create({
-    amount: Math.round(amount * 100), currency,
-    receipt: receiptStr,
-    notes: { orderId: orderId, userId: req.user._id.toString() },
-  });
+  let rpOrder;
+  try {
+    rpOrder = await razorpay.orders.create({
+      amount: Math.round(amount * 100), currency,
+      receipt: receiptStr,
+      notes: { orderId: orderId, userId: req.user._id.toString() },
+    });
+  } catch (err) {
+    console.error('Razorpay SDK Error:', err);
+    res.status(502);
+    throw new Error('Payment service is temporarily unavailable. Please try again.');
+  }
 
   // Tightly couple Razorpay order ID to our DB order immediately
   order.paymentResult = { razorpayOrderId: rpOrder.id };

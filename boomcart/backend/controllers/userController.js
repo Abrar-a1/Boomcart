@@ -19,8 +19,29 @@ const getWishlist = asyncHandler(async (req, res) => {
 
 const addAddress = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
-  if (req.body.isDefault) user.addresses.forEach(a => (a.isDefault = false));
-  user.addresses.push(req.body);
+  const newAddr = req.body;
+  
+  const existingIdx = user.addresses.findIndex(a => 
+    a.fullName === newAddr.fullName &&
+    a.addressLine1 === newAddr.addressLine1 &&
+    (a.addressLine2 || '') === (newAddr.addressLine2 || '') &&
+    a.city === newAddr.city &&
+    a.state === newAddr.state &&
+    a.pincode === newAddr.pincode &&
+    a.phone === newAddr.phone
+  );
+
+  if (newAddr.isDefault) {
+    user.addresses.forEach(a => (a.isDefault = false));
+  }
+
+  if (existingIdx !== -1) {
+    if (newAddr.isDefault) {
+      user.addresses[existingIdx].isDefault = true;
+    }
+  } else {
+    user.addresses.push(newAddr);
+  }
   
   if (!user.profileCompleted) {
     user.profileCompleted = true;

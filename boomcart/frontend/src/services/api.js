@@ -37,6 +37,11 @@ api.interceptors.response.use(
     // If 401 and it's not the login or refresh route itself, try refreshing
     if (err.response?.status === 401 && !originalConfig.url.includes('/auth/login') && !originalConfig.url.includes('/auth/refresh')) {
       
+      if (originalConfig._retry) {
+        return Promise.reject(err);
+      }
+      originalConfig._retry = true;
+
       if (isRefreshing) {
         // If refresh is already in progress, queue this request
         return new Promise(function(resolve, reject) {
@@ -48,7 +53,6 @@ api.interceptors.response.use(
         });
       }
 
-      originalConfig._retry = true;
       isRefreshing = true;
 
       return new Promise(function (resolve, reject) {
@@ -59,7 +63,10 @@ api.interceptors.response.use(
           })
           .catch((_error) => {
             processQueue(_error, null);
-            window.location.href = '/login';
+            // Do not force a hard reload redirect if the failing request was just the startup session check
+            if (!originalConfig.url.includes('/auth/me')) {
+              window.location.href = '/login';
+            }
             reject(_error);
           })
           .finally(() => {

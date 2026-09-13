@@ -16,6 +16,9 @@ export default function Navbar() {
   const [dropOpen, setDropOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const dropRef = useRef(null);
+  const drawerRef = useRef(null);
+  const menuButtonRef = useRef(null);
+  const prevMenuOpen = useRef(false);
   
   const [scrolled, setScrolled] = useState(false);
 
@@ -37,6 +40,64 @@ export default function Navbar() {
     if (menuOpen) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = '';
     return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) {
+      if (prevMenuOpen.current && menuButtonRef.current) {
+        menuButtonRef.current.focus();
+      }
+      prevMenuOpen.current = false;
+      return;
+    }
+    
+    prevMenuOpen.current = true;
+    
+    // Focus trap logic
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        return;
+      }
+      
+      if (e.key === 'Tab' && drawerRef.current) {
+        const focusableElements = drawerRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+        
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    
+    // Initial focus when opening (wait for render)
+    setTimeout(() => {
+      if (drawerRef.current) {
+        const focusableElements = drawerRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length > 0) {
+          focusableElements[0].focus();
+        }
+      }
+    }, 50);
+
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [menuOpen]);
 
   const handleSearch = (e, explicitQuery = null) => {
@@ -72,6 +133,7 @@ export default function Navbar() {
           {/* ── Mobile Left: Hamburger ── */}
           <div className="flex lg:hidden flex-1 justify-start">
             <button 
+              ref={menuButtonRef}
               aria-label="Open mobile menu"
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen(true)}
@@ -249,6 +311,10 @@ export default function Navbar() {
           
           {/* Drawer */}
           <div 
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile Navigation"
             className="fixed inset-y-0 left-0 z-[110] w-[85vw] max-w-[400px] bg-[var(--color-background)] shadow-2xl flex flex-col animate-slide-in-left"
             style={{ animation: 'slideInLeft 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards' }}
           >

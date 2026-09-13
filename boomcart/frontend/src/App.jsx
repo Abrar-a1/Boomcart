@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet } from 'react-router-dom';
+import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -14,7 +14,6 @@ import Cart from './pages/cart/Cart';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import OrderTracking from './pages/OrderTracking';
-import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
 import CompleteProfile from './pages/CompleteProfile';
 import AuthPage from './pages/auth/AuthPage';
@@ -56,7 +55,7 @@ export default function App() {
               <Route path="/checkout"          element={<Checkout />} />
               <Route path="/order-success/:id" element={<OrderSuccess />} />
               <Route path="/order/:id"         element={<OrderTracking />} />
-              <Route path="/wishlist"          element={<Wishlist />} />
+              <Route path="/wishlist"          element={<Navigate to="/profile?tab=wishlist" replace />} />
               <Route path="/profile"           element={<Profile />} />
               <Route path="/complete-profile"  element={<CompleteProfile />} />
             </Route>

@@ -17,6 +17,7 @@ export default function Home() {
 
   const [products, setProducts] = useState([]);
   const [featured, setFeatured] = useState([]);
+  const [featuredError, setFeaturedError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
@@ -24,10 +25,15 @@ export default function Home() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [mobileFilter, setMobileFilter] = useState(false);
 
-  useEffect(() => {
+  const fetchFeatured = () => {
+    setFeaturedError(null);
     productService.getProducts({ isFeatured: true, limit: 8 })
       .then(res => { setFeatured(res.data.data || res.data.products || []); })
-      .catch(() => {});
+      .catch((err) => { setFeaturedError('Failed to load featured collection.'); });
+  };
+
+  useEffect(() => {
+    fetchFeatured();
   }, []);
 
   const paramsString = params.toString();
@@ -80,6 +86,8 @@ export default function Home() {
               src="/images/bridal-hero.png"
               alt="Fashion Campaign"
               className="w-full h-full object-cover object-[center_20%] md:object-[center_30%] scale-105"
+              fetchPriority="high"
+              loading="eager"
             />
             {/* Darker gradient overlay for better text legibility */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent lg:from-black/70 lg:via-black/20 lg:to-transparent" />
@@ -116,33 +124,48 @@ export default function Home() {
       )}
 
       {/* ── NEW ARRIVALS (EDITORIAL GRID) ── */}
-      {!hasFilters && featured.length > 0 && (
+      {!hasFilters && (
         <section className="mb-16 md:mb-24 lg:mb-32 w-full animate-smooth-reveal">
           <PageContainer>
             <div className="flex justify-between items-end mb-8 md:mb-12">
             <div>
               <h2 className="font-heading text-3xl lg:text-4xl font-bold text-[var(--color-primary)]">New Arrivals</h2>
             </div>
-            <button 
-              onClick={() => navigate('/?isFeatured=true')}
-              className="hidden lg:flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text)] underline-hover"
-            >
-              View All <FiArrowRight size={14} />
-            </button>
+            {featured.length > 0 && !featuredError && (
+              <button 
+                onClick={() => navigate('/?isFeatured=true')}
+                className="hidden lg:flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text)] underline-hover"
+              >
+                View All <FiArrowRight size={14} />
+              </button>
+            )}
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-8 md:gap-y-12 lg:gap-x-10">
-            {featured.slice(0, 4).map(p => (
-              <ProductCard key={p._id} product={p} />
-            ))}
-          </div>
-          <div className="mt-10 lg:hidden flex justify-center">
-            <button 
-              onClick={() => navigate('/?isFeatured=true')}
-              className="flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text)] border-b border-[var(--color-primary)] pb-1 transition-colors hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]"
-            >
-              View All Arrivals <FiArrowRight size={14} />
-            </button>
-          </div>
+          
+          {featuredError ? (
+            <EmptyState 
+              title="Unable to load collection" 
+              description={featuredError} 
+              action={<button onClick={fetchFeatured} className="px-6 py-3 bg-[var(--color-primary)] text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm">Try Again</button>} 
+            />
+          ) : featured.length === 0 ? (
+            <p className="text-center font-body text-sm text-[var(--color-text-muted)] py-12">New arrivals coming soon.</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-8 md:gap-y-12 lg:gap-x-10">
+                {featured.slice(0, 4).map(p => (
+                  <ProductCard key={p._id} product={p} />
+                ))}
+              </div>
+              <div className="mt-10 lg:hidden flex justify-center">
+                <button 
+                  onClick={() => navigate('/?isFeatured=true')}
+                  className="flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text)] border-b border-[var(--color-primary)] pb-1 transition-colors hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]"
+                >
+                  View All Arrivals <FiArrowRight size={14} />
+                </button>
+              </div>
+            </>
+          )}
           </PageContainer>
         </section>
       )}

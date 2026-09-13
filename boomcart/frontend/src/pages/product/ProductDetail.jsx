@@ -26,7 +26,7 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [activeAccordion, setActiveAccordion] = useState('details');
   const [relatedProducts, setRelatedProducts] = useState([]);
-  
+
   // Wishlist state
   const { user, wishlistIds, toggleWishlistId } = useAuth();
   const isWishlisted = product ? wishlistIds.includes(product._id) : false;
@@ -41,7 +41,7 @@ export default function ProductDetail() {
       .then(res => {
         const prod = res.data.data || res.data.product;
         setProduct(prod);
-        
+
         // Fetch related products (same category)
         productService.getProducts({ category: prod.category, limit: 5 })
           .then(relRes => {
@@ -73,8 +73,8 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <div className="min-h-[85vh] flex items-center justify-center">
-        <EmptyState 
-          title="Product Not Found" 
+        <EmptyState
+          title="Product Not Found"
           description="The piece you're looking for might be out of stock or unavailable."
           action={<Button variant="primary" onClick={() => navigate('/')}>Back to Shop</Button>}
         />
@@ -88,11 +88,11 @@ export default function ProductDetail() {
   // Check how many of this item/size are already in cart
   const cartItem = cart.find(item => item.product === product._id && item.size === selectedSize);
   const qtyInCart = cartItem ? cartItem.quantity : 0;
-  
+
   const sizeObj = product.sizes?.find(s => s.size === selectedSize);
   const availableStock = selectedSize ? (sizeObj ? sizeObj.stock : 0) : product.stock;
   const maxAllowed = Math.min(availableStock - qtyInCart, 10);
-  
+
   const isOutOfStock = product.stock === 0 || (selectedSize && sizeObj?.stock === 0);
   const isMaxReached = maxAllowed <= 0 && selectedSize;
 
@@ -108,13 +108,31 @@ export default function ProductDetail() {
       setQuantity(1);
       return;
     }
-    
+
     if (!selectedSize) return toast.error('Please select a size');
     if (isOutOfStock) return toast.error('Selected size is out of stock');
     if (isMaxReached) return toast.error('Maximum available quantity reached in cart');
 
     addToCart(product, quantity, selectedSize, '');
     setQuantity(1);
+  };
+
+  const handleBuyNow = () => {
+    if (product.sizes?.length && !selectedSize) return toast.error('Please select a size');
+    if (isOutOfStock) return toast.error(product.sizes?.length ? 'Selected size is out of stock' : 'Out of stock');
+
+    const buyNowItem = {
+      _key: `${product._id}_${selectedSize || ''}_`,
+      product: product._id,
+      name: product.name,
+      image: product.images[0]?.url || '',
+      price: product.discountPrice > 0 ? product.discountPrice : product.price,
+      quantity,
+      size: selectedSize || '',
+      color: ''
+    };
+
+    navigate('/checkout', { state: { buyNowItem } });
   };
 
   const handleWishlist = async () => {
@@ -133,23 +151,42 @@ export default function ProductDetail() {
 
   const content = (
     <div className="relative animate-smooth-reveal pb-24 lg:pb-0">
-      <Helmet><title>{product.name} — Boomcart</title></Helmet>
-      
+      <Helmet>
+        <title>{product.name} — Boomcart</title>
+        {product.description && <meta name="description" content={product.description} />}
+        
+        {/* Open Graph */}
+        <meta property="og:title" content={`${product.name} — Boomcart`} />
+        {product.description && <meta property="og:description" content={product.description} />}
+        {images.length > 0 && images[0]?.url && <meta property="og:image" content={images[0].url} />}
+        <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+        <meta property="og:type" content="product" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${product.name} — Boomcart`} />
+        {product.description && <meta name="twitter:description" content={product.description} />}
+        {images.length > 0 && images[0]?.url && <meta name="twitter:image" content={images[0].url} />}
+
+        {/* Canonical */}
+        {typeof window !== 'undefined' && <link rel="canonical" href={window.location.href} />}
+      </Helmet>
+
       {showBooking && <BookingModal productId={product._id} onClose={() => setShowBooking(false)} />}
 
       {/* Main product layout */}
       <PageContainer className="flex flex-col lg:flex-row gap-0 lg:gap-12 xl:gap-20" variant="commerce">
-        
+
         {/* ── 60% LEFT: EDITORIAL GALLERY (2-COLUMN GRID) ── */}
         <div className="w-full lg:w-[58%] xl:w-[60%] flex flex-col">
-          
+
           {/* Desktop Gallery */}
           <div className="hidden lg:grid grid-cols-2 gap-4 pb-20 pt-8">
             {images.map((img, idx) => (
               <div key={idx} className={`bg-[var(--color-border-light)] overflow-hidden rounded-sm ${images.length === 1 || (images.length === 3 && idx === 0) ? 'col-span-2 aspect-[4/5]' : 'aspect-[3/4]'}`}>
-                <img 
-                  src={img.url} 
-                  alt={`${product.name} view ${idx + 1}`} 
+                <img
+                  src={img.url}
+                  alt={`${product.name} view ${idx + 1}`}
                   className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105 cursor-crosshair"
                 />
               </div>
@@ -158,7 +195,7 @@ export default function ProductDetail() {
 
           {/* Mobile Gallery (Swipeable) */}
           <div className="lg:hidden relative w-full h-[75vh] min-h-[500px] bg-[var(--color-border-light)]">
-            <div 
+            <div
               className="w-full h-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
               onScroll={(e) => {
                 const scrollLeft = e.target.scrollLeft;
@@ -167,10 +204,10 @@ export default function ProductDetail() {
               }}
             >
               {images.map((img, idx) => (
-                <img 
-                  key={idx} 
-                  src={img.url} 
-                  alt={`${product.name} view ${idx + 1}`} 
+                <img
+                  key={idx}
+                  src={img.url}
+                  alt={`${product.name} view ${idx + 1}`}
                   className="w-full h-full flex-shrink-0 snap-center object-cover"
                 />
               ))}
@@ -179,8 +216,8 @@ export default function ProductDetail() {
             {images.length > 1 && (
               <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-10">
                 {images.map((_, idx) => (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     className={`h-1 transition-all duration-300 rounded-sm ${activeImageIndex === idx ? 'w-6 bg-white' : 'w-2 bg-white/50'}`}
                   />
                 ))}
@@ -192,7 +229,7 @@ export default function ProductDetail() {
         {/* ── 40% RIGHT: INFO (STICKY) ── */}
         <div className="w-full lg:w-[42%] xl:w-[40%] px-6 py-10 lg:px-0 lg:py-16">
           <div className="lg:sticky lg:top-32 flex flex-col">
-            
+
             {/* Breadcrumbs / Category */}
             <span className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-4 block">
               {product.brand || product.category} {product.subCategory ? ` / ${product.subCategory}` : ''}
@@ -233,15 +270,15 @@ export default function ProductDetail() {
                     const isSelected = selectedSize === s.size;
                     const isOut = s.stock === 0;
                     return (
-                      <button 
-                        key={s.size} 
-                        disabled={isOut} 
+                      <button
+                        key={s.size}
+                        disabled={isOut}
                         onClick={() => { setSelectedSize(s.size); setQuantity(1); }}
                         className={`min-w-[3.5rem] min-h-[44px] px-4 font-body text-xs font-semibold rounded-sm transition-all focus-visible:outline ${
                           isOut
-                            ? 'bg-[var(--color-background)] text-[var(--color-border)] border border-[var(--color-border-light)] line-through cursor-not-allowed' 
+                            ? 'bg-[var(--color-background)] text-[var(--color-border)] border border-[var(--color-border-light)] line-through cursor-not-allowed'
                             : isSelected
-                              ? 'bg-[var(--color-primary)] text-white border border-[var(--color-primary)]' 
+                              ? 'bg-[var(--color-primary)] text-white border border-[var(--color-primary)]'
                               : 'bg-transparent border border-[var(--color-border)] text-[var(--color-text)] hover:border-[var(--color-primary)]'
                         }`}
                       >
@@ -256,9 +293,9 @@ export default function ProductDetail() {
             {/* Actions: Quantity & Add to Bag */}
             <div className="hidden lg:flex flex-col gap-4 mb-10">
               {isBridal ? (
-                <Button 
+                <Button
                   variant="primary"
-                  onClick={() => setShowBooking(true)} 
+                  onClick={() => setShowBooking(true)}
                   className="w-full h-14 font-bold uppercase tracking-[0.15em]"
                 >
                   Reserve Consultation
@@ -267,35 +304,45 @@ export default function ProductDetail() {
                 <div className="flex items-center gap-4">
                   {/* Quantity */}
                   <div className="flex items-center justify-between border border-[var(--color-border)] rounded-sm h-14 w-32 px-2">
-                    <button 
+                    <button
                       aria-label="Decrease quantity"
-                      onClick={() => handleQuantity('dec')} 
+                      onClick={() => handleQuantity('dec')}
                       disabled={quantity <= 1}
                       className="w-10 h-10 flex items-center justify-center text-[var(--color-text)] disabled:opacity-30 transition-opacity focus-visible:outline"
                     >
                       <FiMinus size={16} />
                     </button>
                     <span className="font-body text-sm font-semibold">{quantity}</span>
-                    <button 
+                    <button
                       aria-label="Increase quantity"
-                      onClick={() => handleQuantity('inc')} 
+                      onClick={() => handleQuantity('inc')}
                       disabled={quantity >= maxAllowed || !selectedSize}
                       className="w-10 h-10 flex items-center justify-center text-[var(--color-text)] disabled:opacity-30 transition-opacity focus-visible:outline"
                     >
                       <FiPlus size={16} />
                     </button>
                   </div>
-                  
-                  {/* Add to Bag */}
-                  <Button 
-                    variant="primary"
-                    onClick={handleAddToCart}
-                    disabled={(!selectedSize && product.sizes?.length > 0) || isOutOfStock} 
-                    className="flex-1 h-14 font-bold uppercase tracking-[0.15em]"
-                  >
-                    {isOutOfStock ? 'Out of Stock' : (!selectedSize && product.sizes?.length > 0) ? 'Select Size' : 'Add to Bag'}
-                  </Button>
-                  
+
+                  {/* Add to Bag & Buy Now */}
+                  <div className="flex-1 flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={handleAddToCart}
+                      disabled={(!selectedSize && product.sizes?.length > 0) || isOutOfStock}
+                      className="flex-1 h-14 font-bold uppercase tracking-[0.15em]"
+                    >
+                      {isOutOfStock ? 'Out of Stock' : (!selectedSize && product.sizes?.length > 0) ? 'Select Size' : 'Add to Bag'}
+                    </Button>
+                    <Button
+                      variant="primary"
+                      onClick={handleBuyNow}
+                      disabled={(!selectedSize && product.sizes?.length > 0) || isOutOfStock}
+                      className="flex-1 h-14 font-bold uppercase tracking-[0.15em]"
+                    >
+                      Buy Now
+                    </Button>
+                  </div>
+
                   {/* Wishlist */}
                   <button
                     aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
@@ -310,10 +357,10 @@ export default function ProductDetail() {
 
             {/* Accordions */}
             <div className="flex flex-col border-t border-[var(--color-border-light)]">
-              
+
               {/* Description */}
               <div className="border-b border-[var(--color-border-light)]">
-                <button 
+                <button
                   aria-expanded={activeAccordion === 'details'}
                   aria-controls="details-care-content"
                   onClick={() => setActiveAccordion(activeAccordion === 'details' ? '' : 'details')}
@@ -338,7 +385,7 @@ export default function ProductDetail() {
 
               {/* Delivery */}
               <div className="border-b border-[var(--color-border-light)]">
-                <button 
+                <button
                   aria-expanded={activeAccordion === 'delivery'}
                   aria-controls="delivery-returns-content"
                   onClick={() => setActiveAccordion(activeAccordion === 'delivery' ? '' : 'delivery')}
@@ -372,24 +419,34 @@ export default function ProductDetail() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-[var(--color-border-light)] p-4 pb-[env(safe-area-inset-bottom,16px)] z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
         <div className="flex items-center gap-4 w-full">
           {isBridal ? (
-            <Button 
+            <Button
               variant="primary"
-              onClick={() => setShowBooking(true)} 
+              onClick={() => setShowBooking(true)}
               className="flex-1 h-12 font-bold uppercase tracking-widest"
             >
               Reserve Consultation
             </Button>
           ) : (
-            <Button 
-              variant="primary"
-              onClick={handleAddToCart}
-              disabled={(!selectedSize && product.sizes?.length > 0) || isOutOfStock} 
-              className="flex-1 h-12 font-bold uppercase tracking-widest"
-            >
-              {isOutOfStock ? 'Out of Stock' : (!selectedSize && product.sizes?.length > 0) ? 'Select Size' : `Add to Bag • ₹${price.toLocaleString()}`}
-            </Button>
+            <div className="flex-1 flex gap-2">
+              <Button
+                variant="outline"
+                onClick={handleAddToCart}
+                disabled={(!selectedSize && product.sizes?.length > 0) || isOutOfStock}
+                className="flex-1 h-12 font-bold uppercase tracking-widest text-[10px]"
+              >
+                Add to Bag
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleBuyNow}
+                disabled={(!selectedSize && product.sizes?.length > 0) || isOutOfStock}
+                className="flex-1 h-12 font-bold uppercase tracking-widest text-[10px]"
+              >
+                {isOutOfStock ? 'Out of Stock' : (!selectedSize && product.sizes?.length > 0) ? 'Select Size' : 'Buy Now'}
+              </Button>
+            </div>
           )}
-          
+
           <button
             aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
             onClick={handleWishlist}

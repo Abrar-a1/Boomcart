@@ -20,7 +20,7 @@ export default function Cart() {
         <p className="font-body text-sm text-[var(--color-text-muted)] mb-10 max-w-md">
           Discover our latest collections and add some timeless pieces to your wardrobe.
         </p>
-        <button 
+        <button
           onClick={() => navigate('/')}
           className="bg-[var(--color-primary)] text-white font-body text-sm font-bold uppercase tracking-widest py-4 px-10 rounded-sm shadow-sm hover:opacity-90 transition-opacity min-h-[44px] focus-visible:outline"
         >
@@ -31,11 +31,11 @@ export default function Cart() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-[var(--color-background)] pt-12 pb-24">
-      <Helmet><title>Your Bag ({totalItems}) | Boomcart</title></Helmet>
+    <div className="w-full min-h-screen bg-[var(--color-background)] pt-12 pb-32 lg:pb-24 relative">
+      <Helmet><title>{`Your Bag (${totalItems}) | Boomcart`}</title></Helmet>
       <PageContainer variant="functional" className="animate-smooth-reveal">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
-          
+
           {/* ── BAG ITEMS ── */}
           <div className="w-full lg:w-[65%] flex flex-col">
             <div className="flex justify-between items-end border-b border-[var(--color-border-light)] pb-6 mb-8">
@@ -43,8 +43,8 @@ export default function Cart() {
                 <h1 className="font-heading text-4xl lg:text-5xl font-bold text-[var(--color-primary)] leading-none">Your Bag</h1>
                 <span className="font-body text-sm text-[var(--color-text-muted)] mt-2 block">{totalItems} {totalItems === 1 ? 'item' : 'items'}</span>
               </div>
-              <button 
-                onClick={clearCart} 
+              <button
+                onClick={clearCart}
                 className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-[var(--color-cta)] transition-colors focus-visible:outline"
               >
                 Clear Bag
@@ -54,7 +54,7 @@ export default function Cart() {
             <div className="flex flex-col gap-8">
               {cart.map((item) => (
                 <div key={item._key} className="flex items-start gap-6 group">
-                  
+
                   {/* Image */}
                   <div className="w-28 h-36 lg:w-32 lg:h-40 bg-[var(--color-border-light)] rounded-sm overflow-hidden flex-shrink-0">
                     {item.image ? (
@@ -63,12 +63,12 @@ export default function Cart() {
                       <div className="w-full h-full flex items-center justify-center text-[var(--color-text-muted)] text-xs font-body">No Img</div>
                     )}
                   </div>
-                  
+
                   {/* Details */}
-                  <div className="flex-1 flex flex-col h-full py-1">
+                  <div className="flex-1 flex flex-col h-full py-1 min-w-0">
                     <div className="flex justify-between items-start gap-4">
-                      <div>
-                        <h3 className="font-heading text-xl lg:text-2xl font-bold text-[var(--color-primary)] leading-tight mb-1">
+                      <div className="min-w-0">
+                        <h3 className="font-heading text-xl lg:text-2xl font-bold text-[var(--color-primary)] leading-tight mb-1 line-clamp-2">
                           {item.name}
                         </h3>
                         <p className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] mb-4 block">
@@ -83,7 +83,7 @@ export default function Cart() {
                     <div className="mt-auto flex justify-between items-end">
                       {/* Quantity */}
                       <div className="flex items-center border border-[var(--color-border)] rounded-sm overflow-hidden">
-                        <button 
+                        <button
                           onClick={() => updateQuantity(item._key, item.quantity - 1)}
                           disabled={item.quantity <= 1}
                           className="w-10 h-10 flex items-center justify-center bg-white text-[var(--color-text)] hover:bg-[var(--color-border-light)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline"
@@ -94,7 +94,7 @@ export default function Cart() {
                         <span className="w-10 h-10 flex items-center justify-center bg-white font-body text-sm font-semibold text-[var(--color-text)] border-x border-[var(--color-border-light)]">
                           {item.quantity}
                         </span>
-                        <button 
+                        <button
                           onClick={() => updateQuantity(item._key, item.quantity + 1)}
                           className="w-10 h-10 flex items-center justify-center bg-white text-[var(--color-text)] hover:bg-[var(--color-border-light)] transition-colors focus-visible:outline"
                           aria-label="Increase quantity"
@@ -102,9 +102,9 @@ export default function Cart() {
                           <FiPlus size={14} />
                         </button>
                       </div>
-                      
+
                       {/* Remove */}
-                      <button 
+                      <button
                         onClick={() => removeFromCart(item._key)}
                         className="font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-[var(--color-cta)] transition-colors flex items-center gap-1.5 focus-visible:outline"
                       >
@@ -124,7 +124,7 @@ export default function Cart() {
               <h2 className="font-heading text-2xl font-bold text-[var(--color-primary)] border-b border-[var(--color-border-light)] pb-4 mb-6">
                 Order Summary
               </h2>
-              
+
               <div className="flex justify-between items-center mb-4">
                 <span className="font-body text-sm text-[var(--color-text-muted)]">Subtotal</span>
                 <span className="font-body text-sm font-bold text-[var(--color-text)]">₹{subtotal.toLocaleString()}</span>
@@ -133,7 +133,7 @@ export default function Cart() {
                 <span className="font-body text-sm text-[var(--color-text-muted)]">Delivery</span>
                 <span className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-accent-dark)]">Complimentary</span>
               </div>
-              
+
               <div className="border-t border-[var(--color-border-light)] pt-6 mb-8">
                 <div className="flex justify-between items-end">
                   <span className="font-heading text-xl font-bold text-[var(--color-primary)]">Total</span>
@@ -141,13 +141,13 @@ export default function Cart() {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={() => navigate('/checkout')}
-                className="w-full flex items-center justify-center gap-2 h-14 bg-[var(--color-cta)] text-white font-body text-sm font-bold uppercase tracking-[0.15em] rounded-sm transition-all hover:opacity-90 shadow-[0_4px_14px_rgba(194,90,60,0.3)] hover:shadow-none focus-visible:outline"
+                className="hidden lg:flex w-full items-center justify-center gap-2 h-14 bg-[var(--color-cta)] text-white font-body text-sm font-bold uppercase tracking-[0.15em] rounded-sm transition-all hover:opacity-90 shadow-[0_4px_14px_rgba(194,90,60,0.3)] hover:shadow-none focus-visible:outline"
               >
                 Proceed to Checkout <FiArrowRight size={16} />
               </button>
-              
+
               <div className="mt-6 flex items-center justify-center gap-2">
                 <span className="text-[var(--color-text-muted)]">🔒</span>
                 <span className="font-body text-xs text-[var(--color-text-muted)]">Secure encrypted checkout</span>
@@ -156,6 +156,20 @@ export default function Cart() {
           </div>
         </div>
       </PageContainer>
+
+      {/* ── MOBILE STICKY CTA ── */}
+      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white border-t border-[var(--color-border-light)] p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-40 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="flex justify-between items-center mb-3 px-2">
+          <span className="font-body text-sm font-bold text-[var(--color-text-muted)]">Total ({totalItems} items)</span>
+          <span className="font-body text-lg font-bold text-[var(--color-cta)]">₹{subtotal.toLocaleString()}</span>
+        </div>
+        <button
+          onClick={() => navigate('/checkout')}
+          className="w-full flex items-center justify-center gap-2 h-12 bg-[var(--color-cta)] text-white font-body text-sm font-bold uppercase tracking-[0.15em] rounded-sm transition-all hover:opacity-90 shadow-[0_4px_14px_rgba(194,90,60,0.3)] focus-visible:outline"
+        >
+          Checkout <FiArrowRight size={16} />
+        </button>
+      </div>
     </div>
   );
 }

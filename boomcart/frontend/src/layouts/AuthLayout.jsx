@@ -16,7 +16,7 @@ export default function AuthLayout({ children }) {
         {/* Subtle top glow effect */}
         <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
 
-        <div className="p-8 sm:p-12 flex flex-col w-full">
+        <div className="p-8 sm:p-12 flex flex-col w-full max-w-[440px] mx-auto bg-white/60 backdrop-blur-sm border border-[var(--color-border-light)] shadow-sm rounded-sm relative z-10">
           {children}
         </div>
         

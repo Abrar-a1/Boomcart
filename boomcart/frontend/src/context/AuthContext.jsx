@@ -39,6 +39,13 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const getErrorMessage = (err, defaultMsg) => {
+    if (!err.response) return 'Unable to connect to the server. Please check your connection and try again.';
+    if (err.response.status === 429) return 'Too many attempts. Please try again in 15 minutes.';
+    if (err.response.status >= 500) return 'Something went wrong on the server. Please try again.';
+    return err.response?.data?.message || defaultMsg;
+  };
+
   const login = async (email, password) => {
     setLoading(true);
     try {
@@ -48,7 +55,7 @@ export const AuthProvider = ({ children }) => {
       setTimeout(refreshWishlist, 0);
       return { success: true };
     } catch (err) {
-      const msg = err.response?.data?.message || 'Login failed';
+      const msg = getErrorMessage(err, 'Login failed');
       toast.error(msg);
       return { success: false, message: msg };
     } finally { setLoading(false); }
@@ -61,7 +68,7 @@ export const AuthProvider = ({ children }) => {
       toast.success('OTP sent! Please check your email.');
       return { success: true };
     } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to send OTP';
+      const msg = getErrorMessage(err, 'Failed to send OTP');
       toast.error(msg);
       return { success: false, message: msg };
     } finally { setLoading(false); }
@@ -75,7 +82,7 @@ export const AuthProvider = ({ children }) => {
       toast.success('Account created successfully!');
       return { success: true };
     } catch (err) {
-      const msg = err.response?.data?.message || 'Verification failed';
+      const msg = getErrorMessage(err, 'Verification failed');
       toast.error(msg);
       return { success: false, message: msg };
     } finally { setLoading(false); }

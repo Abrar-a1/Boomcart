@@ -33,6 +33,7 @@ const authSchemas = {
 
 const userSchemas = {
   addAddress: Joi.object({
+    fullName: Joi.string().required(),
     addressLine1: Joi.string().required(),
     addressLine2: Joi.string().allow('', null),
     city: Joi.string().required(),
@@ -105,7 +106,8 @@ const orderSchemas = {
         image: Joi.string().required(),
         price: Joi.number().required(),
         quantity: Joi.number().min(1).required(),
-        size: Joi.string().allow('', null)
+        size: Joi.string().allow('', null),
+        color: Joi.string().allow('', null)
       })
     ).min(1).required(),
     shippingAddress: Joi.object({

@@ -4,6 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import { addAddress } from '../services/userService';
 import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
+import PageContainer from '../components/common/PageContainer';
+import Input from '../components/common/Input';
+import Select from '../components/common/Select';
+import Button from '../components/common/Button';
 
 const STATES = ['Jammu & Kashmir','Delhi','Maharashtra','Karnataka','Tamil Nadu','Rajasthan','Uttar Pradesh','Gujarat','West Bengal','Punjab','Haryana','Kerala','Madhya Pradesh','Bihar','Assam','Himachal Pradesh','Other'];
 
@@ -41,48 +45,86 @@ export default function CompleteProfile() {
   };
 
   return (
-    <div className="page" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div className="w-full min-h-screen bg-[var(--color-background)] py-12 lg:py-20 flex items-center justify-center">
       <Helmet><title>Complete Your Profile — Boomcart</title></Helmet>
       
-      <div className="card" style={{ maxWidth: 500, width: '100%', padding: '40px 32px' }}>
-        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 26, color: 'var(--navy)', marginBottom: 8, textAlign: 'center' }}>
-          Welcome, {user?.name?.split(' ')[0]}!
-        </h1>
-        <p style={{ color: 'var(--gray-500)', fontSize: 15, marginBottom: 28, textAlign: 'center', lineHeight: 1.5 }}>
-          Before you start shopping, please provide your contact details and default shipping address.
-        </p>
-        
-        <form onSubmit={handleSubmit} style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          {[{n:'fullName',l:'Full Name',col:'1/-1'},
-            {n:'phone',l:'Phone Number',col:'1/-1'},
-            {n:'addressLine1',l:'Address Line 1',col:'1/-1'},
-            {n:'addressLine2',l:'Address Line 2 (optional)',col:'1/-1'},
-            {n:'city',l:'City'},
-            {n:'pincode',l:'Pincode'}
-          ].map(f => (
-            <div key={f.n} className="form-group" style={{ gridColumn:f.col||'auto' }}>
-              <label style={{ fontSize:13 }}>{f.l}</label>
-              <input 
-                className="form-input" 
-                value={addrForm[f.n]} 
-                onChange={e => setAddrForm({...addrForm, [f.n]: e.target.value})} 
-                required={f.n !== 'addressLine2'} 
-              />
-            </div>
-          ))}
-          <div className="form-group">
-            <label style={{ fontSize:13 }}>State</label>
-            <select className="form-input" value={addrForm.state} onChange={e => setAddrForm({...addrForm, state: e.target.value})} required>
+      <PageContainer variant="functional" className="max-w-2xl w-full">
+        <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 lg:p-12 shadow-sm animate-fade-in">
+          <h1 className="font-heading text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-2 text-center">
+            Welcome, {user?.name?.split(' ')[0]}!
+          </h1>
+          <p className="font-body text-sm text-[var(--color-text-muted)] mb-10 text-center max-w-md mx-auto leading-relaxed">
+            Before you start shopping, please provide your contact details and default shipping address.
+          </p>
+          
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input 
+              label="Full Name"
+              name="fullName"
+              value={addrForm.fullName}
+              onChange={e => setAddrForm({...addrForm, fullName: e.target.value})}
+              required
+              className="md:col-span-2"
+            />
+            <Input 
+              label="Phone Number"
+              name="phone"
+              value={addrForm.phone}
+              onChange={e => setAddrForm({...addrForm, phone: e.target.value})}
+              required
+              className="md:col-span-2"
+            />
+            <Input 
+              label="Address Line 1"
+              name="addressLine1"
+              value={addrForm.addressLine1}
+              onChange={e => setAddrForm({...addrForm, addressLine1: e.target.value})}
+              required
+              className="md:col-span-2"
+            />
+            <Input 
+              label="Address Line 2 (optional)"
+              name="addressLine2"
+              value={addrForm.addressLine2}
+              onChange={e => setAddrForm({...addrForm, addressLine2: e.target.value})}
+              className="md:col-span-2"
+            />
+            <Input 
+              label="City"
+              name="city"
+              value={addrForm.city}
+              onChange={e => setAddrForm({...addrForm, city: e.target.value})}
+              required
+            />
+            <Input 
+              label="Pincode"
+              name="pincode"
+              value={addrForm.pincode}
+              onChange={e => setAddrForm({...addrForm, pincode: e.target.value})}
+              required
+            />
+            <Select
+              label="State"
+              value={addrForm.state}
+              onChange={e => setAddrForm({...addrForm, state: e.target.value})}
+              required
+              className="md:col-span-2"
+            >
               <option value="">Select state</option>
               {STATES.map(s => <option key={s}>{s}</option>)}
-            </select>
-          </div>
-          
-          <button className="btn btn-primary btn-block btn-lg" type="submit" disabled={loading} style={{ gridColumn: '1/-1', marginTop: 16 }}>
-            {loading ? 'Saving...' : 'Complete Profile & Start Shopping'}
-          </button>
-        </form>
-      </div>
+            </Select>
+            
+            <Button 
+              variant="primary" 
+              type="submit" 
+              disabled={loading} 
+              className="md:col-span-2 mt-4 font-bold uppercase tracking-widest py-4"
+            >
+              {loading ? 'Saving...' : 'Complete Profile & Start Shopping'}
+            </Button>
+          </form>
+        </div>
+      </PageContainer>
     </div>
   );
 }

@@ -9,6 +9,8 @@ import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 import PageContainer from '../components/common/PageContainer';
+import Input from '../components/common/Input';
+import Button from '../components/common/Button';
 
 const STATUS_BADGE = { pending:'bg-orange-100 text-orange-800', confirmed:'bg-blue-100 text-blue-800', processing:'bg-blue-100 text-blue-800', shipped:'bg-blue-100 text-blue-800', delivered:'bg-green-100 text-green-800', cancelled:'bg-red-100 text-red-800', refunded:'bg-gray-100 text-gray-800' };
 const STATES = ['Jammu & Kashmir','Delhi','Maharashtra','Karnataka','Tamil Nadu','Rajasthan','Uttar Pradesh','Gujarat','West Bengal','Punjab','Haryana','Kerala','Madhya Pradesh','Bihar','Assam','Himachal Pradesh','Other'];
@@ -40,6 +42,13 @@ export default function Profile() {
       getWishlist().then(({ data }) => setWishItems(data.data)).catch(console.error).finally(() => setWishLoading(false));
     }
   }, [tab]);
+
+  useEffect(() => {
+    const queryTab = params.get('tab');
+    if (queryTab && queryTab !== tab) {
+      setTab(queryTab);
+    }
+  }, [params]);
 
   const saveProfile = async (e) => {
     e.preventDefault(); setSaving(true);
@@ -143,27 +152,24 @@ export default function Profile() {
               <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)] mb-10">Personal Information</h2>
               <form onSubmit={saveProfile} className="flex flex-col gap-6 max-w-[500px]">
                 {[{n:'name',l:'Full Name',t:'text'},{n:'email',l:'Email Address',t:'email'}].map(f => (
-                  <div key={f.n} className="flex flex-col gap-2">
-                    <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{f.l}</label>
-                    <input 
-                      type={f.t} 
-                      className="w-full px-4 py-3 bg-white border border-[var(--color-border)] rounded-sm font-body text-sm text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" 
-                      value={profileForm[f.n]} 
-                      onChange={e => setProfileForm({...profileForm,[f.n]:e.target.value})} 
-                    />
-                  </div>
+                  <Input 
+                    key={f.n}
+                    type={f.t}
+                    label={f.l}
+                    name={f.n}
+                    value={profileForm[f.n]}
+                    onChange={e => setProfileForm({...profileForm,[f.n]:e.target.value})}
+                  />
                 ))}
-                <div className="flex flex-col gap-2">
-                  <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">Role</label>
-                  <input className="w-full px-4 py-3 bg-[var(--color-background)] border border-[var(--color-border-light)] rounded-sm font-body text-sm text-[var(--color-text-muted)] cursor-not-allowed" value={user?.role} disabled />
-                </div>
-                <button 
-                  className="mt-4 self-start px-8 py-3 bg-[var(--color-primary)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:bg-black focus-visible:outline disabled:opacity-50 disabled:cursor-not-allowed" 
+                <Input label="Role" value={user?.role || ''} disabled />
+                <Button 
+                  variant="primary" 
                   type="submit" 
                   disabled={saving}
+                  className="mt-4 self-start font-bold uppercase tracking-widest px-8 py-3"
                 >
                   {saving ? 'Saving...' : 'Save Changes'}
-                </button>
+                </Button>
               </form>
             </div>
           )}
@@ -193,7 +199,7 @@ export default function Profile() {
                           <span className={`font-body text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-sm ${STATUS_BADGE[o.orderStatus]||'bg-gray-100 text-gray-800'}`}>
                             {o.orderStatus}
                           </span>
-                          <Link to={`/order/${o._id}`} className="inline-flex items-center gap-2 px-4 py-2 border border-[var(--color-primary)] text-[var(--color-primary)] font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-[var(--color-primary)] hover:text-white transition-colors">
+                          <Link to={`/order/${o._id}`} className="inline-flex items-center gap-2 px-4 py-2 border border-[var(--color-primary)] text-[var(--color-primary)] font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-[var(--color-primary)] hover:text-white transition-colors" aria-label={`Track order ${o._id.slice(-8).toUpperCase()}`}>
                             <FiEye size={12}/> Track
                           </Link>
                         </div>
@@ -239,14 +245,19 @@ export default function Profile() {
                   <h4 className="font-heading text-xl font-bold text-[var(--color-primary)] mb-6">New Address</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {[{n:'fullName',l:'Full Name',col:'md:col-span-2'},{n:'phone',l:'Phone'},{n:'pincode',l:'Pincode'},{n:'addressLine1',l:'Address Line 1',col:'md:col-span-2'},{n:'addressLine2',l:'Address Line 2 (optional)',col:'md:col-span-2'},{n:'city',l:'City'}].map(f => (
-                      <div key={f.n} className={`flex flex-col gap-2 ${f.col || ''}`}>
-                        <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{f.l}</label>
-                        <input className="w-full px-4 py-3 bg-white border border-[var(--color-border)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={addrForm[f.n]} onChange={e => setAddrForm({...addrForm,[f.n]:e.target.value})} required={f.n!=='addressLine2'} />
-                      </div>
+                      <Input 
+                        key={f.n}
+                        label={f.l}
+                        name={f.n}
+                        value={addrForm[f.n]}
+                        onChange={e => setAddrForm({...addrForm,[f.n]:e.target.value})}
+                        required={f.n!=='addressLine2'}
+                        className={f.col || ''}
+                      />
                     ))}
-                    <div className="flex flex-col gap-2">
-                      <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">State</label>
-                      <select className="w-full px-4 py-3 bg-white border border-[var(--color-border)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={addrForm.state} onChange={e => setAddrForm({...addrForm,state:e.target.value})} required>
+                    <div className="flex flex-col gap-1 w-full">
+                      <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text)]">State *</label>
+                      <select className="w-full px-4 py-3 min-h-[48px] bg-white border border-[var(--color-border)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={addrForm.state} onChange={e => setAddrForm({...addrForm,state:e.target.value})} required>
                         <option value="">Select state</option>
                         {STATES.map(s => <option key={s}>{s}</option>)}
                       </select>
@@ -256,9 +267,9 @@ export default function Profile() {
                       <label htmlFor="isDefault" className="font-body text-sm text-[var(--color-text)]">Set as default address</label>
                     </div>
                   </div>
-                  <button className="px-8 py-3 bg-[var(--color-primary)] text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors" type="submit" disabled={savingAddr}>
+                  <Button variant="primary" type="submit" disabled={savingAddr} className="px-8 py-3 font-bold uppercase tracking-widest">
                     {savingAddr ? 'Saving...' : 'Save Address'}
-                  </button>
+                  </Button>
                 </form>
               )}
 
@@ -272,7 +283,7 @@ export default function Profile() {
                   {addresses.map(a => (
                     <div key={a._id} className="relative border border-[var(--color-border)] rounded-sm p-6 flex flex-col items-start gap-4 hover:border-[var(--color-primary)] transition-colors group">
                       {a.isDefault && <span className="absolute top-6 right-16 bg-[var(--color-background)] border border-[var(--color-border-light)] text-[var(--color-primary)] font-body text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm">Default</span>}
-                      <button onClick={() => removeAddress(a._id)} className="absolute top-6 right-6 text-[var(--color-text-light)] hover:text-[var(--color-cta)] transition-colors" title="Remove">
+                      <button onClick={() => removeAddress(a._id)} className="absolute top-6 right-6 text-[var(--color-text-light)] hover:text-[var(--color-cta)] transition-colors" title="Remove" aria-label={`Remove address for ${a.fullName}`}>
                         <FiTrash2 size={18}/>
                       </button>
                       <p className="font-heading text-xl font-bold text-[var(--color-primary)] max-w-[80%] leading-tight">{a.fullName}</p>
@@ -304,7 +315,7 @@ export default function Profile() {
                     const price = item.discountPrice > 0 ? item.discountPrice : item.price;
                     return (
                       <div key={item._id} className="group relative border border-[var(--color-border)] rounded-sm overflow-hidden bg-[var(--color-background)]">
-                        <button onClick={() => removeWish(item._id)} className="absolute top-3 right-3 z-10 w-8 h-8 bg-white rounded-full flex items-center justify-center text-[var(--color-text-light)] hover:text-[var(--color-cta)] hover:scale-110 shadow-sm transition-all">
+                        <button onClick={() => removeWish(item._id)} className="absolute top-3 right-3 z-10 w-8 h-8 bg-white rounded-full flex items-center justify-center text-[var(--color-text-light)] hover:text-[var(--color-cta)] hover:scale-110 shadow-sm transition-all" aria-label={`Remove ${item.name} from wishlist`}>
                           <FiTrash2 size={14}/>
                         </button>
                         <Link to={`/product/${item._id}`} className="block w-full aspect-[3/4] overflow-hidden">
@@ -332,14 +343,19 @@ export default function Profile() {
               <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)] mb-10">Security Settings</h2>
               <form onSubmit={savePassword} className="flex flex-col gap-6 max-w-[500px]">
                 {[{n:'currentPassword',l:'Current Password'},{n:'newPassword',l:'New Password'},{n:'confirm',l:'Confirm New Password'}].map(f => (
-                  <div key={f.n} className="flex flex-col gap-2">
-                    <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{f.l}</label>
-                    <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-white border border-[var(--color-border)] rounded-sm font-body text-sm focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors" value={pwForm[f.n]} onChange={e => setPwForm({...pwForm,[f.n]:e.target.value})} />
-                  </div>
+                  <Input 
+                    key={f.n}
+                    type="password"
+                    label={f.l}
+                    name={f.n}
+                    placeholder="••••••••"
+                    value={pwForm[f.n]}
+                    onChange={e => setPwForm({...pwForm,[f.n]:e.target.value})}
+                  />
                 ))}
-                <button className="mt-4 self-start px-8 py-3 bg-[var(--color-primary)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:bg-black focus-visible:outline disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={saving}>
+                <Button variant="primary" type="submit" disabled={saving} className="mt-4 self-start px-8 py-3 font-bold uppercase tracking-widest">
                   {saving ? 'Updating...' : 'Update Password'}
-                </button>
+                </Button>
               </form>
             </div>
           )}
