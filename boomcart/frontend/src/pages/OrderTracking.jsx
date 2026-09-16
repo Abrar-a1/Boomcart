@@ -36,59 +36,59 @@ export default function OrderTracking() {
     } finally { setCancelling(false); }
   };
 
-  if (loading) return <div className="min-h-[85vh] flex items-center justify-center font-body text-sm text-[var(--color-text-muted)] animate-pulse">Loading tracking details...</div>;
-  if (!order)  return <div className="min-h-[85vh] flex items-center justify-center font-body text-sm font-bold text-[var(--color-error)]">Order not found.</div>;
+  if (loading) return <div className="min-h-[85vh] flex items-center justify-center font-body text-sm text-text-muted animate-pulse">Loading tracking details...</div>;
+  if (!order)  return <div className="min-h-[85vh] flex items-center justify-center font-body text-sm font-bold text-error">Order not found.</div>;
 
   const isCancelled = ['cancelled','refunded'].includes(order.orderStatus);
   const currentIdx  = isCancelled ? -1 : (ORDER_IDX[order.orderStatus] ?? 0);
 
   return (
-    <div className="w-full min-h-screen bg-[var(--color-background)] py-12 lg:py-20">
+    <div className="w-full min-h-screen bg-background py-12 lg:py-20">
       <Helmet><title>Order #{order._id.slice(-8).toUpperCase()} — Boomcart</title></Helmet>
       
       <div className="max-w-[800px] mx-auto px-6 lg:px-12 animate-smooth-reveal">
 
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-10 border-b border-[var(--color-border-light)] pb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-10 border-b border-border-light pb-6">
           <div>
-            <h1 className="font-heading text-4xl font-bold text-[var(--color-primary)] mb-2">Order Tracking</h1>
-            <p className="font-body text-xs text-[var(--color-text-muted)]">Order #{order._id.slice(-10).toUpperCase()}</p>
+            <h1 className="font-heading text-4xl font-bold text-primary mb-2">Order Tracking</h1>
+            <p className="font-body text-xs text-text-muted">Order #{order._id.slice(-10).toUpperCase()}</p>
           </div>
-          <span className={`font-body text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-sm ${isCancelled ? 'bg-[var(--color-error-light)] text-[var(--color-error)] border border-[var(--color-error)]' : order.orderStatus === 'delivered' ? 'bg-[var(--color-background)] text-[var(--color-accent-dark)] border border-[var(--color-border-light)]' : 'bg-[var(--color-primary)] text-white'}`}>
+          <span className={`font-body text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-sm ${isCancelled ? 'bg-error-light text-error border border-error' : order.orderStatus === 'delivered' ? 'bg-background text-accent-dark border border-border-light' : 'bg-primary text-white'}`}>
             {order.orderStatus}
           </span>
         </div>
 
-        <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 mb-8 flex flex-col md:flex-row gap-8 justify-between shadow-sm">
+        <div className="bg-white border border-border rounded-sm p-8 mb-8 flex flex-col md:flex-row gap-8 justify-between shadow-sm">
           <div className="flex flex-col gap-1">
-            <span className="font-body text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">Date</span>
-            <span className="font-body text-sm font-bold text-[var(--color-text)]">{new Date(order.createdAt).toLocaleDateString('en-IN')}</span>
+            <span className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted">Date</span>
+            <span className="font-body text-sm font-bold text-text">{new Date(order.createdAt).toLocaleDateString('en-IN')}</span>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="font-body text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">Total Amount</span>
-            <span className="font-body text-sm font-bold text-[var(--color-text)]">₹{order.totalPrice?.toLocaleString()}</span>
+            <span className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted">Total Amount</span>
+            <span className="font-body text-sm font-bold text-text">₹{order.totalPrice?.toLocaleString()}</span>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="font-body text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">Payment</span>
-            <span className="font-body text-sm font-bold text-[var(--color-text)] uppercase">{order.paymentMethod}</span>
+            <span className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted">Payment</span>
+            <span className="font-body text-sm font-bold text-text uppercase">{order.paymentMethod}</span>
           </div>
           {order.trackingNumber && (
             <div className="flex flex-col gap-1">
-              <span className="font-body text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">Tracking ID</span>
-              <span className="font-body text-sm font-bold text-[var(--color-text)]">{order.trackingNumber}</span>
+              <span className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted">Tracking ID</span>
+              <span className="font-body text-sm font-bold text-text">{order.trackingNumber}</span>
             </div>
           )}
         </div>
 
         {!isCancelled ? (
-          <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 lg:p-10 mb-8 shadow-sm">
-            <h3 className="font-heading text-2xl font-bold text-[var(--color-primary)] mb-10">Shipment Progress</h3>
+          <div className="bg-white border border-border rounded-sm p-8 lg:p-10 mb-8 shadow-sm">
+            <h3 className="font-heading text-2xl font-bold text-primary mb-10">Shipment Progress</h3>
             
             <div className="relative flex justify-between">
               {/* Progress Bar Background */}
-              <div className="absolute top-5 left-[10%] right-[10%] h-[2px] bg-[var(--color-border)] z-0" />
+              <div className="absolute top-5 left-[10%] right-[10%] h-[2px] bg-border z-0" />
               {/* Progress Bar Fill */}
               <div 
-                className="absolute top-5 left-[10%] right-[10%] h-[2px] bg-[var(--color-primary)] z-0 transition-all duration-700 ease-out" 
+                className="absolute top-5 left-[10%] right-[10%] h-[2px] bg-primary z-0 transition-all duration-700 ease-out" 
                 style={{ width: `${Math.max(0, (currentIdx / (STEPS.length - 1)) * 100)}%` }} 
               />
               
@@ -97,10 +97,10 @@ export default function OrderTracking() {
                 const Icon = s.icon;
                 return (
                   <div key={s.status} className="relative z-10 flex flex-col items-center gap-3 w-1/5">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${done ? 'bg-[var(--color-primary)] text-white shadow-md scale-110' : 'bg-white border-2 border-[var(--color-border)] text-[var(--color-text-light)]'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${done ? 'bg-primary text-white shadow-md scale-110' : 'bg-white border-2 border-border text-text-light'}`}>
                       <Icon size={16} />
                     </div>
-                    <span className={`font-body text-[10px] uppercase tracking-widest text-center transition-colors ${done ? 'font-bold text-[var(--color-primary)]' : 'font-medium text-[var(--color-text-light)]'}`}>
+                    <span className={`font-body text-[10px] uppercase tracking-widest text-center transition-colors ${done ? 'font-bold text-primary' : 'font-medium text-text-light'}`}>
                       {s.label}
                     </span>
                   </div>
@@ -109,64 +109,64 @@ export default function OrderTracking() {
             </div>
           </div>
         ) : (
-          <div className="bg-[var(--color-error-light)] border border-[var(--color-error)] opacity-80 rounded-sm p-6 mb-8 flex items-center gap-4">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[var(--color-error)] shadow-sm shrink-0">
+          <div className="bg-error-light border border-error opacity-80 rounded-sm p-6 mb-8 flex items-center gap-4">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-error shadow-sm shrink-0">
               <FiX size={20} />
             </div>
             <div>
-              <p className="font-heading text-lg font-bold text-[var(--color-error)] leading-tight">Order {order.orderStatus}</p>
-              <p className="font-body text-xs text-[var(--color-error)] mt-1">This order has been {order.orderStatus} and will not be shipped.</p>
+              <p className="font-heading text-lg font-bold text-error leading-tight">Order {order.orderStatus}</p>
+              <p className="font-body text-xs text-error mt-1">This order has been {order.orderStatus} and will not be shipped.</p>
             </div>
           </div>
         )}
 
-        <div className="bg-white border border-[var(--color-border)] rounded-sm mb-8 shadow-sm">
-          <div className="p-6 border-b border-[var(--color-border-light)]">
-            <h4 className="font-heading text-xl font-bold text-[var(--color-primary)]">Items in this order</h4>
+        <div className="bg-white border border-border rounded-sm mb-8 shadow-sm">
+          <div className="p-6 border-b border-border-light">
+            <h4 className="font-heading text-xl font-bold text-primary">Items in this order</h4>
           </div>
           <div className="flex flex-col">
             {order.orderItems?.map((item, idx) => (
-              <div key={item._id} className={`flex gap-6 p-6 items-center ${idx !== order.orderItems.length - 1 ? 'border-b border-[var(--color-border-light)]' : ''}`}>
-                <div className="w-16 h-20 bg-[var(--color-border-light)] rounded-sm overflow-hidden shrink-0">
+              <div key={item._id} className={`flex gap-6 p-6 items-center ${idx !== order.orderItems.length - 1 ? 'border-b border-border-light' : ''}`}>
+                <div className="w-16 h-20 bg-border-light rounded-sm overflow-hidden shrink-0">
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-heading text-lg font-bold text-[var(--color-primary)] mb-1 leading-tight">{item.name}</p>
-                  {item.size && <p className="font-body text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] mb-2">Size: {item.size}</p>}
-                  <p className="font-body text-xs text-[var(--color-text)]">₹{item.price.toLocaleString()} × {item.quantity}</p>
+                  <p className="font-heading text-lg font-bold text-primary mb-1 leading-tight">{item.name}</p>
+                  {item.size && <p className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">Size: {item.size}</p>}
+                  <p className="font-body text-xs text-text">₹{item.price.toLocaleString()} × {item.quantity}</p>
                 </div>
-                <p className="font-body text-sm font-bold text-[var(--color-text)]">₹{(item.price * item.quantity).toLocaleString()}</p>
+                <p className="font-body text-sm font-bold text-text">₹{(item.price * item.quantity).toLocaleString()}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white border border-[var(--color-border)] rounded-sm p-6 lg:p-8 mb-10 shadow-sm">
-          <h4 className="font-heading text-xl font-bold text-[var(--color-primary)] mb-6">Delivery Details</h4>
+        <div className="bg-white border border-border rounded-sm p-6 lg:p-8 mb-10 shadow-sm">
+          <h4 className="font-heading text-xl font-bold text-primary mb-6">Delivery Details</h4>
           <div className="flex flex-col gap-1">
-            <p className="font-body text-sm font-bold text-[var(--color-text)] mb-2">{order.shippingAddress?.fullName}</p>
-            <p className="font-body text-sm text-[var(--color-text-muted)] leading-relaxed">
+            <p className="font-body text-sm font-bold text-text mb-2">{order.shippingAddress?.fullName}</p>
+            <p className="font-body text-sm text-text-muted leading-relaxed">
               {order.shippingAddress?.addressLine1}{order.shippingAddress?.addressLine2 ? `, ${order.shippingAddress.addressLine2}` : ''}<br/>
               {order.shippingAddress?.city}, {order.shippingAddress?.state} — {order.shippingAddress?.pincode}<br/>
             </p>
-            <p className="font-body text-sm text-[var(--color-text)] font-medium mt-2">📞 {order.shippingAddress?.phone}</p>
+            <p className="font-body text-sm text-text font-medium mt-2">📞 {order.shippingAddress?.phone}</p>
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 items-center">
-          <Link to="/profile?tab=orders" className="flex items-center justify-center px-8 py-4 bg-transparent border border-[var(--color-primary)] text-[var(--color-primary)] font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-[var(--color-background)] transition-colors focus-visible:outline w-full sm:w-auto">
+          <Link to="/profile?tab=orders" className="flex items-center justify-center px-8 py-4 bg-transparent border border-primary text-primary font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-background transition-colors focus-visible:outline w-full sm:w-auto">
             All Orders
           </Link>
           {['pending','confirmed'].includes(order.orderStatus) && (
             <button 
-              className="flex items-center justify-center px-8 py-4 bg-[var(--color-error-light)] text-[var(--color-error)] font-body text-xs font-bold uppercase tracking-widest rounded-sm border border-[var(--color-error)] hover:opacity-80 transition-opacity focus-visible:outline w-full sm:w-auto disabled:opacity-50" 
+              className="flex items-center justify-center px-8 py-4 bg-error-light text-error font-body text-xs font-bold uppercase tracking-widest rounded-sm border border-error hover:opacity-80 transition-opacity focus-visible:outline w-full sm:w-auto disabled:opacity-50" 
               onClick={handleCancel} 
               disabled={cancelling}
             >
               {cancelling ? 'Cancelling...' : 'Cancel Order'}
             </button>
           )}
-          <Link to="/" className="flex items-center justify-center gap-2 px-8 py-4 bg-[var(--color-primary)] text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors focus-visible:outline w-full sm:w-auto ml-auto">
+          <Link to="/" className="flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors focus-visible:outline w-full sm:w-auto ml-auto">
             Continue Shopping <FiArrowRight size={14} />
           </Link>
         </div>

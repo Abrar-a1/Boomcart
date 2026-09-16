@@ -12,10 +12,10 @@ const Button = forwardRef(({
   const baseClasses = 'inline-flex items-center justify-center font-body rounded-sm transition-colors focus:outline-none focus-visible:outline disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variants = {
-    primary: 'bg-[var(--color-cta)] text-white hover:bg-[var(--color-cta-dark)]',
-    secondary: 'bg-transparent border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white',
-    ghost: 'bg-transparent text-[var(--color-primary)] hover:bg-[var(--color-background)]',
-    danger: 'bg-[var(--color-error)] text-white hover:opacity-90'
+    primary: 'bg-cta text-white hover:bg-cta-dark',
+    secondary: 'bg-transparent border border-primary text-primary hover:bg-primary hover:text-white',
+    ghost: 'bg-transparent text-primary hover:bg-background',
+    danger: 'bg-error text-white hover:opacity-90'
   };
 
   const sizes = {

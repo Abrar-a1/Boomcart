@@ -17,8 +17,8 @@ const Select = forwardRef(({
   return (
     <div className="flex flex-col gap-1.5 w-full">
       {label && (
-        <label htmlFor={selectId} className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text)]">
-          {label} {props.required && <span className="text-[var(--color-error)]">*</span>}
+        <label htmlFor={selectId} className="font-body text-xs font-bold uppercase tracking-widest text-text">
+          {label} {props.required && <span className="text-error">*</span>}
         </label>
       )}
       <select
@@ -27,11 +27,11 @@ const Select = forwardRef(({
         aria-invalid={!!error}
         aria-describedby={`${error ? errorId : ''} ${helperText && !error ? helperId : ''}`.trim() || undefined}
         className={`
-          w-full px-4 py-3 bg-white border border-[var(--color-border)] rounded-sm font-body text-sm text-[var(--color-text)] 
-          transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] 
-          disabled:bg-[var(--color-background)] disabled:text-[var(--color-text-muted)] disabled:cursor-not-allowed
+          w-full px-4 py-3 bg-white border border-border rounded-sm font-body text-sm text-text 
+          transition-colors focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary 
+          disabled:bg-background disabled:text-text-muted disabled:cursor-not-allowed
           appearance-none
-          ${error ? 'border-[var(--color-error)] focus:border-[var(--color-error)] focus:ring-[var(--color-error)]' : ''}
+          ${error ? 'border-error focus:border-error focus:ring-error' : ''}
           ${className}
         `}
         style={{
@@ -44,8 +44,8 @@ const Select = forwardRef(({
       >
         {children}
       </select>
-      {error && <span id={errorId} className="text-xs text-[var(--color-error)] font-body">{error}</span>}
-      {helperText && !error && <span id={helperId} className="text-xs text-[var(--color-text-muted)] font-body">{helperText}</span>}
+      {error && <span id={errorId} className="text-xs text-error font-body">{error}</span>}
+      {helperText && !error && <span id={helperId} className="text-xs text-text-muted font-body">{helperText}</span>}
     </div>
   );
 });

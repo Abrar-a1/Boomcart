@@ -2,9 +2,9 @@ import React from 'react';
 
 const Badge = ({ children, variant = 'neutral', className = '', ...props }) => {
   const variants = {
-    neutral: 'bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-text-muted)]',
-    discount: 'bg-[var(--color-cta)] text-white border border-[var(--color-cta)]',
-    status: 'bg-[var(--color-primary)] text-white border border-[var(--color-primary)]'
+    neutral: 'bg-background border border-border text-text-muted',
+    discount: 'bg-cta text-white border border-cta',
+    status: 'bg-primary text-white border border-primary'
   };
 
   return (

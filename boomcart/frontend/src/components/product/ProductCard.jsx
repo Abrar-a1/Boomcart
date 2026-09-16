@@ -30,7 +30,7 @@ export default function ProductCard({ product }) {
       
       {/* ── IMAGE ── */}
       <div 
-        className="relative w-full aspect-[3/4] md:aspect-[4/5] rounded-sm overflow-hidden bg-[var(--color-border-light)] border border-[var(--color-border-light)] shadow-sm mb-4 lg:mb-6"
+        className="relative w-full aspect-[3/4] md:aspect-[4/5] rounded-sm overflow-hidden bg-border-light border border-border-light shadow-sm mb-4 lg:mb-6"
         onMouseEnter={() => setHoverImg(true)}
         onMouseLeave={() => setHoverImg(false)}
       >
@@ -51,7 +51,7 @@ export default function ProductCard({ product }) {
         {/* Out of stock overlay */}
         {product.stock === 0 && (
           <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] flex items-center justify-center">
-            <span className="font-body text-[10px] font-bold uppercase tracking-widest text-[var(--color-primary)] bg-white/90 px-4 py-2 rounded-sm shadow-sm">Out of Stock</span>
+            <span className="font-body text-[10px] font-bold uppercase tracking-widest text-primary bg-white/90 px-4 py-2 rounded-sm shadow-sm">Out of Stock</span>
           </div>
         )}
 
@@ -60,7 +60,7 @@ export default function ProductCard({ product }) {
           onClick={handleWishlist}
           aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
           className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 focus-visible:outline
-            ${wishlisted ? 'bg-white/80 backdrop-blur-sm text-[var(--color-cta)] opacity-100 shadow-sm' : 'bg-transparent text-white opacity-0 group-hover:opacity-100 hover:scale-110 drop-shadow-md'}`}
+            ${wishlisted ? 'bg-white/80 backdrop-blur-sm text-cta opacity-100 shadow-sm' : 'bg-transparent text-white opacity-0 group-hover:opacity-100 hover:scale-110 drop-shadow-md'}`}
         >
           <FiHeart size={14} className={wishlisted ? 'fill-current' : ''} />
         </button>
@@ -71,28 +71,28 @@ export default function ProductCard({ product }) {
         
         <div className="flex items-start justify-between gap-4 mb-2">
           {/* Brand / Category */}
-          <span className="font-body text-[9px] lg:text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          <span className="font-body text-[9px] lg:text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted">
             {product.brand || product.category}
           </span>
           
           {/* Reviews */}
           {(product.numReviews > 0) && (
             <div className="flex items-center gap-1 shrink-0">
-              <FiStar size={10} className="text-[var(--color-accent)] fill-current" />
-              <span className="font-body text-[10px] font-bold text-[var(--color-text-muted)]">{product.ratings?.toFixed(1)}</span>
+              <FiStar size={10} className="text-accent fill-current" />
+              <span className="font-body text-[10px] font-bold text-text-muted">{product.ratings?.toFixed(1)}</span>
             </div>
           )}
         </div>
 
         {/* Title */}
-        <h3 className="font-heading text-base md:text-xl lg:text-2xl font-bold text-[var(--color-primary)] leading-tight mb-1.5 md:mb-2 group-hover:text-[var(--color-text-muted)] transition-colors line-clamp-1">
+        <h3 className="font-heading text-base md:text-xl lg:text-2xl font-bold text-primary leading-tight mb-1.5 md:mb-2 group-hover:text-text-muted transition-colors line-clamp-1">
           {product.name}
         </h3>
 
         {/* Price */}
         <div className="flex flex-wrap items-center gap-2 md:gap-3">
-          <span className="font-body text-sm md:text-base font-bold text-[var(--color-text)]">₹{price.toLocaleString()}</span>
-          {discount > 0 && <span className="font-body text-xs font-semibold text-[var(--color-text-light)] line-through">₹{product.price.toLocaleString()}</span>}
+          <span className="font-body text-sm md:text-base font-bold text-text">₹{price.toLocaleString()}</span>
+          {discount > 0 && <span className="font-body text-xs font-semibold text-text-light line-through">₹{product.price.toLocaleString()}</span>}
         </div>
 
       </div>

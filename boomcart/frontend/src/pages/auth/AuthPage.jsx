@@ -110,7 +110,7 @@ export default function AuthPage() {
            style={{ backgroundColor: 'var(--color-background)' }}>
 
         {/* ── Main Container ── */}
-        <div className="w-full max-w-[800px] min-h-[540px] bg-[#2A2B2D] rounded-xl shadow-[0_0_20px_rgba(194,90,60,0.4)] relative overflow-hidden animate-smooth-reveal border border-[var(--color-cta)]/50">
+        <div className="w-full max-w-[800px] min-h-[540px] bg-[#2A2B2D] rounded-xl shadow-[0_0_20px_rgba(194,90,60,0.4)] relative overflow-hidden animate-smooth-reveal border border-cta/50">
 
           {/* ── Form Layer (behind the welcome panel) ── */}
           <div className="flex w-full min-h-[540px] relative">
@@ -161,7 +161,7 @@ export default function AuthPage() {
                   
                   <div className="flex items-center justify-between mt-2">
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" className="w-4 h-4 rounded-sm border-white/40 bg-white/10 accent-[var(--color-cta)]" />
+                      <input type="checkbox" className="w-4 h-4 rounded-sm border-white/40 bg-white/10 accent-cta" />
                       <span className="font-body text-xs text-white/70">Remember me</span>
                     </label>
                     <Link to="/forgot-password" className="font-body text-xs text-white/70 hover:text-white transition-colors">
@@ -246,7 +246,7 @@ export default function AuthPage() {
                       <div className="text-xs text-center">
                         {canResend ? (
                           <button type="button" onClick={handleResend} disabled={loading}
-                            className="font-bold text-[var(--color-cta)] hover:underline">Resend OTP</button>
+                            className="font-bold text-cta hover:underline">Resend OTP</button>
                         ) : (
                           <span className="text-white/70">Resend in {countdown}s</span>
                         )}
@@ -306,7 +306,7 @@ export default function AuthPage() {
                   </p>
                   <Button 
                     onClick={toggleMode}
-                    className="px-8 py-3 border-2 border-white text-white bg-transparent font-body text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-[var(--color-cta)] transition-all duration-300"
+                    className="px-8 py-3 border-2 border-white text-white bg-transparent font-body text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-cta transition-all duration-300"
                   >
                     Register
                   </Button>
@@ -323,7 +323,7 @@ export default function AuthPage() {
                   </p>
                   <Button 
                     onClick={toggleMode}
-                    className="px-8 py-3 border-2 border-white text-white bg-transparent font-body text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-[var(--color-cta)] transition-all duration-300"
+                    className="px-8 py-3 border-2 border-white text-white bg-transparent font-body text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-cta transition-all duration-300"
                   >
                     Login
                   </Button>

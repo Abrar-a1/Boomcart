@@ -72,7 +72,7 @@ export default function Home() {
   );
 
   return (
-    <div className="w-full bg-[var(--color-background)] min-h-screen">
+    <div className="w-full bg-background min-h-screen">
       <Helmet>
         <title>Boomcart — Modern Indian Timeless Luxury</title>
         <meta name="description" content="Premium Indian fashion for Men, Women, Kids & Bridal. Discover curated collections at Boomcart." />
@@ -129,12 +129,12 @@ export default function Home() {
           <PageContainer>
             <div className="flex justify-between items-end mb-8 md:mb-12">
             <div>
-              <h2 className="font-heading text-3xl lg:text-4xl font-bold text-[var(--color-primary)]">New Arrivals</h2>
+              <h2 className="font-heading text-3xl lg:text-4xl font-bold text-primary">New Arrivals</h2>
             </div>
             {featured.length > 0 && !featuredError && (
               <button 
                 onClick={() => navigate('/?isFeatured=true')}
-                className="hidden lg:flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text)] underline-hover"
+                className="hidden lg:flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-text underline-hover"
               >
                 View All <FiArrowRight size={14} />
               </button>
@@ -145,10 +145,10 @@ export default function Home() {
             <EmptyState 
               title="Unable to load collection" 
               description={featuredError} 
-              action={<button onClick={fetchFeatured} className="px-6 py-3 bg-[var(--color-primary)] text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm">Try Again</button>} 
+              action={<button onClick={fetchFeatured} className="px-6 py-3 bg-primary text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm">Try Again</button>} 
             />
           ) : featured.length === 0 ? (
-            <p className="text-center font-body text-sm text-[var(--color-text-muted)] py-12">New arrivals coming soon.</p>
+            <p className="text-center font-body text-sm text-text-muted py-12">New arrivals coming soon.</p>
           ) : (
             <>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-8 md:gap-y-12 lg:gap-x-10">
@@ -159,7 +159,7 @@ export default function Home() {
               <div className="mt-10 lg:hidden flex justify-center">
                 <button 
                   onClick={() => navigate('/?isFeatured=true')}
-                  className="flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text)] border-b border-[var(--color-primary)] pb-1 transition-colors hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]"
+                  className="flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-text border-b border-primary pb-1 transition-colors hover:text-accent hover:border-accent"
                 >
                   View All Arrivals <FiArrowRight size={14} />
                 </button>
@@ -174,44 +174,44 @@ export default function Home() {
       {!hasFilters && (
         <section className="mb-16 md:mb-24 lg:mb-40 w-full animate-smooth-reveal">
           <PageContainer>
-            <h2 className="font-heading text-3xl lg:text-4xl font-bold text-[var(--color-primary)] mb-8 md:mb-12">Categories</h2>
+            <h2 className="font-heading text-3xl lg:text-4xl font-bold text-primary mb-8 md:mb-12">Categories</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8">
             
-            <button onClick={() => navigate('/?category=women')} className="group relative aspect-[3/4] md:aspect-auto md:h-full lg:aspect-[4/5] overflow-hidden rounded-sm bg-[var(--color-border-light)] flex flex-col justify-end p-8 lg:p-12 text-left">
+            <button onClick={() => navigate('/?category=women')} className="group relative aspect-[3/4] md:aspect-auto md:h-full lg:aspect-[4/5] overflow-hidden rounded-sm bg-border-light flex flex-col justify-end p-8 lg:p-12 text-left">
               <img src="/images/category-women.png" alt="Women" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-90" />
               <div className="relative z-10">
                 <h3 className="font-heading text-4xl lg:text-5xl text-white font-bold mb-3">Women</h3>
-                <span className="inline-flex items-center gap-2 font-body text-[10px] font-bold uppercase tracking-widest text-white/90 group-hover:text-[var(--color-accent)] transition-colors">
+                <span className="inline-flex items-center gap-2 font-body text-[10px] font-bold uppercase tracking-widest text-white/90 group-hover:text-accent transition-colors">
                   Shop Now <FiArrowRight size={12} />
                 </span>
               </div>
             </button>
 
             <div className="grid grid-rows-[auto_auto] md:grid-rows-2 gap-4 lg:gap-8 h-full">
-              <button onClick={() => navigate('/?category=men')} className="group relative aspect-[4/3] md:aspect-auto overflow-hidden rounded-sm bg-[var(--color-border-light)] flex flex-col justify-end p-6 md:p-8 text-left h-full">
+              <button onClick={() => navigate('/?category=men')} className="group relative aspect-[4/3] md:aspect-auto overflow-hidden rounded-sm bg-border-light flex flex-col justify-end p-6 md:p-8 text-left h-full">
                 <img src="/images/category-men.png" alt="Men" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-90" />
                 <div className="relative z-10">
                   <h3 className="font-heading text-3xl lg:text-4xl text-white font-bold mb-2">Men</h3>
-                  <span className="font-body text-[10px] font-bold uppercase tracking-widest text-white/90 group-hover:text-[var(--color-accent)] transition-colors">Shop Now</span>
+                  <span className="font-body text-[10px] font-bold uppercase tracking-widest text-white/90 group-hover:text-accent transition-colors">Shop Now</span>
                 </div>
               </button>
 
               <div className="grid grid-cols-2 gap-4 lg:gap-8 h-full">
-                <button onClick={() => navigate('/kids')} className="group relative aspect-square md:aspect-auto overflow-hidden rounded-sm bg-[var(--color-border-light)] flex flex-col justify-end p-5 md:p-6 text-left h-full">
+                <button onClick={() => navigate('/kids')} className="group relative aspect-square md:aspect-auto overflow-hidden rounded-sm bg-border-light flex flex-col justify-end p-5 md:p-6 text-left h-full">
                   <img src="/images/kids-hero.png" alt="Kids" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-90" />
                   <div className="relative z-10">
                     <h3 className="font-heading text-2xl lg:text-3xl text-white font-bold mb-2">Kids</h3>
-                    <span className="font-body text-[10px] font-bold uppercase tracking-widest text-white/90 group-hover:text-[var(--color-accent)] transition-colors">Shop Now</span>
+                    <span className="font-body text-[10px] font-bold uppercase tracking-widest text-white/90 group-hover:text-accent transition-colors">Shop Now</span>
                   </div>
                 </button>
-                <button onClick={() => navigate('/bridal')} className="group relative aspect-square md:aspect-auto overflow-hidden rounded-sm bg-[var(--color-border-light)] flex flex-col justify-end p-5 md:p-6 text-left h-full">
-                  <div className="absolute inset-0 bg-[var(--color-primary)] transition-transform duration-1000 ease-out group-hover:scale-105" />
+                <button onClick={() => navigate('/bridal')} className="group relative aspect-square md:aspect-auto overflow-hidden rounded-sm bg-border-light flex flex-col justify-end p-5 md:p-6 text-left h-full">
+                  <div className="absolute inset-0 bg-primary transition-transform duration-1000 ease-out group-hover:scale-105" />
                   <div className="relative z-10">
-                    <h3 className="font-heading text-2xl lg:text-3xl text-[var(--color-accent)] font-bold mb-2">Bridal</h3>
+                    <h3 className="font-heading text-2xl lg:text-3xl text-accent font-bold mb-2">Bridal</h3>
                     <span className="font-body text-[10px] font-bold uppercase tracking-widest text-white/90 transition-colors">Explore Edit</span>
                   </div>
                 </button>
@@ -227,9 +227,9 @@ export default function Home() {
       {!hasFilters && (
         <section className="mb-16 md:mb-24 lg:mb-40 animate-smooth-reveal">
           <PageContainer>
-            <div className="flex flex-col lg:flex-row bg-[var(--color-primary)] text-[var(--color-background)] rounded-sm overflow-hidden shadow-sm">
+            <div className="flex flex-col lg:flex-row bg-primary text-background rounded-sm overflow-hidden shadow-sm">
               <div className="w-full lg:w-1/2 px-6 py-12 md:p-16 lg:p-24 flex flex-col justify-center">
-                <span className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-accent)] mb-3 md:mb-4">
+                <span className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-accent mb-3 md:mb-4">
                   Bespoke Services
                 </span>
                 <h2 className="font-heading text-4xl lg:text-6xl font-bold mb-4 md:mb-6">
@@ -241,7 +241,7 @@ export default function Home() {
                 <div>
                   <button 
                     onClick={() => navigate('/bridal')}
-                    className="w-full sm:w-auto px-8 py-3.5 md:py-4 bg-transparent border border-[var(--color-accent)] text-[var(--color-accent)] font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition-colors focus-visible:outline"
+                    className="w-full sm:w-auto px-8 py-3.5 md:py-4 bg-transparent border border-accent text-accent font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-accent hover:text-primary transition-colors focus-visible:outline"
                   >
                     Explore Bridal
                   </button>
@@ -262,18 +262,18 @@ export default function Home() {
       {/* ── NEWSLETTER ── */}
       {!hasFilters && (
         <section className="mb-16 md:mb-24 max-w-[600px] mx-auto px-6 lg:px-0 text-center animate-smooth-reveal">
-          <h2 className="font-heading text-3xl lg:text-4xl font-bold text-[var(--color-primary)] mb-3 md:mb-4">Stay in the know.</h2>
-          <p className="font-body text-sm text-[var(--color-text-muted)] mb-6 md:mb-8">Sign up for early access to new collections and exclusive events.</p>
+          <h2 className="font-heading text-3xl lg:text-4xl font-bold text-primary mb-3 md:mb-4">Stay in the know.</h2>
+          <p className="font-body text-sm text-text-muted mb-6 md:mb-8">Sign up for early access to new collections and exclusive events.</p>
           <form className="flex flex-col sm:flex-row gap-3 md:gap-4" onSubmit={(e) => e.preventDefault()}>
             <input 
               type="email" 
               placeholder="Your email address" 
-              className="flex-1 w-full px-5 py-3.5 md:px-6 md:py-4 bg-transparent border border-[var(--color-border)] font-body text-sm text-[var(--color-text)] outline-none focus:border-[var(--color-primary)] transition-colors rounded-sm"
+              className="flex-1 w-full px-5 py-3.5 md:px-6 md:py-4 bg-transparent border border-border font-body text-sm text-text outline-none focus:border-primary transition-colors rounded-sm"
               required
             />
             <button 
               type="submit"
-              className="w-full sm:w-auto px-8 py-3.5 md:py-4 bg-[var(--color-primary)] text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors focus-visible:outline shrink-0"
+              className="w-full sm:w-auto px-8 py-3.5 md:py-4 bg-primary text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors focus-visible:outline shrink-0"
             >
               Subscribe
             </button>
@@ -286,13 +286,13 @@ export default function Home() {
         <PageContainer>
         
         {hasFilters && (
-          <div className="mb-16 border-b border-[var(--color-border-light)] pb-8 animate-smooth-reveal">
-            <span className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-4 block">
+          <div className="mb-16 border-b border-border-light pb-8 animate-smooth-reveal">
+            <span className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted mb-4 block">
               Curated Edit
             </span>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <h2 className="font-heading text-4xl lg:text-6xl font-bold text-[var(--color-primary)]">The Collection</h2>
-              <p className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] mb-2">
+              <h2 className="font-heading text-4xl lg:text-6xl font-bold text-primary">The Collection</h2>
+              <p className="font-body text-xs font-bold uppercase tracking-widest text-text-muted mb-2">
                 {loading ? 'Loading pieces...' : `${totalProducts} pieces`}
               </p>
             </div>
@@ -310,13 +310,13 @@ export default function Home() {
           <div className="flex-1 min-w-0">
             
             {/* Mobile Filter Trigger */}
-            <div className="lg:hidden flex justify-between items-center mb-6 md:mb-8 border-b border-[var(--color-border-light)] pb-4">
-              <span className="font-body text-sm font-semibold text-[var(--color-text)]">
+            <div className="lg:hidden flex justify-between items-center mb-6 md:mb-8 border-b border-border-light pb-4">
+              <span className="font-body text-sm font-semibold text-text">
                 {products.length} Results
               </span>
               <button
                 onClick={() => setMobileFilter(true)}
-                className="flex items-center gap-2 px-5 py-2.5 border border-[var(--color-primary)] text-[var(--color-primary)] font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-[var(--color-primary)] hover:text-white transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 border border-primary text-primary font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-primary hover:text-white transition-colors"
               >
                 <FiFilter size={14} /> Filter
               </button>
@@ -330,7 +330,7 @@ export default function Home() {
               <EmptyState 
                 title="Something went wrong" 
                 description={error} 
-                action={<button onClick={() => window.location.reload()} className="px-6 py-3 bg-[var(--color-primary)] text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm">Try Again</button>} 
+                action={<button onClick={() => window.location.reload()} className="px-6 py-3 bg-primary text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm">Try Again</button>} 
               />
             ) : products.length === 0 ? (
               <EmptyState 
@@ -339,7 +339,7 @@ export default function Home() {
                 action={hasFilters && (
                   <button
                     onClick={clearFilters}
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-[var(--color-primary)] text-white font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors"
                   >
                     Clear Refinements
                   </button>
@@ -364,10 +364,10 @@ export default function Home() {
       {mobileFilter && (
         <div className="lg:hidden">
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100]" onClick={() => setMobileFilter(false)} />
-          <div className="fixed inset-y-0 right-0 w-[85vw] max-w-[320px] bg-[var(--color-background)] z-[110] flex flex-col shadow-2xl animate-slide-in">
-            <div className="flex items-center justify-between p-6 border-b border-[var(--color-border-light)]">
-              <span className="font-heading text-2xl font-bold text-[var(--color-primary)]">Refine</span>
-              <button onClick={() => setMobileFilter(false)} className="text-[var(--color-primary)] hover:opacity-80">
+          <div className="fixed inset-y-0 right-0 w-[85vw] max-w-[320px] bg-background z-[110] flex flex-col shadow-2xl animate-slide-in">
+            <div className="flex items-center justify-between p-6 border-b border-border-light">
+              <span className="font-heading text-2xl font-bold text-primary">Refine</span>
+              <button onClick={() => setMobileFilter(false)} className="text-primary hover:opacity-80">
                 <FiX size={24} />
               </button>
             </div>

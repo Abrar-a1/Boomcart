@@ -72,15 +72,15 @@ export default function ForgotPassword() {
 
       <div className="w-full flex flex-col">
         <div className="mb-10 text-center">
-          <span className="block font-body text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-3">
+          <span className="block font-body text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted mb-3">
             VERIFICATION
           </span>
-          <h1 className="font-heading text-4xl lg:text-5xl font-bold text-[var(--color-primary)] mb-4 tracking-tight">
+          <h1 className="font-heading text-4xl lg:text-5xl font-bold text-primary mb-4 tracking-tight">
             Recover Password
           </h1>
-          <p className="font-body text-sm text-[var(--color-text-muted)]">
+          <p className="font-body text-sm text-text-muted">
             {!otpSent ? 'Enter the email address associated with your Boomcart account.' : (
-              <span>We've sent a 6-digit verification code to:<br/><strong className="text-[var(--color-primary)] mt-1 inline-block">{email}</strong></span>
+              <span>We've sent a 6-digit verification code to:<br/><strong className="text-primary mt-1 inline-block">{email}</strong></span>
             )}
           </p>
         </div>
@@ -113,11 +113,11 @@ export default function ForgotPassword() {
               />
               <div className="text-center mt-2">
                 {canResend ? (
-                  <button type="button" onClick={handleResend} disabled={loading} className="font-body text-sm font-bold text-[var(--color-primary)] hover:text-[var(--color-cta)] transition-colors focus-visible:outline underline underline-offset-4">
+                  <button type="button" onClick={handleResend} disabled={loading} className="font-body text-sm font-bold text-primary hover:text-cta transition-colors focus-visible:outline underline underline-offset-4">
                     Resend code
                   </button>
                 ) : (
-                  <p className="text-[var(--color-text-muted)] font-body text-sm">
+                  <p className="text-text-muted font-body text-sm">
                     Didn't receive the code? <br className="sm:hidden" />
                     <span className="font-bold ml-1">Resend in {countdown}s</span>
                   </p>
@@ -129,15 +129,15 @@ export default function ForgotPassword() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-4 h-14 bg-[var(--color-primary)] text-white font-body text-sm font-bold uppercase tracking-[0.15em] rounded-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline shadow-[0_4px_14px_rgba(30,58,58,0.2)]"
+            className="w-full mt-4 h-14 bg-primary text-white font-body text-sm font-bold uppercase tracking-[0.15em] rounded-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline shadow-[0_4px_14px_rgba(30,58,58,0.2)]"
           >
             {loading ? 'Processing...' : (!otpSent ? 'Continue' : 'Verify OTP')}
           </button>
         </form>
 
-        <div className="mt-8 pt-8 border-t border-[var(--color-border-light)] text-center flex flex-col gap-4">
+        <div className="mt-8 pt-8 border-t border-border-light text-center flex flex-col gap-4">
           {!otpSent ? (
-            <Link to="/login" className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors inline-block focus-visible:outline">
+            <Link to="/login" className="font-body text-xs font-bold uppercase tracking-widest text-text-muted hover:text-primary transition-colors inline-block focus-visible:outline">
               ← Back to Sign In
             </Link>
           ) : (
@@ -145,7 +145,7 @@ export default function ForgotPassword() {
               type="button"
               onClick={() => setOtpSent(false)}
               disabled={loading}
-              className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors focus-visible:outline"
+              className="font-body text-xs font-bold uppercase tracking-widest text-text-muted hover:text-primary transition-colors focus-visible:outline"
             >
               Use a different email
             </button>

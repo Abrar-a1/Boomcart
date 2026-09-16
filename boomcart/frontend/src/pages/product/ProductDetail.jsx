@@ -183,7 +183,7 @@ export default function ProductDetail() {
           {/* Desktop Gallery */}
           <div className="hidden lg:grid grid-cols-2 gap-4 pb-20 pt-8">
             {images.map((img, idx) => (
-              <div key={idx} className={`bg-[var(--color-border-light)] overflow-hidden rounded-sm ${images.length === 1 || (images.length === 3 && idx === 0) ? 'col-span-2 aspect-[4/5]' : 'aspect-[3/4]'}`}>
+              <div key={idx} className={`bg-border-light overflow-hidden rounded-sm ${images.length === 1 || (images.length === 3 && idx === 0) ? 'col-span-2 aspect-[4/5]' : 'aspect-[3/4]'}`}>
                 <img
                   src={img.url}
                   alt={`${product.name} view ${idx + 1}`}
@@ -194,7 +194,7 @@ export default function ProductDetail() {
           </div>
 
           {/* Mobile Gallery (Swipeable) */}
-          <div className="lg:hidden relative w-full h-[75vh] min-h-[500px] bg-[var(--color-border-light)]">
+          <div className="lg:hidden relative w-full h-[75vh] min-h-[500px] bg-border-light">
             <div
               className="w-full h-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
               onScroll={(e) => {
@@ -231,37 +231,37 @@ export default function ProductDetail() {
           <div className="lg:sticky lg:top-32 flex flex-col">
 
             {/* Breadcrumbs / Category */}
-            <span className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-4 block">
+            <span className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted mb-4 block">
               {product.brand || product.category} {product.subCategory ? ` / ${product.subCategory}` : ''}
             </span>
 
             {/* Title */}
-            <h1 className="font-heading text-3xl lg:text-5xl font-bold text-[var(--color-primary)] leading-[1.1] mb-4">
+            <h1 className="font-heading text-3xl lg:text-5xl font-bold text-primary leading-[1.1] mb-4">
               {product.name}
             </h1>
 
             {/* Price */}
             <div className="flex items-center gap-4 mb-8">
               {isBridal && product.priceRange ? (
-                <span className="font-body text-lg font-bold text-[var(--color-text)]">{product.priceRange}</span>
+                <span className="font-body text-lg font-bold text-text">{product.priceRange}</span>
               ) : (
                 <>
-                  <span className="font-body text-xl font-bold text-[var(--color-text)]">₹{price.toLocaleString()}</span>
+                  <span className="font-body text-xl font-bold text-text">₹{price.toLocaleString()}</span>
                   {product.discountPrice > 0 && (
-                    <span className="font-body text-sm font-semibold text-[var(--color-text-light)] line-through">₹{product.price.toLocaleString()}</span>
+                    <span className="font-body text-sm font-semibold text-text-light line-through">₹{product.price.toLocaleString()}</span>
                   )}
                 </>
               )}
             </div>
 
-            <div className="w-full h-[1px] bg-[var(--color-border-light)] mb-8" />
+            <div className="w-full h-[1px] bg-border-light mb-8" />
 
             {/* Sizing */}
             {!isBridal && product.sizes?.length > 0 && (
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="font-body text-[10px] font-bold uppercase tracking-widest text-[var(--color-primary)]">Size</span>
-                  <button className="font-body text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-[var(--color-primary)] underline transition-colors">
+                  <span className="font-body text-[10px] font-bold uppercase tracking-widest text-primary">Size</span>
+                  <button className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted hover:text-primary underline transition-colors">
                     Size Guide
                   </button>
                 </div>
@@ -276,10 +276,10 @@ export default function ProductDetail() {
                         onClick={() => { setSelectedSize(s.size); setQuantity(1); }}
                         className={`min-w-[3.5rem] min-h-[44px] px-4 font-body text-xs font-semibold rounded-sm transition-all focus-visible:outline ${
                           isOut
-                            ? 'bg-[var(--color-background)] text-[var(--color-border)] border border-[var(--color-border-light)] line-through cursor-not-allowed'
+                            ? 'bg-background text-border border border-border-light line-through cursor-not-allowed'
                             : isSelected
-                              ? 'bg-[var(--color-primary)] text-white border border-[var(--color-primary)]'
-                              : 'bg-transparent border border-[var(--color-border)] text-[var(--color-text)] hover:border-[var(--color-primary)]'
+                              ? 'bg-primary text-white border border-primary'
+                              : 'bg-transparent border border-border text-text hover:border-primary'
                         }`}
                       >
                         {s.size}
@@ -303,12 +303,12 @@ export default function ProductDetail() {
               ) : (
                 <div className="flex items-center gap-4">
                   {/* Quantity */}
-                  <div className="flex items-center justify-between border border-[var(--color-border)] rounded-sm h-14 w-32 px-2">
+                  <div className="flex items-center justify-between border border-border rounded-sm h-14 w-32 px-2">
                     <button
                       aria-label="Decrease quantity"
                       onClick={() => handleQuantity('dec')}
                       disabled={quantity <= 1}
-                      className="w-10 h-10 flex items-center justify-center text-[var(--color-text)] disabled:opacity-30 transition-opacity focus-visible:outline"
+                      className="w-10 h-10 flex items-center justify-center text-text disabled:opacity-30 transition-opacity focus-visible:outline"
                     >
                       <FiMinus size={16} />
                     </button>
@@ -317,7 +317,7 @@ export default function ProductDetail() {
                       aria-label="Increase quantity"
                       onClick={() => handleQuantity('inc')}
                       disabled={quantity >= maxAllowed || !selectedSize}
-                      className="w-10 h-10 flex items-center justify-center text-[var(--color-text)] disabled:opacity-30 transition-opacity focus-visible:outline"
+                      className="w-10 h-10 flex items-center justify-center text-text disabled:opacity-30 transition-opacity focus-visible:outline"
                     >
                       <FiPlus size={16} />
                     </button>
@@ -347,7 +347,7 @@ export default function ProductDetail() {
                   <button
                     aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
                     onClick={handleWishlist}
-                    className={`h-14 w-14 flex items-center justify-center border rounded-sm transition-colors focus-visible:outline ${isWishlisted ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white' : 'border-[var(--color-border)] text-[var(--color-primary)] hover:border-[var(--color-primary)]'}`}
+                    className={`h-14 w-14 flex items-center justify-center border rounded-sm transition-colors focus-visible:outline ${isWishlisted ? 'border-primary bg-primary text-white' : 'border-border text-primary hover:border-primary'}`}
                   >
                     <FiHeart size={20} className={isWishlisted ? 'fill-current' : ''} />
                   </button>
@@ -356,26 +356,26 @@ export default function ProductDetail() {
             </div>
 
             {/* Accordions */}
-            <div className="flex flex-col border-t border-[var(--color-border-light)]">
+            <div className="flex flex-col border-t border-border-light">
 
               {/* Description */}
-              <div className="border-b border-[var(--color-border-light)]">
+              <div className="border-b border-border-light">
                 <button
                   aria-expanded={activeAccordion === 'details'}
                   aria-controls="details-care-content"
                   onClick={() => setActiveAccordion(activeAccordion === 'details' ? '' : 'details')}
-                  className="w-full flex items-center justify-between py-5 font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-primary)] group focus-visible:outline"
+                  className="w-full flex items-center justify-between py-5 font-body text-[11px] font-bold uppercase tracking-widest text-primary group focus-visible:outline"
                 >
                   Details & Care
-                  <span className="text-[var(--color-text-light)] group-hover:text-[var(--color-primary)] transition-colors">
+                  <span className="text-text-light group-hover:text-primary transition-colors">
                     {activeAccordion === 'details' ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
                   </span>
                 </button>
                 <div id="details-care-content" role="region" className={`overflow-hidden transition-all duration-500 ease-in-out ${activeAccordion === 'details' ? 'max-h-96 opacity-100 pb-5' : 'max-h-0 opacity-0'}`}>
-                  <p className="font-body text-sm text-[var(--color-text)] leading-relaxed opacity-90">
+                  <p className="font-body text-sm text-text leading-relaxed opacity-90">
                     {product.description}
                   </p>
-                  <ul className="mt-4 space-y-2 font-body text-xs text-[var(--color-text-muted)]">
+                  <ul className="mt-4 space-y-2 font-body text-xs text-text-muted">
                     <li className="flex items-center gap-2">✓ Handcrafted detailing</li>
                     <li className="flex items-center gap-2">✓ Premium materials</li>
                     <li className="flex items-center gap-2">✓ Dry clean only</li>
@@ -384,27 +384,27 @@ export default function ProductDetail() {
               </div>
 
               {/* Delivery */}
-              <div className="border-b border-[var(--color-border-light)]">
+              <div className="border-b border-border-light">
                 <button
                   aria-expanded={activeAccordion === 'delivery'}
                   aria-controls="delivery-returns-content"
                   onClick={() => setActiveAccordion(activeAccordion === 'delivery' ? '' : 'delivery')}
-                  className="w-full flex items-center justify-between py-5 font-body text-[11px] font-bold uppercase tracking-widest text-[var(--color-primary)] group focus-visible:outline"
+                  className="w-full flex items-center justify-between py-5 font-body text-[11px] font-bold uppercase tracking-widest text-primary group focus-visible:outline"
                 >
                   Delivery & Returns
-                  <span className="text-[var(--color-text-light)] group-hover:text-[var(--color-primary)] transition-colors">
+                  <span className="text-text-light group-hover:text-primary transition-colors">
                     {activeAccordion === 'delivery' ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
                   </span>
                 </button>
                 <div id="delivery-returns-content" role="region" className={`overflow-hidden transition-all duration-500 ease-in-out ${activeAccordion === 'delivery' ? 'max-h-96 opacity-100 pb-5' : 'max-h-0 opacity-0'}`}>
                   <div className="space-y-4">
                     <div className="flex gap-3">
-                      <FiCheckCircle size={16} className="text-[var(--color-accent)] shrink-0 mt-0.5" />
-                      <p className="font-body text-xs text-[var(--color-text)] leading-relaxed"><strong className="font-semibold text-[var(--color-primary)]">Free Global Shipping</strong><br/>Enjoy complimentary express delivery on all orders above ₹10,000.</p>
+                      <FiCheckCircle size={16} className="text-accent shrink-0 mt-0.5" />
+                      <p className="font-body text-xs text-text leading-relaxed"><strong className="font-semibold text-primary">Free Global Shipping</strong><br/>Enjoy complimentary express delivery on all orders above ₹10,000.</p>
                     </div>
                     <div className="flex gap-3">
-                      <FiCheckCircle size={16} className="text-[var(--color-accent)] shrink-0 mt-0.5" />
-                      <p className="font-body text-xs text-[var(--color-text)] leading-relaxed"><strong className="font-semibold text-[var(--color-primary)]">14-Day Returns</strong><br/>Try it on at home. Return within 14 days for a full refund (excluding bespoke items).</p>
+                      <FiCheckCircle size={16} className="text-accent shrink-0 mt-0.5" />
+                      <p className="font-body text-xs text-text leading-relaxed"><strong className="font-semibold text-primary">14-Day Returns</strong><br/>Try it on at home. Return within 14 days for a full refund (excluding bespoke items).</p>
                     </div>
                   </div>
                 </div>
@@ -416,7 +416,7 @@ export default function ProductDetail() {
       </PageContainer>
 
       {/* ── MOBILE STICKY CTA ── */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-[var(--color-border-light)] p-4 pb-[env(safe-area-inset-bottom,16px)] z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-border-light p-4 pb-[env(safe-area-inset-bottom,16px)] z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
         <div className="flex items-center gap-4 w-full">
           {isBridal ? (
             <Button
@@ -450,7 +450,7 @@ export default function ProductDetail() {
           <button
             aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
             onClick={handleWishlist}
-            className={`w-12 h-12 flex items-center justify-center border rounded-sm shrink-0 transition-colors focus-visible:outline ${isWishlisted ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white' : 'border-[var(--color-border)] text-[var(--color-primary)]'}`}
+            className={`w-12 h-12 flex items-center justify-center border rounded-sm shrink-0 transition-colors focus-visible:outline ${isWishlisted ? 'border-primary bg-primary text-white' : 'border-border text-primary'}`}
           >
             <FiHeart size={20} className={isWishlisted ? 'fill-current' : ''} />
           </button>
@@ -459,8 +459,8 @@ export default function ProductDetail() {
 
       {/* ── RELATED PRODUCTS ── */}
       {relatedProducts.length > 0 && (
-        <PageContainer className="py-16 lg:py-24 border-t border-[var(--color-border-light)] mt-12 lg:mt-24">
-          <h2 className="font-heading text-3xl font-bold text-[var(--color-primary)] mb-10">You May Also Like</h2>
+        <PageContainer className="py-16 lg:py-24 border-t border-border-light mt-12 lg:mt-24">
+          <h2 className="font-heading text-3xl font-bold text-primary mb-10">You May Also Like</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-10">
             {relatedProducts.map(p => (
               <ProductCard key={p._id} product={p} />

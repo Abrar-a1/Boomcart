@@ -45,15 +45,15 @@ export default function CompleteProfile() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[var(--color-background)] py-12 lg:py-20 flex items-center justify-center">
+    <div className="w-full min-h-screen bg-background py-12 lg:py-20 flex items-center justify-center">
       <Helmet><title>Complete Your Profile — Boomcart</title></Helmet>
       
       <PageContainer variant="functional" className="max-w-2xl w-full">
-        <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 lg:p-12 shadow-sm animate-fade-in">
-          <h1 className="font-heading text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-2 text-center">
+        <div className="bg-white border border-border rounded-sm p-8 lg:p-12 shadow-sm animate-fade-in">
+          <h1 className="font-heading text-3xl md:text-4xl font-bold text-primary mb-2 text-center">
             Welcome, {user?.name?.split(' ')[0]}!
           </h1>
-          <p className="font-body text-sm text-[var(--color-text-muted)] mb-10 text-center max-w-md mx-auto leading-relaxed">
+          <p className="font-body text-sm text-text-muted mb-10 text-center max-w-md mx-auto leading-relaxed">
             Before you start shopping, please provide your contact details and default shipping address.
           </p>
           

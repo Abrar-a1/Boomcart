@@ -55,11 +55,11 @@ export default function KidsCatalog() {
   );
 
   return (
-    <div className="w-full bg-[var(--color-background)] min-h-[60vh]">
+    <div className="w-full bg-background min-h-[60vh]">
       <Helmet><title>Kids Collection — Boomcart</title></Helmet>
 
       {/* ── Hero Banner ── */}
-      <section className="relative overflow-hidden min-h-[400px] bg-[var(--color-background)] flex items-center">
+      <section className="relative overflow-hidden min-h-[400px] bg-background flex items-center">
         <img
           src="/images/kids-hero.png"
           alt="Kids Collection"
@@ -75,7 +75,7 @@ export default function KidsCatalog() {
 
         <PageContainer className="relative z-10 py-16">
           <nav className="flex items-center gap-2 text-sm mb-6">
-            <Link to="/" className="text-white hover:text-[var(--color-accent)] transition-colors inline-flex items-center gap-1">
+            <Link to="/" className="text-white hover:text-accent transition-colors inline-flex items-center gap-1">
               <FiArrowLeft size={14} /> Home
             </Link>
             <span className="text-white/40">/</span>
@@ -96,7 +96,7 @@ export default function KidsCatalog() {
 
       {/* ── Products Grid ── */}
       <PageContainer className="py-12 lg:py-16">
-        <div className="flex items-center justify-between mb-8 pb-4 border-b border-[var(--color-border-light)]">
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-border-light">
           <h2 className="font-heading" style={{ fontSize: '24px', color: '#1E3A3A', fontWeight: 700, margin: 0 }}>
             All Kids Products
           </h2>

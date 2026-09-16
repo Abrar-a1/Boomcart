@@ -39,9 +39,9 @@ export default function ResetPassword() {
       
       <div className="w-full flex flex-col">
         <div className="mb-10 text-center">
-          <span className="block font-body text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-3">SECURITY</span>
-          <h1 className="font-heading text-4xl lg:text-5xl font-bold text-[var(--color-primary)] mb-4 tracking-tight">Create New Password</h1>
-          <p className="font-body text-sm text-[var(--color-text-muted)]">Choose a strong password for your Boomcart account.</p>
+          <span className="block font-body text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted mb-3">SECURITY</span>
+          <h1 className="font-heading text-4xl lg:text-5xl font-bold text-primary mb-4 tracking-tight">Create New Password</h1>
+          <p className="font-body text-sm text-text-muted">Choose a strong password for your Boomcart account.</p>
         </div>
 
         <form onSubmit={handleResetPassword} className="flex flex-col gap-6">
@@ -62,7 +62,7 @@ export default function ResetPassword() {
                 <button 
                   type="button" 
                   onClick={() => setShowPassword(!showPassword)}
-                  className="pr-4 flex items-center justify-center text-[var(--color-text-light)] hover:text-[var(--color-primary)] transition-colors focus-visible:outline"
+                  className="pr-4 flex items-center justify-center text-text-light hover:text-primary transition-colors focus-visible:outline"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
@@ -74,14 +74,14 @@ export default function ResetPassword() {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full mt-4 h-14 bg-[var(--color-primary)] text-white font-body text-sm font-bold uppercase tracking-[0.15em] rounded-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline shadow-[0_4px_14px_rgba(30,58,58,0.2)]"
+            className="w-full mt-4 h-14 bg-primary text-white font-body text-sm font-bold uppercase tracking-[0.15em] rounded-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline shadow-[0_4px_14px_rgba(30,58,58,0.2)]"
           >
             {loading ? 'Resetting...' : 'Change Password'}
           </button>
         </form>
 
-        <div className="mt-8 pt-8 border-t border-[var(--color-border-light)] text-center">
-          <Link to="/login" className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors inline-block focus-visible:outline">
+        <div className="mt-8 pt-8 border-t border-border-light text-center">
+          <Link to="/login" className="font-body text-xs font-bold uppercase tracking-widest text-text-muted hover:text-primary transition-colors inline-block focus-visible:outline">
             ← Back to Sign In
           </Link>
         </div>

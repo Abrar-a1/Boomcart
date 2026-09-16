@@ -137,10 +137,10 @@ export default function Checkout() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[var(--color-background)] pt-12 pb-24">
+    <div className="w-full min-h-screen bg-background pt-12 pb-24">
       <Helmet><title>Secure Checkout | Boomcart</title></Helmet>
       <PageContainer variant="functional" className="animate-smooth-reveal">
-        <h1 className="font-heading text-4xl lg:text-5xl font-bold text-[var(--color-primary)] mb-12">Checkout</h1>
+        <h1 className="font-heading text-4xl lg:text-5xl font-bold text-primary mb-12">Checkout</h1>
 
         {/* ── STEP INDICATOR ── */}
         <div className="flex items-center mb-16 max-w-[600px]">
@@ -148,15 +148,15 @@ export default function Checkout() {
             <div key={s.n} className="flex items-center flex-1">
               <div className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-body text-xs font-bold transition-colors ${
-                  step > s.n ? 'bg-[var(--color-primary)] text-white' : step === s.n ? 'bg-[var(--color-cta)] text-white' : 'bg-white border border-[var(--color-border)] text-[var(--color-text-muted)]'
+                  step > s.n ? 'bg-primary text-white' : step === s.n ? 'bg-cta text-white' : 'bg-white border border-border text-text-muted'
                 }`}>
                   {step > s.n ? <FiCheck size={14}/> : s.n}
                 </div>
                 <span className={`font-body text-xs font-bold uppercase tracking-widest ${
-                  step >= s.n ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)]'
+                  step >= s.n ? 'text-primary' : 'text-text-muted'
                 }`}>{s.l}</span>
               </div>
-              {idx === 0 && <div className={`flex-1 h-[1px] mx-6 transition-colors ${step > 1 ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border-light)]'}`} />}
+              {idx === 0 && <div className={`flex-1 h-[1px] mx-6 transition-colors ${step > 1 ? 'bg-primary' : 'bg-border-light'}`} />}
             </div>
           ))}
         </div>
@@ -167,8 +167,8 @@ export default function Checkout() {
           <div className="w-full lg:w-[60%] flex flex-col gap-8 order-last lg:order-first">
 
             {step === 1 && (
-              <div className="bg-transparent border border-[var(--color-border)] rounded-sm p-8 bg-white">
-                <h3 className="font-heading text-2xl font-bold text-[var(--color-primary)] mb-8">Shipping Address</h3>
+              <div className="bg-transparent border border-border rounded-sm p-8 bg-white">
+                <h3 className="font-heading text-2xl font-bold text-primary mb-8">Shipping Address</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Input
@@ -222,12 +222,12 @@ export default function Checkout() {
                   />
 
                   <div className="flex flex-col gap-1 w-full">
-                    <label className="font-body text-xs font-bold uppercase tracking-widest text-[var(--color-text)]">State *</label>
+                    <label className="font-body text-xs font-bold uppercase tracking-widest text-text">State *</label>
                     <select
                       name="state"
                       value={addr.state}
                       onChange={handleAddr}
-                      className="w-full px-4 py-3 min-h-[48px] bg-white border border-[var(--color-border)] rounded-sm font-body text-sm text-[var(--color-text)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+                      className="w-full px-4 py-3 min-h-[48px] bg-white border border-border rounded-sm font-body text-sm text-text transition-colors focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                       required
                     >
                       <option value="">Select state</option>
@@ -238,17 +238,17 @@ export default function Checkout() {
 
                 {user && (
                   <label className="mt-6 flex items-center gap-3 cursor-pointer group w-max">
-                    <div className={`w-5 h-5 flex items-center justify-center border rounded-sm transition-colors ${saveAddress ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-white' : 'border-[var(--color-border)] bg-transparent group-hover:border-[var(--color-primary)]'}`}>
+                    <div className={`w-5 h-5 flex items-center justify-center border rounded-sm transition-colors ${saveAddress ? 'bg-primary border-primary text-white' : 'border-border bg-transparent group-hover:border-primary'}`}>
                       {saveAddress && <FiCheck size={14} />}
                     </div>
                     <input type="checkbox" className="hidden" checked={saveAddress} onChange={e => setSaveAddress(e.target.checked)} />
-                    <span className="font-body text-sm text-[var(--color-text-muted)] group-hover:text-[var(--color-text)] transition-colors">Save this address as my default</span>
+                    <span className="font-body text-sm text-text-muted group-hover:text-text transition-colors">Save this address as my default</span>
                   </label>
                 )}
 
                 <button
                   onClick={() => { if (validateAddr()) setStep(2); }}
-                  className="mt-10 w-full md:w-auto px-10 py-4 bg-[var(--color-primary)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:bg-black focus-visible:outline"
+                  className="mt-10 w-full md:w-auto px-10 py-4 bg-primary text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:bg-black focus-visible:outline"
                 >
                   Continue to Payment
                 </button>
@@ -256,15 +256,15 @@ export default function Checkout() {
             )}
 
             {step === 2 && (
-              <div className="bg-transparent border border-[var(--color-border)] rounded-sm p-8 bg-white animate-smooth-reveal">
-                <h3 className="font-heading text-2xl font-bold text-[var(--color-primary)] mb-8">Payment Method</h3>
+              <div className="bg-transparent border border-border rounded-sm p-8 bg-white animate-smooth-reveal">
+                <h3 className="font-heading text-2xl font-bold text-primary mb-8">Payment Method</h3>
 
                 <div className="flex flex-col gap-4">
                   {[{v:'razorpay',l:'Pay Online',sub:'Credit/Debit Card, UPI, Net Banking'},{v:'cod',l:'Cash on Delivery',sub:'Pay when your order arrives'}].map(opt => (
                     <label
                       key={opt.v}
                       className={`flex items-start gap-4 p-5 border rounded-sm cursor-pointer transition-all ${
-                        payMethod === opt.v ? 'border-[var(--color-primary)] bg-[var(--color-background)]' : 'border-[var(--color-border)] bg-white hover:border-[var(--color-primary)]/50'
+                        payMethod === opt.v ? 'border-primary bg-background' : 'border-border bg-white hover:border-primary/50'
                       }`}
                     >
                       <input
@@ -273,11 +273,11 @@ export default function Checkout() {
                         value={opt.v}
                         checked={payMethod === opt.v}
                         onChange={() => setPayMethod(opt.v)}
-                        className="mt-1 w-4 h-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                        className="mt-1 w-4 h-4 text-primary focus:ring-primary"
                       />
                       <div>
-                        <p className="font-heading text-lg font-bold text-[var(--color-primary)] leading-none mb-1.5">{opt.l}</p>
-                        <p className="font-body text-xs text-[var(--color-text-muted)]">{opt.sub}</p>
+                        <p className="font-heading text-lg font-bold text-primary leading-none mb-1.5">{opt.l}</p>
+                        <p className="font-body text-xs text-text-muted">{opt.sub}</p>
                       </div>
                     </label>
                   ))}
@@ -286,14 +286,14 @@ export default function Checkout() {
                 <div className="flex gap-4 mt-10">
                   <button
                     onClick={() => setStep(1)}
-                    className="px-6 py-4 bg-transparent text-[var(--color-text-muted)] font-body text-sm font-bold uppercase tracking-widest hover:text-[var(--color-primary)] transition-colors focus-visible:outline"
+                    className="px-6 py-4 bg-transparent text-text-muted font-body text-sm font-bold uppercase tracking-widest hover:text-primary transition-colors focus-visible:outline"
                   >
                     Back
                   </button>
                   <button
                     onClick={placeOrder}
                     disabled={loading}
-                    className="flex-1 py-4 bg-[var(--color-cta)] text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:opacity-90 shadow-[0_4px_14px_rgba(194,90,60,0.3)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline"
+                    className="flex-1 py-4 bg-cta text-white font-body text-sm font-bold uppercase tracking-widest rounded-sm transition-all hover:opacity-90 shadow-[0_4px_14px_rgba(194,90,60,0.3)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline"
                   >
                     {loading ? 'Processing...' : payMethod === 'cod' ? 'Confirm Order' : 'Pay Securely'}
                   </button>
@@ -304,15 +304,15 @@ export default function Checkout() {
 
           {/* ── RIGHT ORDER SUMMARY (Always on top for mobile) ── */}
           <div className="w-full lg:w-[40%] lg:sticky lg:top-28 order-first lg:order-last mb-2 lg:mb-0">
-            <div className="bg-white border border-[var(--color-border)] rounded-sm p-8 shadow-sm">
-              <h4 className="font-heading text-2xl font-bold text-[var(--color-primary)] border-b border-[var(--color-border-light)] pb-4 mb-6">
+            <div className="bg-white border border-border rounded-sm p-8 shadow-sm">
+              <h4 className="font-heading text-2xl font-bold text-primary border-b border-border-light pb-4 mb-6">
                 Your Order
               </h4>
 
               <div className="flex flex-col gap-6 mb-8 max-h-[300px] overflow-y-auto pr-2">
                 {items.map(i => (
                   <div key={i._key} className="flex gap-4 items-center">
-                    <div className="w-16 h-20 bg-[var(--color-border-light)] rounded-sm overflow-hidden flex-shrink-0">
+                    <div className="w-16 h-20 bg-border-light rounded-sm overflow-hidden flex-shrink-0">
                       <img 
                         src={i.image} 
                         alt={i.name} 
@@ -321,31 +321,31 @@ export default function Checkout() {
                       />
                     </div>
                     <div className="flex-1">
-                      <p className="font-heading text-sm font-bold text-[var(--color-primary)] leading-tight mb-1">{i.name}</p>
-                      {i.size && <p className="font-body text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] mb-1">Size: {i.size}</p>}
-                      <p className="font-body text-xs font-bold text-[var(--color-text)]">₹{(i.price).toLocaleString()} <span className="font-normal text-[var(--color-text-muted)] ml-1">× {i.quantity}</span></p>
+                      <p className="font-heading text-sm font-bold text-primary leading-tight mb-1">{i.name}</p>
+                      {i.size && <p className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted mb-1">Size: {i.size}</p>}
+                      <p className="font-body text-xs font-bold text-text">₹{(i.price).toLocaleString()} <span className="font-normal text-text-muted ml-1">× {i.quantity}</span></p>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="border-t border-[var(--color-border-light)] pt-6 flex flex-col gap-3">
-                <div className="flex justify-between font-body text-sm text-[var(--color-text-muted)]">
+              <div className="border-t border-border-light pt-6 flex flex-col gap-3">
+                <div className="flex justify-between font-body text-sm text-text-muted">
                   <span>Subtotal</span><span>₹{itemsPrice.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between font-body text-sm text-[var(--color-text-muted)]">
-                  <span>Delivery</span><span className="font-bold text-[var(--color-accent-dark)] uppercase text-[10px] tracking-widest mt-0.5">{shippingPrice === 0 ? 'Complimentary' : `₹${shippingPrice}`}</span>
+                <div className="flex justify-between font-body text-sm text-text-muted">
+                  <span>Delivery</span><span className="font-bold text-accent-dark uppercase text-[10px] tracking-widest mt-0.5">{shippingPrice === 0 ? 'Complimentary' : `₹${shippingPrice}`}</span>
                 </div>
                 {taxPrice > 0 && (
-                  <div className="flex justify-between font-body text-sm text-[var(--color-text-muted)]">
+                  <div className="flex justify-between font-body text-sm text-text-muted">
                     <span>Tax</span><span>₹{taxPrice}</span>
                   </div>
                 )}
               </div>
 
-              <div className="border-t border-[var(--color-border-light)] pt-6 mt-6 flex justify-between items-end">
-                <span className="font-heading text-xl font-bold text-[var(--color-primary)]">Total</span>
-                <span className="font-body text-2xl font-bold text-[var(--color-cta)]">₹{totalPrice.toLocaleString()}</span>
+              <div className="border-t border-border-light pt-6 mt-6 flex justify-between items-end">
+                <span className="font-heading text-xl font-bold text-primary">Total</span>
+                <span className="font-body text-2xl font-bold text-cta">₹{totalPrice.toLocaleString()}</span>
               </div>
             </div>
           </div>

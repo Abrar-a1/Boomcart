@@ -32,11 +32,11 @@ export default function BridalCatalog() {
   );
 
   return (
-    <div className="w-full bg-[var(--color-background)] min-h-[60vh]">
+    <div className="w-full bg-background min-h-[60vh]">
       <Helmet><title>Bridal & Couture — Boomcart</title></Helmet>
 
       {/* ── Hero Banner ── */}
-      <div className="relative overflow-hidden min-h-[400px] bg-[var(--color-background)] flex items-center">
+      <div className="relative overflow-hidden min-h-[400px] bg-background flex items-center">
         <img
           src="/images/bridal-hero.png"
           alt="Bridal Couture"
@@ -46,14 +46,14 @@ export default function BridalCatalog() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent lg:from-black/70 lg:via-black/20 lg:to-transparent" />
 
         {/* Decorative elements */}
-        <div className="absolute top-6 left-6 w-10 h-10 border-l-2 border-t-2 border-[var(--color-accent)] opacity-60" />
-        <div className="absolute bottom-6 right-6 w-10 h-10 border-r-2 border-b-2 border-[var(--color-accent)] opacity-60" />
-        <div className="animate-float absolute top-10 right-20 text-2xl text-[var(--color-accent)] opacity-50">✦</div>
-        <div className="animate-float absolute bottom-12 left-16 text-lg text-[var(--color-accent)] opacity-40" style={{ animationDelay: '1.5s' }}>❖</div>
+        <div className="absolute top-6 left-6 w-10 h-10 border-l-2 border-t-2 border-accent opacity-60" />
+        <div className="absolute bottom-6 right-6 w-10 h-10 border-r-2 border-b-2 border-accent opacity-60" />
+        <div className="animate-float absolute top-10 right-20 text-2xl text-accent opacity-50">✦</div>
+        <div className="animate-float absolute bottom-12 left-16 text-lg text-accent opacity-40" style={{ animationDelay: '1.5s' }}>❖</div>
 
         <PageContainer className="relative z-10 py-16 text-center">
           <nav className="flex items-center justify-center gap-2 text-sm mb-8">
-            <Link to="/" className="text-white hover:text-[var(--color-accent)] transition-colors inline-flex items-center gap-1">
+            <Link to="/" className="text-white hover:text-accent transition-colors inline-flex items-center gap-1">
               <FiArrowLeft size={14} /> Home
             </Link>
             <span className="text-white/40">/</span>
@@ -93,15 +93,15 @@ export default function BridalCatalog() {
             {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         ) : products.length === 0 ? (
-          <div className="text-center py-16 bg-white border border-[var(--color-border-light)] rounded-sm">
-            <div className="w-20 h-20 bg-[var(--color-background)] rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
+          <div className="text-center py-16 bg-white border border-border-light rounded-sm">
+            <div className="w-20 h-20 bg-background rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
               👰
             </div>
-            <h3 className="font-heading text-2xl text-[var(--color-primary)] font-bold mb-2">Bridal collection coming soon</h3>
-            <p className="text-[var(--color-text-muted)] max-w-[320px] mx-auto mb-6 leading-[1.6]">
+            <h3 className="font-heading text-2xl text-primary font-bold mb-2">Bridal collection coming soon</h3>
+            <p className="text-text-muted max-w-[320px] mx-auto mb-6 leading-[1.6]">
               Our designers are crafting something special for you.
             </p>
-            <Link to="/" className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-primary)] text-white font-bold text-sm rounded-sm hover:opacity-90 transition-opacity">
+            <Link to="/" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold text-sm rounded-sm hover:opacity-90 transition-opacity">
               Browse All Products
             </Link>
           </div>
