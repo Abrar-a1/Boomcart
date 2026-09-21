@@ -2,6 +2,9 @@
   "name": "boomcart",
   "version": "1.0.0",
   "description": "Boomcart Fashion E-commerce",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd backend && npm run dev",
