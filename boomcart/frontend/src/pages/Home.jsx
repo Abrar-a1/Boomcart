@@ -94,7 +94,7 @@ export default function Home() {
           </div>
           
           <PageContainer className="relative h-full flex flex-col justify-center items-start z-10 pt-16">
-            <span className="font-body text-[10px] lg:text-xs font-bold uppercase tracking-[0.25em] text-white mb-4 md:mb-6 bg-black/30 px-4 py-2 backdrop-blur-sm rounded-sm border border-white/20">
+            <span className="font-body text-xs lg:text-sm font-bold text-white mb-4 md:mb-6 bg-black/30 px-4 py-2 backdrop-blur-sm rounded-sm border border-white/20">
               Bridal Couture 2026
             </span>
             <h1 className="font-heading text-5xl md:text-6xl lg:text-8xl text-white font-bold leading-[1.1] mb-4 md:mb-6 max-w-[800px] drop-shadow-lg">
@@ -127,7 +127,7 @@ export default function Home() {
       {!hasFilters && (
         <section className="mb-16 md:mb-24 lg:mb-32 w-full animate-smooth-reveal">
           <PageContainer>
-            <div className="flex justify-between items-end mb-8 md:mb-12">
+            <div className={`flex justify-between items-end ${featured.length > 0 ? 'mb-8 md:mb-12' : 'mb-4'}`}>
             <div>
               <h2 className="font-heading text-3xl lg:text-4xl font-bold text-primary">New Arrivals</h2>
             </div>
@@ -142,10 +142,10 @@ export default function Home() {
           </div>
           
           {featuredError ? (
-            <EmptyState 
-              title="Unable to load collection" 
-              description={featuredError} 
-              action={<button onClick={fetchFeatured} className="px-6 py-3 bg-primary text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm">Try Again</button>} 
+            <EmptyState
+              title="Curating our collection"
+              description="We are currently updating our new arrivals. Please check back shortly."
+              action={<button onClick={fetchFeatured} className="px-6 py-3 bg-primary text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm">Try Again</button>}
             />
           ) : featured.length === 0 ? (
             <p className="text-center font-body text-sm text-text-muted py-12">New arrivals coming soon.</p>
@@ -178,12 +178,12 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8">
             
-            <button onClick={() => navigate('/?category=women')} className="group relative aspect-[3/4] md:aspect-auto md:h-full lg:aspect-[4/5] overflow-hidden rounded-sm bg-border-light flex flex-col justify-end p-8 lg:p-12 text-left">
+            <button onClick={() => navigate('/?category=women')} className="group relative aspect-[3/4] md:aspect-auto md:h-full lg:aspect-[4/5] overflow-hidden rounded-sm bg-border-light flex flex-col justify-end p-6 md:p-8 text-left">
               <img src="/images/category-women.png" alt="Women" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-90" />
               <div className="relative z-10">
                 <h3 className="font-heading text-4xl lg:text-5xl text-white font-bold mb-3">Women</h3>
-                <span className="inline-flex items-center gap-2 font-body text-[10px] font-bold uppercase tracking-widest text-white/90 group-hover:text-accent transition-colors">
+                <span className="inline-flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-white/90 group-hover:text-accent transition-colors">
                   Shop Now <FiArrowRight size={12} />
                 </span>
               </div>
@@ -195,24 +195,25 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-90" />
                 <div className="relative z-10">
                   <h3 className="font-heading text-3xl lg:text-4xl text-white font-bold mb-2">Men</h3>
-                  <span className="font-body text-[10px] font-bold uppercase tracking-widest text-white/90 group-hover:text-accent transition-colors">Shop Now</span>
+                  <span className="font-body text-xs font-bold uppercase tracking-widest text-white/90 group-hover:text-accent transition-colors">Shop Now</span>
                 </div>
               </button>
 
               <div className="grid grid-cols-2 gap-4 lg:gap-8 h-full">
-                <button onClick={() => navigate('/kids')} className="group relative aspect-square md:aspect-auto overflow-hidden rounded-sm bg-border-light flex flex-col justify-end p-5 md:p-6 text-left h-full">
+                <button onClick={() => navigate('/kids')} className="group relative aspect-square md:aspect-auto overflow-hidden rounded-sm bg-border-light flex flex-col justify-end p-6 md:p-8 text-left h-full">
                   <img src="/images/kids-hero.png" alt="Kids" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-90" />
                   <div className="relative z-10">
                     <h3 className="font-heading text-2xl lg:text-3xl text-white font-bold mb-2">Kids</h3>
-                    <span className="font-body text-[10px] font-bold uppercase tracking-widest text-white/90 group-hover:text-accent transition-colors">Shop Now</span>
+                    <span className="font-body text-xs font-bold uppercase tracking-widest text-white/90 group-hover:text-accent transition-colors">Shop Now</span>
                   </div>
                 </button>
-                <button onClick={() => navigate('/bridal')} className="group relative aspect-square md:aspect-auto overflow-hidden rounded-sm bg-border-light flex flex-col justify-end p-5 md:p-6 text-left h-full">
-                  <div className="absolute inset-0 bg-primary transition-transform duration-1000 ease-out group-hover:scale-105" />
+                <button onClick={() => navigate('/bridal')} className="group relative aspect-square md:aspect-auto overflow-hidden rounded-sm bg-border-light flex flex-col justify-end p-6 md:p-8 text-left h-full">
+                  <img src="/images/bridal-hero.png" alt="Bridal" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-90" />
                   <div className="relative z-10">
-                    <h3 className="font-heading text-2xl lg:text-3xl text-accent font-bold mb-2">Bridal</h3>
-                    <span className="font-body text-[10px] font-bold uppercase tracking-widest text-white/90 transition-colors">Explore Edit</span>
+                    <h3 className="font-heading text-2xl lg:text-3xl text-white font-bold mb-2">Bridal</h3>
+                    <span className="font-body text-xs font-bold uppercase tracking-widest text-white/90 transition-colors">Explore Edit</span>
                   </div>
                 </button>
               </div>
@@ -228,20 +229,20 @@ export default function Home() {
         <section className="mb-16 md:mb-24 lg:mb-40 animate-smooth-reveal">
           <PageContainer>
             <div className="flex flex-col lg:flex-row bg-primary text-background rounded-sm overflow-hidden shadow-sm">
-              <div className="w-full lg:w-1/2 px-6 py-12 md:p-16 lg:p-24 flex flex-col justify-center">
-                <span className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-accent mb-3 md:mb-4">
+              <div className="w-full lg:w-1/2 px-6 py-12 md:p-16 lg:p-24 flex flex-col justify-center items-center text-center">
+                <span className="font-body text-xs lg:text-sm font-bold text-accent mb-1 md:mb-2">
                   Bespoke Services
                 </span>
                 <h2 className="font-heading text-4xl lg:text-6xl font-bold mb-4 md:mb-6">
                   The Bridal Edit
                 </h2>
-                <p className="font-body text-sm lg:text-base opacity-80 max-w-[400px] mb-8 md:mb-10 leading-relaxed">
+                <p className="font-body text-sm lg:text-base opacity-80 max-w-[400px] mx-auto mb-8 md:mb-10 leading-relaxed">
                   Timeless pieces for unforgettable moments. Experience unparalleled craftsmanship and schedule a private consultation for your big day.
                 </p>
                 <div>
                   <button 
                     onClick={() => navigate('/bridal')}
-                    className="w-full sm:w-auto px-8 py-3.5 md:py-4 bg-transparent border border-accent text-accent font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-accent hover:text-primary transition-colors focus-visible:outline"
+                    className="w-full sm:w-auto px-8 py-3.5 md:py-4 bg-accent text-primary font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-white transition-colors focus-visible:outline"
                   >
                     Explore Bridal
                   </button>
@@ -287,7 +288,7 @@ export default function Home() {
         
         {hasFilters && (
           <div className="mb-16 border-b border-border-light pb-8 animate-smooth-reveal">
-            <span className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted mb-4 block">
+            <span className="font-body text-xs font-bold uppercase tracking-[0.2em] text-text-muted mb-4 block">
               Curated Edit
             </span>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -316,7 +317,7 @@ export default function Home() {
               </span>
               <button
                 onClick={() => setMobileFilter(true)}
-                className="flex items-center gap-2 px-5 py-2.5 border border-primary text-primary font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-primary hover:text-white transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 border border-primary text-primary font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-primary hover:text-white transition-colors"
               >
                 <FiFilter size={14} /> Filter
               </button>
@@ -327,10 +328,10 @@ export default function Home() {
                 {Array.from({ length: 10 }).map((_, i) => <SkeletonCard key={i} />)}
               </div>
             ) : error ? (
-              <EmptyState 
-                title="Something went wrong" 
-                description={error} 
-                action={<button onClick={() => window.location.reload()} className="px-6 py-3 bg-primary text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm">Try Again</button>} 
+              <EmptyState
+                title="Updating Collection"
+                description="We are experiencing a slight delay in loading our catalog. Please try refreshing the page."
+                action={<button onClick={() => window.location.reload()} className="px-6 py-3 bg-primary text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm">Refresh Page</button>}
               />
             ) : products.length === 0 ? (
               <EmptyState 
@@ -339,7 +340,7 @@ export default function Home() {
                 action={hasFilters && (
                   <button
                     onClick={clearFilters}
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors"
                   >
                     Clear Refinements
                   </button>

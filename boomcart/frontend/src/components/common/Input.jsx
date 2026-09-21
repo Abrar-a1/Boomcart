@@ -19,13 +19,13 @@ const Input = forwardRef(({
   const variantStyles = {
     default: "bg-white border border-border rounded-sm text-text focus:border-primary focus:ring-1 focus:ring-primary disabled:bg-background placeholder:text-text-light",
     glass: "bg-transparent border-0 border-b border-white/40 rounded-none text-white focus:border-white focus:ring-0 placeholder:text-white/60 focus:bg-white/5 disabled:bg-transparent px-0",
-    slider: "bg-transparent border-0 border-b border-white/60 rounded-none text-white focus:border-white focus:ring-0 placeholder:text-white/40 disabled:bg-transparent px-0 py-2 min-h-[40px] text-[15px]"
+    slider: "bg-transparent border-0 border-b border-white/60 rounded-none text-white focus:border-white focus:ring-0 placeholder:text-white/40 disabled:bg-transparent px-0 py-2 min-h-[40px] text-sm"
   };
 
   const labelStyles = {
     default: "text-xs font-bold uppercase tracking-widest text-text",
     glass: "text-xs font-bold uppercase tracking-widest text-white/90",
-    slider: "text-[13px] font-medium text-white/90"
+    slider: "text-sm font-medium text-white/90"
   };
 
   return (

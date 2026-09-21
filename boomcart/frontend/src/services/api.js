@@ -34,6 +34,16 @@ api.interceptors.response.use(
   async (err) => {
     const originalConfig = err.config;
 
+    // Handle CSRF token failures – re-fetch token and retry once (fixes mobile cookie issues)
+    if (err.response?.status === 403 && !originalConfig._csrfRetry) {
+      const msg = err.response?.data?.message || '';
+      if (msg.toLowerCase().includes('csrf')) {
+        originalConfig._csrfRetry = true;
+        await api.get('/auth/csrf'); // refresh the XSRF-TOKEN cookie
+        return api(originalConfig);  // retry the original request
+      }
+    }
+
     // If 401 and it's not the login or refresh route itself, try refreshing
     if (err.response?.status === 401 && !originalConfig.url.includes('/auth/login') && !originalConfig.url.includes('/auth/refresh')) {
       

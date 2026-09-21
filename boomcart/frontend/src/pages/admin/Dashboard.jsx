@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiGrid, FiPackage, FiUsers, FiShoppingBag, FiDollarSign, FiTrendingUp, FiClock, FiCheckCircle } from 'react-icons/fi';
+import { FiGrid, FiPackage, FiUsers, FiShoppingBag, FiShield, FiDollarSign, FiTrendingUp, FiClock, FiCheckCircle } from 'react-icons/fi';
 import { getDashboardStats } from '../../services/orderService';
+import { useAuth } from '../../context/AuthContext';
 import Loader from '../../components/common/Loader';
 import { Helmet } from 'react-helmet-async';
 import './Admin.css';
@@ -9,11 +10,13 @@ import './Admin.css';
 /* ── Shared Sidebar Navigation ────────────────────────────── */
 function AdminNav() {
   const { pathname } = useLocation();
+  const { isSuperAdmin } = useAuth();
   const links = [
     { to:'/admin',          label:'Dashboard',  Icon:FiGrid },
     { to:'/admin/products', label:'Products',   Icon:FiShoppingBag },
     { to:'/admin/orders',   label:'Orders',     Icon:FiPackage },
     { to:'/admin/users',    label:'Users',      Icon:FiUsers },
+    ...(isSuperAdmin ? [{ to:'/admin/admin-management', label:'Admins', Icon:FiShield }] : []),
   ];
 
   return (

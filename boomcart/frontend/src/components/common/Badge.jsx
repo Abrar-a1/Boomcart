@@ -9,7 +9,7 @@ const Badge = ({ children, variant = 'neutral', className = '', ...props }) => {
 
   return (
     <span 
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full font-body text-[10px] uppercase tracking-widest font-bold ${variants[variant]} ${className}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full font-body text-xs uppercase tracking-widest font-bold ${variants[variant]} ${className}`}
       {...props}
     >
       {children}

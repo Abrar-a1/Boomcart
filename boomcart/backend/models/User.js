@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   name:  { type: String, required: true, trim: true, maxlength: 50 },
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true, minlength: 6, select: false },
-  role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  role: { type: String, enum: ['customer', 'admin', 'superadmin'], default: 'customer' },
   avatar: { url: { type: String, default: '' }, publicId: { type: String, default: '' } },
   addresses: [addressSchema],
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],

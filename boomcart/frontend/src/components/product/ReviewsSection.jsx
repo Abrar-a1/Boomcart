@@ -160,7 +160,7 @@ export default function ReviewsSection({ productId }) {
             <div key={review._id} className="border-b border-border-light pb-8 last:border-0 animate-smooth-reveal">
               <div className="flex justify-between items-start mb-3">
                 <StarRating rating={review.rating} />
-                <span className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted">{new Date(review.createdAt).toLocaleDateString('en-IN')}</span>
+                <span className="font-body text-xs font-bold uppercase tracking-widest text-text-muted">{new Date(review.createdAt).toLocaleDateString('en-IN')}</span>
               </div>
               <h4 className="font-heading text-xl font-bold text-primary mb-2">{review.title}</h4>
               <p className="font-body text-sm text-text mb-6 leading-relaxed opacity-90">{review.comment}</p>
@@ -172,7 +172,7 @@ export default function ReviewsSection({ productId }) {
                 <div>
                   <p className="font-body text-xs font-bold uppercase tracking-widest text-text">{review.user?.name}</p>
                   {review.isVerifiedPurchase && (
-                    <p className="font-body text-[10px] text-success font-bold flex items-center gap-1 mt-1 uppercase tracking-widest">
+                    <p className="font-body text-xs text-success font-bold flex items-center gap-1 mt-1 uppercase tracking-widest">
                       <FiCheckCircle size={10} /> Verified Purchase
                     </p>
                   )}

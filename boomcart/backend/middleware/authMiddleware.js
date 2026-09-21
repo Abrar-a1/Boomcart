@@ -19,10 +19,18 @@ const protect = asyncHandler(async (req, res, next) => {
   res.status(401); throw new Error('Not authorized, no token');
 });
 
-const admin = (req, res, next) => {
-  if (req.user?.role === 'admin') return next();
+// Flexible role-based authorization: requireRole('admin', 'superadmin')
+const requireRole = (...roles) => (req, res, next) => {
+  if (!req.user) {
+    res.status(401);
+    return next(new Error('Authentication required'));
+  }
+  if (roles.includes(req.user.role)) return next();
   res.status(403);
-  return next(new Error('Admin access required'));
+  return next(new Error('Insufficient permissions'));
 };
 
-module.exports = { protect, admin };
+// Backward-compatible alias: allows both admin and superadmin
+const admin = requireRole('admin', 'superadmin');
+
+module.exports = { protect, admin, requireRole };

@@ -82,7 +82,7 @@ export default function KidsCatalog() {
             <span className="text-white/90 font-semibold">Kids</span>
           </nav>
 
-          <span className="inline-block text-[10px] font-bold tracking-[0.2em] uppercase text-white mb-6 bg-black/30 px-4 py-2 backdrop-blur-sm rounded-sm border border-white/20">
+          <span className="inline-block text-xs font-bold tracking-[0.2em] uppercase text-white mb-6 bg-black/30 px-4 py-2 backdrop-blur-sm rounded-sm border border-white/20">
             For Little Ones
           </span>
           <h1 className="font-heading text-5xl lg:text-7xl font-bold text-white leading-[1.1] mb-6 drop-shadow-lg">

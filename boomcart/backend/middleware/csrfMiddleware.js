@@ -9,8 +9,9 @@ const setCsrfCookie = (req, res, next) => {
     res.cookie('XSRF-TOKEN', csrfToken, {
       httpOnly: false, // Must be readable by frontend JS (Axios)
       secure: process.env.NODE_ENV !== 'development',
-      sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'strict',
+      sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
       path: '/',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours – keeps token alive across navigation
     });
   }
   next();

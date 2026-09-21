@@ -322,7 +322,7 @@ export default function Checkout() {
                     </div>
                     <div className="flex-1">
                       <p className="font-heading text-sm font-bold text-primary leading-tight mb-1">{i.name}</p>
-                      {i.size && <p className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted mb-1">Size: {i.size}</p>}
+                      {i.size && <p className="font-body text-xs font-bold uppercase tracking-widest text-text-muted mb-1">Size: {i.size}</p>}
                       <p className="font-body text-xs font-bold text-text">₹{(i.price).toLocaleString()} <span className="font-normal text-text-muted ml-1">× {i.quantity}</span></p>
                     </div>
                   </div>
@@ -334,7 +334,7 @@ export default function Checkout() {
                   <span>Subtotal</span><span>₹{itemsPrice.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between font-body text-sm text-text-muted">
-                  <span>Delivery</span><span className="font-bold text-accent-dark uppercase text-[10px] tracking-widest mt-0.5">{shippingPrice === 0 ? 'Complimentary' : `₹${shippingPrice}`}</span>
+                  <span>Delivery</span><span className="font-bold text-accent-dark uppercase text-xs tracking-widest mt-0.5">{shippingPrice === 0 ? 'Complimentary' : `₹${shippingPrice}`}</span>
                 </div>
                 {taxPrice > 0 && (
                   <div className="flex justify-between font-body text-sm text-text-muted">

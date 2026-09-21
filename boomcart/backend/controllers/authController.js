@@ -114,8 +114,8 @@ const verifyOtp = asyncHandler(async (req, res) => {
     if (!name || !password) { res.status(400); throw new Error('Name and password required for signup'); }
     if (await User.findOne({ email })) { res.status(400); throw new Error('Email already registered'); }
 
-    // Explicitly enforce role as 'user' for public signups to prevent privilege escalation
-    const role = 'user';
+    // Explicitly enforce role as 'customer' for public signups to prevent privilege escalation
+    const role = 'customer';
     
     const user = await User.create({
       name,

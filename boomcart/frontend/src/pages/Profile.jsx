@@ -120,9 +120,9 @@ export default function Profile() {
             </div>
             <p className="font-heading text-xl font-bold text-white mb-1">{user?.name}</p>
             <p className="font-body text-xs text-white/60 mb-2">{user?.email}</p>
-            {user?.role === 'admin' && (
-              <span className="inline-flex items-center gap-1.5 mt-2 bg-accent/20 text-accent font-body text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm">
-                <FiShield size={12}/> ADMIN
+            {(user?.role === 'admin' || user?.role === 'superadmin') && (
+              <span className="inline-flex items-center gap-1.5 mt-2 bg-accent/20 text-accent font-body text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-sm">
+                <FiShield size={12}/> {user.role === 'superadmin' ? 'SUPER ADMIN' : 'ADMIN'}
               </span>
             )}
           </div>
@@ -196,10 +196,10 @@ export default function Profile() {
                           <p className="font-body text-xs text-text-muted mt-1">{new Date(o.createdAt).toLocaleDateString('en-IN')}</p>
                         </div>
                         <div className="flex items-center gap-4">
-                          <span className={`font-body text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-sm ${STATUS_BADGE[o.orderStatus]||'bg-gray-100 text-gray-800'}`}>
+                          <span className={`font-body text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-sm ${STATUS_BADGE[o.orderStatus]||'bg-gray-100 text-gray-800'}`}>
                             {o.orderStatus}
                           </span>
-                          <Link to={`/order/${o._id}`} className="inline-flex items-center gap-2 px-4 py-2 border border-primary text-primary font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-primary hover:text-white transition-colors" aria-label={`Track order ${o._id.slice(-8).toUpperCase()}`}>
+                          <Link to={`/order/${o._id}`} className="inline-flex items-center gap-2 px-4 py-2 border border-primary text-primary font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-primary hover:text-white transition-colors" aria-label={`Track order ${o._id.slice(-8).toUpperCase()}`}>
                             <FiEye size={12}/> Track
                           </Link>
                         </div>
@@ -233,7 +233,7 @@ export default function Profile() {
               <div className="flex justify-between items-center mb-10">
                 <h2 className="font-heading text-3xl font-bold text-primary">Saved Addresses</h2>
                 <button 
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors" 
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-black transition-colors"
                   onClick={() => setShowAddrForm(!showAddrForm)}
                 >
                   <FiPlus size={14}/> {showAddrForm ? 'Cancel' : 'Add New'}
@@ -282,7 +282,7 @@ export default function Profile() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {addresses.map(a => (
                     <div key={a._id} className="relative border border-border rounded-sm p-6 flex flex-col items-start gap-4 hover:border-primary transition-colors group">
-                      {a.isDefault && <span className="absolute top-6 right-16 bg-background border border-border-light text-primary font-body text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm">Default</span>}
+                      {a.isDefault && <span className="absolute top-6 right-16 bg-background border border-border-light text-primary font-body text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm">Default</span>}
                       <button onClick={() => removeAddress(a._id)} className="absolute top-6 right-6 text-text-light hover:text-cta transition-colors" title="Remove" aria-label={`Remove address for ${a.fullName}`}>
                         <FiTrash2 size={18}/>
                       </button>
@@ -323,8 +323,8 @@ export default function Profile() {
                         </Link>
                         <div className="p-4 bg-white flex flex-col gap-2">
                           <Link to={`/product/${item._id}`} className="font-heading text-lg font-bold text-primary leading-tight group-hover:text-accent-dark transition-colors line-clamp-1">{item.name}</Link>
-                          <p className="font-body text-[15px] font-bold text-text mb-2">₹{price.toLocaleString()}</p>
-                          <button className="w-full py-2.5 bg-white border border-primary text-primary font-body text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-primary hover:text-white transition-colors"
+                          <p className="font-body text-sm font-bold text-text mb-2">₹{price.toLocaleString()}</p>
+                          <button className="w-full py-2.5 bg-white border border-primary text-primary font-body text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-primary hover:text-white transition-colors"
                             onClick={() => addToCart(item, 1, item.sizes?.[0]||'', item.colors?.[0]||'')}>
                             Add to Bag
                           </button>

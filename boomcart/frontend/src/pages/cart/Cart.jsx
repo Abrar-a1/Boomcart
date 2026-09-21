@@ -45,7 +45,7 @@ export default function Cart() {
               </div>
               <button
                 onClick={clearCart}
-                className="font-body text-[11px] font-bold uppercase tracking-widest text-text-muted hover:text-cta transition-colors focus-visible:outline"
+                className="font-body text-xs font-bold uppercase tracking-widest text-text-muted hover:text-cta transition-colors focus-visible:outline"
               >
                 Clear Bag
               </button>
@@ -71,7 +71,7 @@ export default function Cart() {
                         <h3 className="font-heading text-xl lg:text-2xl font-bold text-primary leading-tight mb-1 line-clamp-2">
                           {item.name}
                         </h3>
-                        <p className="font-body text-[11px] font-bold uppercase tracking-widest text-text-muted mb-4 block">
+                        <p className="font-body text-xs font-bold uppercase tracking-widest text-text-muted mb-4 block">
                           Size: {item.size || 'N/A'}
                         </p>
                       </div>
@@ -106,7 +106,7 @@ export default function Cart() {
                       {/* Remove */}
                       <button
                         onClick={() => removeFromCart(item._key)}
-                        className="font-body text-[11px] font-bold uppercase tracking-widest text-text-muted hover:text-cta transition-colors flex items-center gap-1.5 focus-visible:outline"
+                        className="font-body text-xs font-bold uppercase tracking-widest text-text-muted hover:text-cta transition-colors flex items-center gap-1.5 focus-visible:outline"
                       >
                         <FiTrash2 size={14} /> Remove
                       </button>

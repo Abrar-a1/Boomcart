@@ -43,7 +43,7 @@ export default function ProductCard({ product }) {
         
         {/* Minimal Badge */}
         {discount > 0 && (
-          <span className="absolute top-4 left-4 font-body text-[10px] font-bold uppercase tracking-widest text-white bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-sm">
+          <span className="absolute top-4 left-4 font-body text-xs font-bold uppercase tracking-widest text-white bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-sm">
             {discount}% Off
           </span>
         )}
@@ -51,7 +51,7 @@ export default function ProductCard({ product }) {
         {/* Out of stock overlay */}
         {product.stock === 0 && (
           <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] flex items-center justify-center">
-            <span className="font-body text-[10px] font-bold uppercase tracking-widest text-primary bg-white/90 px-4 py-2 rounded-sm shadow-sm">Out of Stock</span>
+            <span className="font-body text-xs font-bold uppercase tracking-widest text-primary bg-white/90 px-4 py-2 rounded-sm shadow-sm">Out of Stock</span>
           </div>
         )}
 
@@ -71,7 +71,7 @@ export default function ProductCard({ product }) {
         
         <div className="flex items-start justify-between gap-4 mb-2">
           {/* Brand / Category */}
-          <span className="font-body text-[9px] lg:text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted">
+          <span className="font-body text-xs lg:text-xs font-bold uppercase tracking-[0.2em] text-text-muted">
             {product.brand || product.category}
           </span>
           
@@ -79,7 +79,7 @@ export default function ProductCard({ product }) {
           {(product.numReviews > 0) && (
             <div className="flex items-center gap-1 shrink-0">
               <FiStar size={10} className="text-accent fill-current" />
-              <span className="font-body text-[10px] font-bold text-text-muted">{product.ratings?.toFixed(1)}</span>
+              <span className="font-body text-xs font-bold text-text-muted">{product.ratings?.toFixed(1)}</span>
             </div>
           )}
         </div>

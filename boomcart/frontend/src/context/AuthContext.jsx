@@ -116,10 +116,15 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
+  // Role helpers: superadmin has all admin privileges
+  const isSuperAdmin = user?.role === 'superadmin';
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+
   return (
     <AuthContext.Provider value={{
       user, loading, login, register, verifyRegistration, logout, updateUser,
-      isAdmin: user?.role === 'admin',
+      isAdmin,
+      isSuperAdmin,
       wishlistIds, refreshWishlist, toggleWishlistId,
     }}>
       {children}

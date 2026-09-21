@@ -182,7 +182,7 @@ export default function Navbar() {
                 aria-label="Search"
               >
                 <FiSearch size={18} />
-                <span className="font-body text-[10px] font-bold tracking-[0.1em] uppercase">Search</span>
+                <span className="font-body text-xs font-bold tracking-[0.1em] uppercase">Search</span>
               </button>
               
               {/* Expandable Search Panel */}
@@ -236,7 +236,7 @@ export default function Navbar() {
                   onClick={() => setDropOpen(!dropOpen)}
                   aria-expanded={dropOpen}
                   aria-haspopup="true"
-                  className="flex items-center justify-center w-8 h-8 text-[11px] font-bold text-primary bg-accent hover:opacity-90 transition-opacity rounded-full focus-visible:outline"
+                  className="flex items-center justify-center w-8 h-8 text-xs font-bold text-primary bg-accent hover:opacity-90 transition-opacity rounded-full focus-visible:outline"
                   aria-label="Account Menu"
                 >
                   {user.name?.[0]?.toUpperCase()}
@@ -244,7 +244,7 @@ export default function Navbar() {
               ) : (
                 <Link to="/login" className="hover:text-accent transition-colors flex items-center gap-2 focus-visible:outline">
                   <FiUser size={18} />
-                  <span className="font-body text-[10px] font-bold tracking-[0.1em] uppercase">Account</span>
+                  <span className="font-body text-xs font-bold tracking-[0.1em] uppercase">Account</span>
                 </Link>
               )}
               
@@ -293,7 +293,7 @@ export default function Navbar() {
                   </span>
                 )}
               </div>
-              <span className="hidden lg:block font-body text-[10px] font-bold tracking-[0.1em] uppercase">Bag</span>
+              <span className="hidden lg:block font-body text-xs font-bold tracking-[0.1em] uppercase">Bag</span>
             </Link>
             
           </div>

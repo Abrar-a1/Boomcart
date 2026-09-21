@@ -39,7 +39,7 @@ export default function ResetPassword() {
       
       <div className="w-full flex flex-col">
         <div className="mb-10 text-center">
-          <span className="block font-body text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted mb-3">SECURITY</span>
+          <span className="block font-body text-xs font-bold uppercase tracking-[0.2em] text-text-muted mb-3">SECURITY</span>
           <h1 className="font-heading text-4xl lg:text-5xl font-bold text-primary mb-4 tracking-tight">Create New Password</h1>
           <p className="font-body text-sm text-text-muted">Choose a strong password for your Boomcart account.</p>
         </div>

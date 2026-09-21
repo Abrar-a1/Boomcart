@@ -108,8 +108,16 @@ export default function Footer() {
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
             <span>Secure payments via</span>
-            {['Razorpay','UPI','VISA','AMEX'].map(p => (
-              <span key={p} style={{ fontWeight: 700, letterSpacing: '0.06em', color: 'rgba(255,255,255,0.7)' }}>{p}</span>
+            {['Razorpay','UPI','Visa','American Express'].map(p => (
+              <span key={p} style={{
+                fontWeight: 700,
+                letterSpacing: '0.04em',
+                color: '#fff',
+                backgroundColor: 'rgba(255,255,255,0.1)',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                border: '1px solid rgba(255,255,255,0.2)'
+              }}>{p}</span>
             ))}
           </div>
         </PageContainer>

@@ -60,20 +60,20 @@ export default function OrderTracking() {
 
         <div className="bg-white border border-border rounded-sm p-8 mb-8 flex flex-col md:flex-row gap-8 justify-between shadow-sm">
           <div className="flex flex-col gap-1">
-            <span className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted">Date</span>
+            <span className="font-body text-xs font-bold uppercase tracking-widest text-text-muted">Date</span>
             <span className="font-body text-sm font-bold text-text">{new Date(order.createdAt).toLocaleDateString('en-IN')}</span>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted">Total Amount</span>
+            <span className="font-body text-xs font-bold uppercase tracking-widest text-text-muted">Total Amount</span>
             <span className="font-body text-sm font-bold text-text">₹{order.totalPrice?.toLocaleString()}</span>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted">Payment</span>
+            <span className="font-body text-xs font-bold uppercase tracking-widest text-text-muted">Payment</span>
             <span className="font-body text-sm font-bold text-text uppercase">{order.paymentMethod}</span>
           </div>
           {order.trackingNumber && (
             <div className="flex flex-col gap-1">
-              <span className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted">Tracking ID</span>
+              <span className="font-body text-xs font-bold uppercase tracking-widest text-text-muted">Tracking ID</span>
               <span className="font-body text-sm font-bold text-text">{order.trackingNumber}</span>
             </div>
           )}
@@ -100,7 +100,7 @@ export default function OrderTracking() {
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${done ? 'bg-primary text-white shadow-md scale-110' : 'bg-white border-2 border-border text-text-light'}`}>
                       <Icon size={16} />
                     </div>
-                    <span className={`font-body text-[10px] uppercase tracking-widest text-center transition-colors ${done ? 'font-bold text-primary' : 'font-medium text-text-light'}`}>
+                    <span className={`font-body text-xs uppercase tracking-widest text-center transition-colors ${done ? 'font-bold text-primary' : 'font-medium text-text-light'}`}>
                       {s.label}
                     </span>
                   </div>
@@ -132,7 +132,7 @@ export default function OrderTracking() {
                 </div>
                 <div className="flex-1">
                   <p className="font-heading text-lg font-bold text-primary mb-1 leading-tight">{item.name}</p>
-                  {item.size && <p className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">Size: {item.size}</p>}
+                  {item.size && <p className="font-body text-xs font-bold uppercase tracking-widest text-text-muted mb-2">Size: {item.size}</p>}
                   <p className="font-body text-xs text-text">₹{item.price.toLocaleString()} × {item.quantity}</p>
                 </div>
                 <p className="font-body text-sm font-bold text-text">₹{(item.price * item.quantity).toLocaleString()}</p>

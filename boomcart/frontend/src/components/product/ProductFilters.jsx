@@ -11,9 +11,10 @@ export default function ProductFilters({ onClose }) {
   const [params, setParams] = useSearchParams();
   const [expanded, setExpanded] = useState({
     category: true,
-    subCategory: true,
-    price: true,
-    sort: true
+    subCategory: false,
+    price: false,
+    sort: false,
+    featured: false
   });
 
   const toggleSection = (section) => {
@@ -37,7 +38,7 @@ export default function ProductFilters({ onClose }) {
         <h3 className="font-heading text-xl font-bold text-primary">Filters</h3>
         <button 
           onClick={clearAll}
-          className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted hover:text-primary transition-colors focus-visible:outline"
+          className="font-body text-xs font-bold uppercase tracking-widest text-text-muted hover:text-primary underline transition-colors focus-visible:outline"
         >
           Clear All
         </button>
@@ -45,7 +46,7 @@ export default function ProductFilters({ onClose }) {
 
       <div className="flex-1 overflow-y-auto lg:overflow-visible">
         {/* ── Sort Section ── */}
-        <div className="mb-6">
+        <div className="mb-4">
           <button
             onClick={() => toggleSection('sort')}
             className="w-full flex items-center justify-between py-3 md:py-2 group focus-visible:outline touch-manipulation"
@@ -76,7 +77,7 @@ export default function ProductFilters({ onClose }) {
         </div>
 
         {/* ── Category Section ── */}
-        <div className="mb-6 border-t border-border-light pt-4">
+        <div className="mb-4 border-t border-border-light pt-4">
           <button
             onClick={() => toggleSection('category')}
             className="w-full flex items-center justify-between py-3 md:py-2 group focus-visible:outline touch-manipulation"
@@ -106,7 +107,7 @@ export default function ProductFilters({ onClose }) {
         </div>
 
         {/* ── Product Type Section ── */}
-        <div className="mb-6 border-t border-border-light pt-4">
+        <div className="mb-4 border-t border-border-light pt-4">
           <button
             onClick={() => toggleSection('subCategory')}
             className="w-full flex items-center justify-between py-3 md:py-2 group focus-visible:outline touch-manipulation"
@@ -126,7 +127,7 @@ export default function ProductFilters({ onClose }) {
                     checked={active('subCategory', s)}
                     onChange={() => set('subCategory', active('subCategory', s) ? '' : s)}
                   />
-                  <span className={`font-body text-sm transition-colors truncate ${active('subCategory', s) ? 'font-bold text-primary' : 'text-text'}`}>
+                  <span className={`font-body text-sm transition-colors break-words ${active('subCategory', s) ? 'font-bold text-primary' : 'text-text'}`}>
                     {s.charAt(0).toUpperCase() + s.slice(1)}
                   </span>
                 </label>
@@ -136,7 +137,7 @@ export default function ProductFilters({ onClose }) {
         </div>
 
         {/* ── Price Range Section ── */}
-        <div className="mb-6 border-t border-border-light pt-4">
+        <div className="mb-4 border-t border-border-light pt-4">
           <button
             onClick={() => toggleSection('price')}
             className="w-full flex items-center justify-between py-3 md:py-2 group focus-visible:outline touch-manipulation"
@@ -178,18 +179,31 @@ export default function ProductFilters({ onClose }) {
         </div>
 
         {/* Featured Items Only */}
-        <div className="pt-4 border-t border-border-light">
-          <label className="flex items-center gap-3 cursor-pointer group py-3 md:py-2 touch-manipulation">
-            <input
-              type="checkbox"
-              className="w-4 h-4 accent-accent cursor-pointer rounded-sm"
-              checked={params.get('isFeatured') === 'true'}
-              onChange={() => set('isFeatured', params.get('isFeatured') === 'true' ? '' : 'true')}
-            />
-            <span className={`font-body text-sm transition-colors flex-1 ${params.get('isFeatured') === 'true' ? 'font-bold text-primary' : 'text-text'}`}>
-              Show Featured Only
+        <div className="mb-4 border-t border-border-light pt-4">
+          <button
+            onClick={() => toggleSection('featured')}
+            className="w-full flex items-center justify-between py-3 md:py-2 group focus-visible:outline touch-manipulation"
+          >
+            <h4 className="font-body text-xs font-bold uppercase tracking-[0.1em] text-primary">Featured</h4>
+            <span className="text-text-light group-hover:text-primary transition-colors">
+              {expanded.featured ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
             </span>
-          </label>
+          </button>
+          {expanded.featured && (
+            <div className="mt-3 flex flex-col gap-3 animate-slide-down">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 accent-accent cursor-pointer rounded-sm"
+                  checked={params.get('isFeatured') === 'true'}
+                  onChange={() => set('isFeatured', params.get('isFeatured') === 'true' ? '' : 'true')}
+                />
+                <span className={`font-body text-sm transition-colors flex-1 ${params.get('isFeatured') === 'true' ? 'font-bold text-primary' : 'text-text'}`}>
+                  Show Featured Only
+                </span>
+              </label>
+            </div>
+          )}
         </div>
       </div>
       

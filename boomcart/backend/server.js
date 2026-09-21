@@ -27,7 +27,31 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
 const initCronJobs  = require('./utils/cronJobs');
 
-connectDB();
+connectDB().then(async () => {
+  // Bootstrap roles after DB connection is established
+  try {
+    const User = require('./models/User');
+
+    // Migrate legacy 'user' role to 'customer'
+    const migrated = await User.updateMany({ role: 'user' }, { role: 'customer' });
+    if (migrated.modifiedCount > 0) {
+      console.log(`📋 Migrated ${migrated.modifiedCount} users from 'user' → 'customer'`);
+    }
+
+    // Bootstrap superadmin from environment variable (one-time ownership setup)
+    const superadminEmail = process.env.INITIAL_SUPERADMIN_EMAIL?.trim().toLowerCase();
+    if (superadminEmail) {
+      const user = await User.findOne({ email: superadminEmail });
+      if (user && user.role !== 'superadmin') {
+        user.role = 'superadmin';
+        await user.save({ validateBeforeSave: false });
+        console.log(`👑 Bootstrapped superadmin: ${superadminEmail}`);
+      }
+    }
+  } catch (err) {
+    console.error('Role bootstrap error:', err.message);
+  }
+});
 scheduleCloudinaryCleanup(); // Auto-delete expired media daily
 
 const app = express();

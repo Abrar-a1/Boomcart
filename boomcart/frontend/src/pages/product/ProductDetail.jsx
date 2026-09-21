@@ -231,7 +231,7 @@ export default function ProductDetail() {
           <div className="lg:sticky lg:top-32 flex flex-col">
 
             {/* Breadcrumbs / Category */}
-            <span className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted mb-4 block">
+            <span className="font-body text-xs font-bold uppercase tracking-[0.2em] text-text-muted mb-4 block">
               {product.brand || product.category} {product.subCategory ? ` / ${product.subCategory}` : ''}
             </span>
 
@@ -260,8 +260,8 @@ export default function ProductDetail() {
             {!isBridal && product.sizes?.length > 0 && (
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="font-body text-[10px] font-bold uppercase tracking-widest text-primary">Size</span>
-                  <button className="font-body text-[10px] font-bold uppercase tracking-widest text-text-muted hover:text-primary underline transition-colors">
+                  <span className="font-body text-xs font-bold uppercase tracking-widest text-primary">Size</span>
+                  <button className="font-body text-xs font-bold uppercase tracking-widest text-text-muted hover:text-primary underline transition-colors">
                     Size Guide
                   </button>
                 </div>
@@ -364,7 +364,7 @@ export default function ProductDetail() {
                   aria-expanded={activeAccordion === 'details'}
                   aria-controls="details-care-content"
                   onClick={() => setActiveAccordion(activeAccordion === 'details' ? '' : 'details')}
-                  className="w-full flex items-center justify-between py-5 font-body text-[11px] font-bold uppercase tracking-widest text-primary group focus-visible:outline"
+                  className="w-full flex items-center justify-between py-5 font-body text-xs font-bold uppercase tracking-widest text-primary group focus-visible:outline"
                 >
                   Details & Care
                   <span className="text-text-light group-hover:text-primary transition-colors">
@@ -389,7 +389,7 @@ export default function ProductDetail() {
                   aria-expanded={activeAccordion === 'delivery'}
                   aria-controls="delivery-returns-content"
                   onClick={() => setActiveAccordion(activeAccordion === 'delivery' ? '' : 'delivery')}
-                  className="w-full flex items-center justify-between py-5 font-body text-[11px] font-bold uppercase tracking-widest text-primary group focus-visible:outline"
+                  className="w-full flex items-center justify-between py-5 font-body text-xs font-bold uppercase tracking-widest text-primary group focus-visible:outline"
                 >
                   Delivery & Returns
                   <span className="text-text-light group-hover:text-primary transition-colors">
@@ -432,7 +432,7 @@ export default function ProductDetail() {
                 variant="outline"
                 onClick={handleAddToCart}
                 disabled={(!selectedSize && product.sizes?.length > 0) || isOutOfStock}
-                className="flex-1 h-12 font-bold uppercase tracking-widest text-[10px]"
+                className="flex-1 h-12 font-bold uppercase tracking-widest text-xs"
               >
                 Add to Bag
               </Button>
@@ -440,7 +440,7 @@ export default function ProductDetail() {
                 variant="primary"
                 onClick={handleBuyNow}
                 disabled={(!selectedSize && product.sizes?.length > 0) || isOutOfStock}
-                className="flex-1 h-12 font-bold uppercase tracking-widest text-[10px]"
+                className="flex-1 h-12 font-bold uppercase tracking-widest text-xs"
               >
                 {isOutOfStock ? 'Out of Stock' : (!selectedSize && product.sizes?.length > 0) ? 'Select Size' : 'Buy Now'}
               </Button>

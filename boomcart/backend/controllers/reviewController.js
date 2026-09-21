@@ -28,7 +28,7 @@ const getProductReviews = asyncHandler(async (req, res) => {
 const deleteReview = asyncHandler(async (req, res) => {
   const review = await Review.findById(req.params.id);
   if (!review) { res.status(404); throw new Error('Review not found'); }
-  if (review.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+  if (review.user.toString() !== req.user._id.toString() && req.user.role !== 'admin' && req.user.role !== 'superadmin') {
     res.status(403); throw new Error('Not authorized');
   }
   await Review.findByIdAndDelete(req.params.id);
